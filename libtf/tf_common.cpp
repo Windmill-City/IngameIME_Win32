@@ -9,6 +9,7 @@ Common::~Common()
 		pThreadMgr = NULL;
 	}
 	client_id = 0;
+	CoUninitialize();
 }
 
 HRESULT _stdcall Common::Initialize()

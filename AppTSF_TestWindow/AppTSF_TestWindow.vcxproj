@@ -149,11 +149,13 @@
   <ItemGroup>
     <ClInclude Include="AppTSF_TestWindow.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="InputMethod.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AppTSF_TestWindow.cpp" />
+    <ClCompile Include="InputMethod.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="AppTSF_TestWindow.rc" />
