@@ -1,17 +1,17 @@
 #pragma once
-#include "tf_common.h"
 #include "Document.h"
+
 class Context
 {
 public:
-	Document* document;
-	IUnknown* textStore;
+	IUnknown* m_pTextStore;
 
-	ITfContext* context;
-	TfEditCookie editCookie;
+	ITfContext* m_pCtx;
+	ITfContextOwnerServices* m_pCtxOwnerServices;
+	ITfContextOwnerCompositionServices* m_pCtxOwnerCompServices;
+	TfEditCookie m_EditCookie = TF_INVALID_COOKIE;
 
-	TF_API Context(Document* doc, IUnknown* punk);
-	TF_API ~Context();
-	TF_API VOID push();
-private:
+	TFAPI Context(Document* document);
+	TFAPI Context(Document* document, IUnknown* punk);
+	TFAPI ~Context();
 };

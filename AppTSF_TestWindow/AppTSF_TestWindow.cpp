@@ -24,15 +24,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
-	//COM MainThread
-	auto COMLoop = [] {
-		CoInitialize(NULL);
-		while (true) {}
-	};
-	std::thread COM_MainThread(COMLoop);
-	COM_MainThread.detach();
-
+	CoInitialize(NULL);
 	ime = new InputMethod();
+	ime->app->m_pThreadMgr->Activate(&(ime->app->m_ClientId));
 	ime->Initialize();
 
 	LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -94,8 +88,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		return FALSE;
 	}
 
-	CoInitializeEx(NULL, COINIT_MULTITHREADED);
-
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
 
@@ -134,15 +126,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		PostQuitMessage(0);
 		break;
 	case WM_SETFOCUS:
-		ime->doc->setFocus();
-		break;
-	case WM_KEYDOWN:
-		if (ime->app->onKeyDown(wParam, lParam, TRUE))
-			ime->app->onKeyDown(wParam, lParam, FALSE);
-		break;
-	case WM_KEYUP:
-		if (ime->app->onKeyUp(wParam, lParam, TRUE))
-			ime->app->onKeyUp(wParam, lParam, FALSE);
+		ime->app->m_pThreadMgr->SetFocus(ime->doc->m_pDocMgr);
 		break;
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);

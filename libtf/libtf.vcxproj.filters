@@ -36,6 +36,18 @@
     <ClInclude Include="Context.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="TextEditSink.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ContextOwner.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="COMBase.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TextStore.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -57,6 +69,18 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Context.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditSink.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ContextOwnerCompositionSink.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ContextOwner.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TextStore.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

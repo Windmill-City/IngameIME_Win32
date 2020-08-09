@@ -3,11 +3,11 @@
 class Document
 {
 public:
-	ITfDocumentMgr* docMgr;
-	Common* common;
+	ITfDocumentMgr* m_pDocMgr;
 
-	TF_API Document(Common* app);
-	TF_API ~Document();
-	TF_API VOID setFocus();
-private:
+	Common* m_Common;
+	HWND m_hWnd;
+
+	TFAPI Document(Common* common, HWND hWnd);
+	TFAPI ~Document();
 };

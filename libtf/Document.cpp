@@ -1,22 +1,18 @@
 #include "pch.h"
 #include "Document.h"
 
-Document::Document(Common* common)
+Document::Document(Common* common, HWND hWnd)
 {
-	this->common = common;
+	m_Common = common;
+	m_hWnd = hWnd;
 
-	this->common->pThreadMgr->CreateDocumentMgr(&docMgr);
+	m_Common->m_pThreadMgr->CreateDocumentMgr(&m_pDocMgr);
 }
 
 Document::~Document()
 {
-	if (docMgr) {
-		docMgr->Release();
-		docMgr = NULL;
+	if (m_pDocMgr) {
+		m_pDocMgr->Release();
+		m_pDocMgr = NULL;
 	}
-}
-
-VOID Document::setFocus()
-{
-	common->pThreadMgr->SetFocus(docMgr);
 }

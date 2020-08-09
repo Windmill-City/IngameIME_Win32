@@ -1,23 +1,13 @@
 #pragma once
+#include <vector>
 #include <msctf.h>
-#define TF_API  __declspec(dllexport)
-class Common :
-	public IUnknown
+#define TFAPI  __declspec(dllexport)
+class Common
 {
 public:
-	ITfThreadMgr* pThreadMgr;
-	TfClientId client_id;
-
-	ITfDocumentMgr* activeDocMgr;
-	ITfContext* activeContext;
+	ITfThreadMgr* m_pThreadMgr;
+	TfClientId m_ClientId;
 
 	~Common();
-	TF_API virtual HRESULT _stdcall Initialize();
-
-	//IUnknown
-	TF_API virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObject) override;
-	TF_API virtual ULONG __stdcall AddRef(void) override;
-	TF_API virtual ULONG __stdcall Release(void) override;
-private:
-	ULONG reference;
+	TFAPI virtual HRESULT _stdcall Initialize();
 };

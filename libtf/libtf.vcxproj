@@ -31,13 +31,14 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <CLRSupport>false</CLRSupport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
+    <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <CLRSupport>false</CLRSupport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -90,6 +91,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <CompileAsManaged>false</CompileAsManaged>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -107,6 +109,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <CompileAsManaged>false</CompileAsManaged>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -152,15 +155,21 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Context.h" />
+    <ClInclude Include="ContextOwner.h" />
     <ClInclude Include="Document.h" />
+    <ClInclude Include="COMBase.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="TextEditSink.h" />
+    <ClInclude Include="TextStore.h" />
     <ClInclude Include="tf_application.h" />
     <ClInclude Include="tf_common.h" />
     <ClInclude Include="tf_textservice.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Context.cpp" />
+    <ClCompile Include="ContextOwner.cpp" />
+    <ClCompile Include="ContextOwnerCompositionSink.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Document.cpp" />
     <ClCompile Include="pch.cpp">
@@ -169,6 +178,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="TextEditSink.cpp" />
+    <ClCompile Include="TextStore.cpp" />
     <ClCompile Include="tf_application.cpp" />
     <ClCompile Include="tf_common.cpp" />
     <ClCompile Include="tf_textservice.cpp" />
