@@ -18,5 +18,13 @@
     <ClCompile Include="ConsoleApplication1.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="TestItem2.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="TestItem2.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

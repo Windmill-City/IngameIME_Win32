@@ -72,23 +72,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\Windmill_City\source\repos\boost_1_74_0;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Windmill_City\source\repos\boost_1_74_0;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(BoostRoot);$(IncludePath)</IncludePath>
+    <LibraryPath>$(BoostRoot);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\Windmill_City\source\repos\boost_1_74_0;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Windmill_City\source\repos\boost_1_74_0;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(BoostRoot);$(IncludePath)</IncludePath>
+    <LibraryPath>$(BoostRoot);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\Windmill_City\source\repos\boost_1_74_0;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Windmill_City\source\repos\boost_1_74_0;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(BoostRoot);$(IncludePath)</IncludePath>
+    <LibraryPath>$(BoostRoot);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\Windmill_City\source\repos\boost_1_74_0;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Windmill_City\source\repos\boost_1_74_0;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(BoostRoot);$(IncludePath)</IncludePath>
+    <LibraryPath>$(BoostRoot);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -110,6 +110,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -148,6 +149,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ConsoleApplication1.cpp" />
+    <ClCompile Include="TestItem2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AppTSF_TestWindow\AppTSF_TestWindow.vcxproj">
@@ -156,6 +158,9 @@
     <ProjectReference Include="..\libtf\libtf.vcxproj">
       <Project>{6b9e60b4-51b6-40b0-884a-a5d07081302a}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="TestItem2.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
