@@ -720,7 +720,6 @@ void TextStore::_UnlockDocument()
 		m_acpStart = m_acpEnd = m_StoredStr.size();
 		m_AdviseSink.pTextStoreACPSink->OnSelectionChange();
 		m_CommitStart = m_CommitEnd = 0;
-		m_fLayoutChanged = TRUE;
 	}
 
 	if (m_Composing) {
