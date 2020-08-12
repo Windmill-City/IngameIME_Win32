@@ -35,7 +35,6 @@ class TextStore :
 	public ITextStoreACP2
 {
 private:
-	typedef boost::signals2::signal<VOID(TextStore*, LONG, LONG, ULONG, LONG*, LONG*)> signal_QueryIns;
 	typedef boost::signals2::signal<VOID(TextStore*, RECT*)> signal_GetCompExt;
 	typedef boost::signals2::signal<VOID(TextStore*, std::wstring)> signal_UpdateCompStr;
 	typedef boost::signals2::signal<VOID(TextStore*, std::wstring)> signal_CommitStr;
@@ -71,7 +70,6 @@ public:
 
 	//event
 	signal_GetCompExt		m_sigGetCompExt;
-	signal_QueryIns			m_sigQueryIns;
 	signal_UpdateCompStr	m_sigUpdateCompStr;
 	signal_CommitStr		m_sigCommitStr;
 

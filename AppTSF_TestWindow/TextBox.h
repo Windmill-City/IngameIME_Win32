@@ -28,7 +28,7 @@ public:
 	HWND m_hWnd;
 	std::wstring m_Text;
 	std::wstring m_CompText;
-	int m_maxLength = 20;
+	int m_maxLength = 5;
 	RECT m_rectComp;
 
 	TextBox(HWND hWnd);
@@ -37,5 +37,4 @@ public:
 	VOID onKeyDown(WPARAM wParam, LPARAM lParam);
 	VOID onKeyUp(WPARAM wParam, LPARAM lParam);
 	VOID GetCompExt(RECT* rect);
-	VOID QueryInsert(ULONG cch, LONG* pacpResultStart, LONG* pacpResultEnd);
 };

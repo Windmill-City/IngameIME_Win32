@@ -19,7 +19,6 @@ public:
 	VOID onCommit(TextStore* textStore, std::wstring commitStr);
 	VOID onCompStr(TextStore* textStore, std::wstring compStr);
 	VOID onGetCompsitionExt(TextStore* textStore, RECT* rect);
-	VOID onQueryInsert(TextStore* textStore, LONG acpTestStart, LONG acpTestEnd, ULONG cch, LONG* pacpResultStart, LONG* pacpResultEnd);
 
 	//TextServiceFramework
 	std::unique_ptr<Application> m_App;

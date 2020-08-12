@@ -24,7 +24,6 @@ VOID InputMethod::Initialize(HWND hWnd)
 
 	m_TextStore = new TextStore(hWnd);
 	//reg events
-	m_TextStore->m_sigQueryIns.connect(boost::bind(&InputMethod::onQueryInsert, this, _1, _2, _3, _4, _5, _6));
 	m_TextStore->m_sigGetCompExt.connect(boost::bind(&InputMethod::onGetCompsitionExt, this, _1, _2));
 	m_TextStore->m_sigCommitStr.connect(boost::bind(&InputMethod::onCommit, this, _1, _2));
 	m_TextStore->m_sigUpdateCompStr.connect(boost::bind(&InputMethod::onCompStr, this, _1, _2));
@@ -66,10 +65,4 @@ VOID InputMethod::onGetCompsitionExt(TextStore* textStore, RECT* rect)
 {
 	if (textStore != m_TextStore.Get() || !m_TextBox) return;
 	m_TextBox->GetCompExt(rect);
-}
-
-VOID InputMethod::onQueryInsert(TextStore* textStore, LONG acpTestStart, LONG acpTestEnd, ULONG cch, LONG* pacpResultStart, LONG* pacpResultEnd)
-{
-	if (textStore != m_TextStore.Get() || !m_TextBox) return;
-	m_TextBox->QueryInsert(cch, pacpResultStart, pacpResultEnd);
 }

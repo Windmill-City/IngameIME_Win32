@@ -190,8 +190,6 @@ HRESULT __stdcall TextStore::QueryInsert(LONG acpTestStart, LONG acpTestEnd, ULO
 	//Microsoft Pinyin seems does not init the result value, so we set the test value here, in case crash
 	*pacpResultStart = acpTestStart;
 	*pacpResultEnd = acpTestEnd;
-
-	m_sigQueryIns(this, acpTestStart, acpTestEnd, cch, pacpResultStart, pacpResultEnd);
 	return S_OK;
 }
 
