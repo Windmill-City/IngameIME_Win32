@@ -172,7 +172,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		SolidBrush brush_white(Color(255, 255, 255, 255));
 
 		graphics.FillRectangle(&brush_white, 0, 0, rect.right, rect.bottom);
-		if (ime->m_TextBox) ime->m_TextBox->Draw(hWnd, hdc, &ps);
+		if (ime && ime->m_TextBox) ime->m_TextBox->Draw(hWnd, hdc, &ps);
 		EndPaint(hWnd, &ps);
 	}
 	break;

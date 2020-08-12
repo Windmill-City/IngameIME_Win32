@@ -16,7 +16,7 @@ public:
 	CComQIPtr<ITfUIElementMgr> m_pUIElementMgr;
 	TfClientId m_ClientId = TF_CLIENTID_NULL;
 
-	~Common();
+	TFAPI ~Common();
 	TFAPI virtual HRESULT _stdcall Initialize();
 };
 #endif // !_TF_COMMON_H_
