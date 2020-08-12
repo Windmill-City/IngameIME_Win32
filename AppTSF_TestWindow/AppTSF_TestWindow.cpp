@@ -27,8 +27,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
-	ime = new InputMethod();
-
 	LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
 	LoadStringW(hInstance, IDC_APPTSFTESTWINDOW, szWindowClass, MAX_LOADSTRING);
 	MyRegisterClass(hInstance);
@@ -41,7 +39,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_APPTSFTESTWINDOW));
 
 	MSG msg;
-
+	Microsoft::WRL::ComPtr<ITfKeystrokeMgr> keyMgr = ime->m_App->m_pKeyMgr;
 	// Main Message Loop
 	while (GetMessage(&msg, nullptr, 0, 0))
 	{
@@ -92,7 +90,21 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		return FALSE;
 	}
 
-	//Init TSF here
+	//CoInitializeEx(NULL, COINIT_MULTITHREADED);
+	////Init TSF here
+	//auto Init = [hWnd] {
+	//	ime = new InputMethod();
+	//	ime->Initialize(hWnd);
+	//	while (true)
+	//	{
+	//	}
+	//};
+	//std::thread InitCom(Init);
+	//InitCom.detach();
+	//while (!ime || !ime->m_Initilized)
+	//{
+	//}
+	ime = new InputMethod();
 	ime->Initialize(hWnd);
 	textBox = new TextBox(hWnd);
 	ime->SetTextBox(textBox);

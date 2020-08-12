@@ -18,10 +18,7 @@ HRESULT __stdcall TextStore::AdviseSink(REFIID riid, IUnknown* punk, DWORD dwMas
 	IUnknown* punkID;
 	//Get the "real" IUnknown pointer. This needs to be done for comparison purposes.
 	hr = punk->QueryInterface(IID_IUnknown, (LPVOID*)&punkID);
-	if (FAILED(hr))
-	{
-		return hr;
-	}
+	RETURNHR(hr);
 
 	hr = E_INVALIDARG;
 
@@ -77,10 +74,7 @@ HRESULT __stdcall TextStore::UnadviseSink(IUnknown* punk)
 	purposes.
 	*/
 	hr = punk->QueryInterface(IID_IUnknown, (LPVOID*)&punkID);
-	if (FAILED(hr))
-	{
-		return hr;
-	}
+	RETURNHR(hr);
 
 	//find the advise sink
 	if (punkID == m_AdviseSink.punkID)

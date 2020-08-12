@@ -9,5 +9,6 @@ Common::~Common()
 
 HRESULT _stdcall Common::Initialize()
 {
-	return CoInitialize(NULL);
+	HRESULT hr = CoInitialize(NULL);
+	return hr;
 }

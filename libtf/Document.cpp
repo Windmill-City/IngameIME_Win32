@@ -7,13 +7,16 @@ Document::Document(const Common* common, const HWND hWnd)
 	this->m_pThreadMgr = common->m_pThreadMgr;
 	this->m_ClientId = common->m_ClientId;
 
-	m_pThreadMgr->CreateDocumentMgr(&m_pDocMgr);
+	HRESULT hr = m_pThreadMgr->CreateDocumentMgr(&m_pDocMgr);
+	THROWHR(hr, "Failed to Create DocumentMgr");
 	Microsoft::WRL::ComPtr<ITfDocumentMgr> prevDocMgr;
-	m_pThreadMgr->AssociateFocus(m_hWnd, m_pDocMgr.Get(), &prevDocMgr);
+	hr = m_pThreadMgr->AssociateFocus(m_hWnd, m_pDocMgr.Get(), &prevDocMgr);
+	THROWHR(hr, "Failed to AssociateFocus");
 }
 
 Document::~Document()
 {
 	Microsoft::WRL::ComPtr<ITfDocumentMgr> prevDocMgr;
-	m_pThreadMgr->AssociateFocus(m_hWnd, NULL, &prevDocMgr);
+	HRESULT hr = m_pThreadMgr->AssociateFocus(m_hWnd, NULL, &prevDocMgr);
+	THROWHR(hr, "Failed to AssociateFocus");
 }

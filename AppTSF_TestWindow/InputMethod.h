@@ -11,6 +11,7 @@ class InputMethod
 public:
 	TextBox* m_TextBox;
 	BOOL m_IsIMEEnabled = TRUE;
+	BOOL m_Initilized = FALSE;
 
 	InputMethod();
 	~InputMethod();

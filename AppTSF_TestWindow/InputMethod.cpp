@@ -31,6 +31,7 @@ VOID InputMethod::Initialize(HWND hWnd)
 	m_Ctx.reset(new Context(m_Doc.get(), (ITextStoreACP2*)m_TextStore.Get()));
 	DisableIME();//Disable input before push, in case start composition
 	m_Doc->m_pDocMgr->Push(m_Ctx->m_pCtx.Get());
+	m_Initilized = TRUE;
 }
 
 VOID InputMethod::SetTextBox(TextBox* textBox)

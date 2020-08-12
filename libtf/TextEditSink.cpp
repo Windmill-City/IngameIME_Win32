@@ -6,16 +6,23 @@ TextEditSink::TextEditSink(Context* ctx)
 {
 	m_Ctx = ctx;
 	Microsoft::WRL::ComPtr<ITfSource> source;
-	m_Ctx->m_pCtx.As(&source);
-	source->AdviseSink(IID_ITfTextEditSink, (ITfTextEditSink*)this, &m_Cookie);
+
+	HRESULT hr = m_Ctx->m_pCtx.As(&source);
+	THROWHR(hr, "Failed to As ITfSource");
+
+	hr = source->AdviseSink(IID_ITfTextEditSink, (ITfTextEditSink*)this, &m_Cookie);
+	THROWHR(hr, "Failed to AdviseSink");
 }
 
 TextEditSink::~TextEditSink()
 {
 	if (m_Cookie != TF_INVALID_COOKIE) {
 		Microsoft::WRL::ComPtr<ITfSource> source;
-		m_Ctx->m_pCtx.As(&source);
-		source->UnadviseSink(m_Cookie);
+		HRESULT hr = m_Ctx->m_pCtx.As(&source);
+		THROWHR(hr, "Failed to As ITfSource");
+
+		hr = source->UnadviseSink(m_Cookie);
+		THROWHR(hr, "Failed to UnadviseSink");
 	}
 }
 

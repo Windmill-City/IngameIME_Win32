@@ -3,6 +3,8 @@
 #include <msctf.h>
 #include <wrl/client.h>
 #define TFAPI  __declspec(dllexport)
+#define THROWHR(hr, msg) if(FAILED(hr)) throw msg ## ":" + hr;
+#define RETURNHR(hr) if(FAILED(hr)) return hr;
 class Common
 {
 public:
