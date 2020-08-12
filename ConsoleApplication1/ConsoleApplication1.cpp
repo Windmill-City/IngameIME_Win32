@@ -4,29 +4,35 @@
 #include <iostream>
 #include <boost/signals2.hpp>
 #include <boost/bind.hpp>
+#include "../libtf/TextStore.h"
 
 class item {
 public:
-	typedef boost::signals2::signal<void(char*, int)> signal_Func;
-	item::signal_Func sigFunc;
+	typedef boost::signals2::signal<VOID(TextStore*, std::wstring)> signal_CommitStr;
+	signal_CommitStr m_sigCommitStr;
 };
 class item2 {
 public:
+	TextStore* m_TextStore;
+	item* i1;
 	item2() {
-		item* item_ = new item();
-		item_->sigFunc.connect(boost::bind(&item2::func, this, _1, _2));
-		item_->sigFunc(new char[] {"Hello World!\n"}, 1);
-		item_->sigFunc(new char[] {"Hello\n"}, 2);
+		m_TextStore = new TextStore((HWND)NULL);
+		auto tobind = boost::bind(&item2::func, this, _1, _2);
+		m_TextStore->m_sigCommitStr.connect(tobind);
+		i1 = new item();
+		i1->m_sigCommitStr.connect(tobind);
 	}
 
-	void func(char* text, int val) {
-		std::cout << text;
+	VOID func(TextStore* text, std::wstring val) {
+		std::cout << val.c_str();
 	};
 };
 
 int main()
 {
-	new item2();
+	item2* i2 = new item2();
+	i2->m_TextStore->m_sigCommitStr(i2->m_TextStore, L"123");
+	i2->i1->m_sigCommitStr(i2->m_TextStore, L"123");
 }
 
 // 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单
