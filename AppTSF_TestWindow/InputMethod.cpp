@@ -17,10 +17,9 @@ InputMethod::~InputMethod()
 
 VOID InputMethod::Initialize(HWND hWnd)
 {
-	//Need to activate as TF_TMAE_UIELEMENTENABLEDONLY, or Microsoft Pinyin will hide candidatelist window, once you commited str, but still have composition str left
 	//MS Pinyin cant open candidate window when using normal active with ITfContextOwnerCompositionSink
-	//bugs?
-	m_App->m_pThreadMgrEx->ActivateEx(&(m_App->m_ClientId), TF_TMAE_UIELEMENTENABLEDONLY);
+	//m_App->m_pThreadMgrEx->ActivateEx(&(m_App->m_ClientId), TF_TMAE_UIELEMENTENABLEDONLY);
+	m_App->m_pThreadMgr->Activate(&(m_App->m_ClientId));
 	m_Doc.reset(new Document(m_App.get(), hWnd));
 
 	m_TextStore = new TextStore(hWnd);
