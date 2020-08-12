@@ -1,4 +1,7 @@
 #pragma once
+#ifndef _TF_TEXTSERVICE_H_
+#define _TF_TEXTSERVICE_H_
+
 #include "COMBase.h"
 #include "tf_common.h"
 class TextService :
@@ -14,3 +17,4 @@ public:
 	virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObject) override;
 	TF_COM_REFS;
 };
+#endif // !_TF_TEXTSERVICE_H_

@@ -1,4 +1,7 @@
 #pragma once
+#ifndef _TEXTEDITSINK_H_
+#define _TEXTEDITSINK_H_
+
 #include <boost/signals2.hpp>
 #include "COMBase.h"
 #include "Context.h"
@@ -20,3 +23,4 @@ public:
 	virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObject) override;
 	TF_COM_REFS;
 };
+#endif // !_TEXTEDITSINK_H_

@@ -1,6 +1,8 @@
 #pragma once
+#ifndef _COMBASE_H_
+#define _COMBASE_H_
+
 #include <msctf.h>
-#include <wrl/client.h>
 
 #define TF_COM_AS(Interface) \
 if (IsEqualIID(IID_##Interface, riid)) {	\
@@ -51,3 +53,4 @@ public:
 private:
 	ULONG m_ulRef;
 };
+#endif // !_COMBASE_H_

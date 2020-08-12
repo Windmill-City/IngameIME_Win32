@@ -39,7 +39,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_APPTSFTESTWINDOW));
 
 	MSG msg;
-	Microsoft::WRL::ComPtr<ITfKeystrokeMgr> keyMgr = ime->m_App->m_pKeyMgr;
 	// Main Message Loop
 	while (GetMessage(&msg, nullptr, 0, 0))
 	{

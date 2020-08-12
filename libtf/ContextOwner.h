@@ -1,5 +1,7 @@
 #pragma once
-#include "COMBase.h"
+#ifndef _CONTEXTOWNER_H_
+#define _CONTEXTOWNER_H_
+
 #include "ContextOwnerCompositionSink.h"
 class ContextOwner :
 	public ITfContextOwner,
@@ -17,3 +19,4 @@ class ContextOwner :
 	virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObject) override;
 	TF_COM_REFS;
 };
+#endif // !_CONTEXTOWNER_H_

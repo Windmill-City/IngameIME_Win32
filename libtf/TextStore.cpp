@@ -1,6 +1,5 @@
 ﻿#include "pch.h"
 #include "TextStore.h"
-#include<boost/bind.hpp>  
 
 TextStore::TextStore(HWND hWnd)
 {

@@ -28,5 +28,5 @@ public:
 	std::unique_ptr<Application> m_App;
 	std::unique_ptr <Document> m_Doc;
 	std::unique_ptr <Context> m_Ctx;
-	Microsoft::WRL::ComPtr<TextStore> m_TextStore;
+	CComPtr<TextStore> m_TextStore;
 };

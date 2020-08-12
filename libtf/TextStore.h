@@ -1,18 +1,13 @@
 #pragma once
-#include <olectl.h>
+#ifndef _TEXTSTORE_H_
+#define _TEXTSTORE_H_
+
 #include <xstring>
-/*
-None of the GUIDs in TSATTRS.H are defined in a LIB, so you have to include
-INITGUID.H just before the first time you include TSATTRS.H
-*/
-#include <initguid.h>
-#include <tsattrs.h>
 
 #include <queue>
 #include <boost/signals2.hpp>
 
 #include "tf_common.h"
-#include "COMBase.h"
 #include "ContextOwnerCompositionSink.h"
 
 #define EDIT_VIEW_COOKIE    0
@@ -35,10 +30,6 @@ class TextStore :
 	public ITextStoreACP2
 {
 private:
-	typedef boost::signals2::signal<VOID(TextStore*, RECT*)> signal_GetCompExt;
-	typedef boost::signals2::signal<VOID(TextStore*, std::wstring)> signal_UpdateCompStr;
-	typedef boost::signals2::signal<VOID(TextStore*, std::wstring)> signal_CommitStr;
-
 	HWND                    m_hWnd;
 	//TextStore
 	LONG                    m_acpStart;
@@ -61,6 +52,10 @@ private:
 	//Composition
 	std::wstring			m_CompStr;
 public:
+	typedef boost::signals2::signal<VOID(TextStore*, RECT*)> signal_GetCompExt;
+	typedef boost::signals2::signal<VOID(TextStore*, std::wstring)> signal_UpdateCompStr;
+	typedef boost::signals2::signal<VOID(TextStore*, std::wstring)> signal_CommitStr;
+
 	BOOL					m_Commit;
 	BOOL					m_Composing;
 	LONG					m_CommitStart;
@@ -114,3 +109,4 @@ private:
 	void _UnlockDocument();
 	BOOL _IsLocked(DWORD dwLockType);
 };
+#endif // !_TEXTSTORE_H_

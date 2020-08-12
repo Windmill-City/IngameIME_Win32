@@ -1,4 +1,4 @@
-﻿#include<boost/bind.hpp>   
+﻿#include <boost/bind.hpp>   
 #include "InputMethod.h"
 InputMethod::InputMethod()
 {
@@ -28,9 +28,9 @@ VOID InputMethod::Initialize(HWND hWnd)
 	m_TextStore->m_sigCommitStr.connect(boost::bind(&InputMethod::onCommit, this, _1, _2));
 	m_TextStore->m_sigUpdateCompStr.connect(boost::bind(&InputMethod::onCompStr, this, _1, _2));
 	//push ctx
-	m_Ctx.reset(new Context(m_Doc.get(), (ITextStoreACP2*)m_TextStore.Get()));
+	m_Ctx.reset(new Context(m_Doc.get(), (ITextStoreACP2*)m_TextStore.p));
 	DisableIME();//Disable input before push, in case start composition
-	m_Doc->m_pDocMgr->Push(m_Ctx->m_pCtx.Get());
+	m_Doc->m_pDocMgr->Push(m_Ctx->m_pCtx.p);
 	m_Initilized = TRUE;
 }
 
@@ -55,21 +55,21 @@ VOID InputMethod::SetTextBox(TextBox* textBox)
 
 VOID InputMethod::onCommit(TextStore* textStore, std::wstring commitStr)
 {
-	if (textStore != m_TextStore.Get() || !m_TextBox) return;
+	if (textStore != m_TextStore.p || !m_TextBox) return;
 	m_TextBox->m_Text.append(commitStr);
 	InvalidateRect(textStore->GetWnd(), NULL, NULL);
 }
 
 VOID InputMethod::onCompStr(TextStore* textStore, std::wstring compStr)
 {
-	if (textStore != m_TextStore.Get() || !m_TextBox) return;
+	if (textStore != m_TextStore.p || !m_TextBox) return;
 	m_TextBox->m_CompText = compStr;
 	InvalidateRect(textStore->GetWnd(), NULL, NULL);
 }
 
 VOID InputMethod::onGetCompsitionExt(TextStore* textStore, RECT* rect)
 {
-	if (textStore != m_TextStore.Get() || !m_TextBox) return;
+	if (textStore != m_TextStore.p || !m_TextBox) return;
 	m_TextBox->GetCompExt(rect);
 }
 

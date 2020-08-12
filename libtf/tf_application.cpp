@@ -11,27 +11,18 @@ HRESULT _stdcall Application::Initialize()
 	HRESULT hr = Common::Initialize();
 	RETURNHR(hr);
 
-	hr = CoCreateInstance(CLSID_TF_ThreadMgr,
-		NULL,
-		CLSCTX_INPROC_SERVER,
-		IID_ITfThreadMgr,
-		&m_pThreadMgr);
+	hr = m_pThreadMgr.CoCreateInstance(CLSID_TF_ThreadMgr);
 	RETURNHR(hr);
 
-	hr = m_pThreadMgr.As(&m_pThreadMgrEx);
-	RETURNHR(hr);
+	m_pThreadMgrEx = m_pThreadMgr;
 
-	hr = m_pThreadMgr.As(&m_pUIElementMgr);
-	RETURNHR(hr);
+	m_pUIElementMgr = m_pThreadMgr;
 
-	hr = m_pThreadMgr.As(&m_pCfgSysKeyFeed);
-	RETURNHR(hr);
+	m_pCfgSysKeyFeed = m_pThreadMgr;
 
-	hr = m_pThreadMgr.As(&m_pKeyMgr);
-	RETURNHR(hr);
+	m_pKeyMgr = m_pThreadMgr;
 
-	hr = m_pThreadMgr.As(&m_pMsgPump);
-	RETURNHR(hr);
+	m_pMsgPump = m_pThreadMgr;
 
 	return hr;
 }

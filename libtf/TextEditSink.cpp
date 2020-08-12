@@ -5,31 +5,28 @@
 TextEditSink::TextEditSink(Context* ctx)
 {
 	m_Ctx = ctx;
-	Microsoft::WRL::ComPtr<ITfSource> source;
+	CComQIPtr<ITfSource> source;
+	source = m_Ctx->m_pCtx;
 
-	HRESULT hr = m_Ctx->m_pCtx.As(&source);
-	THROWHR(hr, "Failed to As ITfSource");
-
-	hr = source->AdviseSink(IID_ITfTextEditSink, (ITfTextEditSink*)this, &m_Cookie);
+	HRESULT hr = source->AdviseSink(IID_ITfTextEditSink, (ITfTextEditSink*)this, &m_Cookie);
 	THROWHR(hr, "Failed to AdviseSink");
 }
 
 TextEditSink::~TextEditSink()
 {
 	if (m_Cookie != TF_INVALID_COOKIE) {
-		Microsoft::WRL::ComPtr<ITfSource> source;
-		HRESULT hr = m_Ctx->m_pCtx.As(&source);
-		THROWHR(hr, "Failed to As ITfSource");
+		CComQIPtr<ITfSource> source;
+		source = m_Ctx->m_pCtx;
 
-		hr = source->UnadviseSink(m_Cookie);
+		HRESULT hr = source->UnadviseSink(m_Cookie);
 		THROWHR(hr, "Failed to UnadviseSink");
 	}
 }
 
 HRESULT __stdcall TextEditSink::OnEndEdit(ITfContext* pic, TfEditCookie ecReadOnly, ITfEditRecord* pEditRecord)
 {
-	TextStore* _TextStore = dynamic_cast<TextStore*> (m_Ctx->m_pTextStore.Get());
-	if (m_Ctx->m_pCtx.Get() != pic || !_TextStore)
+	TextStore* _TextStore = dynamic_cast<TextStore*> (m_Ctx->m_pTextStore.p);
+	if (m_Ctx->m_pCtx.p != pic || !_TextStore)
 		return S_OK;
 	_TextStore->m_Composing = FALSE;
 	_TextStore->m_Commit = FALSE;
@@ -38,9 +35,9 @@ HRESULT __stdcall TextEditSink::OnEndEdit(ITfContext* pic, TfEditCookie ecReadOn
 	const GUID* rgGuids[2] = { &GUID_PROP_COMPOSING,
 								&GUID_PROP_ATTRIBUTE };
 
-	Microsoft::WRL::ComPtr <ITfReadOnlyProperty> TrackProperty;
-	Microsoft::WRL::ComPtr<ITfRange> Start2EndRange;
-	Microsoft::WRL::ComPtr<ITfRange> EndRange;
+	CComQIPtr<ITfReadOnlyProperty> TrackProperty;
+	CComQIPtr<ITfRange> Start2EndRange;
+	CComQIPtr<ITfRange> EndRange;
 
 	if (FAILED(pic->TrackProperties(rgGuids, 2, NULL, 0, &TrackProperty))) {
 		return E_FAIL;
@@ -52,27 +49,27 @@ HRESULT __stdcall TextEditSink::OnEndEdit(ITfContext* pic, TfEditCookie ecReadOn
 	if (FAILED(pic->GetEnd(ecReadOnly, &EndRange)))
 		return E_FAIL;
 	if (FAILED(Start2EndRange->ShiftEndToRange(
-		ecReadOnly, EndRange.Get(), TF_ANCHOR_END))) {
+		ecReadOnly, EndRange.p, TF_ANCHOR_END))) {
 		return E_FAIL;
 	}
 
-	Microsoft::WRL::ComPtr<IEnumTfRanges> Ranges;
+	CComQIPtr<IEnumTfRanges> Ranges;
 	if (FAILED(TrackProperty->EnumRanges(ecReadOnly, &Ranges,
-		Start2EndRange.Get()))) {
+		Start2EndRange.p))) {
 		return E_FAIL;
 	}
 
 	while (TRUE) {
-		Microsoft::WRL::ComPtr<ITfRange> Range;
+		CComQIPtr<ITfRange> Range;
 		ULONG cFetched;
 
 		if (Ranges->Next(1, &Range, &cFetched) != S_OK)
 			break;
 		VARIANT var;
 		VariantInit(&var);
-		Microsoft::WRL::ComPtr<IEnumTfPropertyValue> EnumPropValue;
+		CComQIPtr<IEnumTfPropertyValue> EnumPropValue;
 
-		if (FAILED(TrackProperty->GetValue(ecReadOnly, Range.Get(),
+		if (FAILED(TrackProperty->GetValue(ecReadOnly, Range.p,
 			&var))) {
 			return E_FAIL;
 		}
@@ -93,8 +90,8 @@ HRESULT __stdcall TextEditSink::OnEndEdit(ITfContext* pic, TfEditCookie ecReadOn
 			VariantClear(&PropValue.varValue);
 		}
 
-		Microsoft::WRL::ComPtr<ITfRangeACP> RangeACP;
-		Range.As(&RangeACP);
+		CComQIPtr<ITfRangeACP> RangeACP;
+		RangeACP = Range;
 		LONG AcpStart, Len;
 		RangeACP->GetExtent(&AcpStart, &Len);
 
