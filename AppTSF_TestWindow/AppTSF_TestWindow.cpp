@@ -1,6 +1,5 @@
-﻿#include <thread>
-
-#include "framework.h"
+﻿#include "framework.h"
+#include <thread>
 #include "AppTSF_TestWindow.h"
 #include "InputMethod.h"
 #include "TextBox.h"
