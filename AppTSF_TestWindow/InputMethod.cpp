@@ -31,7 +31,8 @@ VOID InputMethod::Initialize(HWND hWnd)
 	m_Ctx.reset(new Context(m_Doc.get(), (ITextStoreACP2*)m_TextStore.p));
 	DisableIME();//Disable input before push, in case start composition
 	m_Doc->m_pDocMgr->Push(m_Ctx->m_pCtx.p);
-	m_App->m_pThreadMgr->SetFocus(m_Doc->m_pDocMgr);//SetFocus when ctx is vaild
+	//SetFocus when ctx is vaild, it seems that some ime just handle ITfThreadMgrEventSink::OnSetFocus, so when we push context, we need to SetFocus to update their state
+	m_App->m_pThreadMgr->SetFocus(m_Doc->m_pDocMgr);
 	m_Initilized = TRUE;
 }
 
