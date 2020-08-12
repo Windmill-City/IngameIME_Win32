@@ -31,6 +31,7 @@ VOID InputMethod::Initialize(HWND hWnd)
 	m_Ctx.reset(new Context(m_Doc.get(), (ITextStoreACP2*)m_TextStore.p));
 	DisableIME();//Disable input before push, in case start composition
 	m_Doc->m_pDocMgr->Push(m_Ctx->m_pCtx.p);
+	m_App->m_pThreadMgr->SetFocus(m_Doc->m_pDocMgr);//SetFocus when ctx is vaild
 	m_Initilized = TRUE;
 }
 
@@ -95,5 +96,4 @@ VOID InputMethod::EnableIME()
 	if (!m_IsIMEEnabled)
 		m_IsIMEEnabled = TRUE;
 	m_App->m_pCfgSysKeyFeed->EnableSystemKeystrokeFeed();
-	m_App->m_pThreadMgr->SetFocus(m_Doc->m_pDocMgr);
 }
