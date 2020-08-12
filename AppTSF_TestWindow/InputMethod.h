@@ -10,6 +10,7 @@ class InputMethod
 {
 public:
 	TextBox* m_TextBox;
+	BOOL m_IsIMEEnabled = TRUE;
 
 	InputMethod();
 	~InputMethod();
@@ -19,6 +20,8 @@ public:
 	VOID onCommit(TextStore* textStore, std::wstring commitStr);
 	VOID onCompStr(TextStore* textStore, std::wstring compStr);
 	VOID onGetCompsitionExt(TextStore* textStore, RECT* rect);
+	VOID DisableIME();
+	VOID EnableIME();
 
 	//TextServiceFramework
 	std::unique_ptr<Application> m_App;

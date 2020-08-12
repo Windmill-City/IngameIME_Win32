@@ -97,6 +97,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	textBox = new TextBox(hWnd);
 	ime->SetTextBox(textBox);
 
+	EnableMenuItem(GetMenu(hWnd), ID_ENABLEIME, ime->m_IsIMEEnabled);
+	EnableMenuItem(GetMenu(hWnd), ID_DISABLEIME, !ime->m_IsIMEEnabled);
+
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
 
@@ -131,6 +134,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case IDM_EXIT:
 			DestroyWindow(hWnd);
+			break;
+		case ID_ENABLEIME:
+			ime->EnableIME();
+			EnableMenuItem(GetMenu(hWnd), ID_ENABLEIME, ime->m_IsIMEEnabled);
+			EnableMenuItem(GetMenu(hWnd), ID_DISABLEIME, !ime->m_IsIMEEnabled);
+			break;
+		case ID_DISABLEIME:
+			ime->DisableIME();
+			EnableMenuItem(GetMenu(hWnd), ID_ENABLEIME, ime->m_IsIMEEnabled);
+			EnableMenuItem(GetMenu(hWnd), ID_DISABLEIME, !ime->m_IsIMEEnabled);
 			break;
 		default:
 			return DefWindowProc(hWnd, message, wParam, lParam);

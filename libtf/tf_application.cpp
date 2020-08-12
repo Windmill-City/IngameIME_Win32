@@ -24,5 +24,7 @@ HRESULT _stdcall Application::Initialize()
 	hr = m_pThreadMgr.As(&m_pUIElementMgr);
 	if (FAILED(hr)) return hr;
 
+	hr = m_pThreadMgr.As(&m_pCfgSysKeyFeed);
+
 	return hr;
 }

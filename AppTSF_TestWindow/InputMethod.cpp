@@ -29,6 +29,7 @@ VOID InputMethod::Initialize(HWND hWnd)
 	m_TextStore->m_sigUpdateCompStr.connect(boost::bind(&InputMethod::onCompStr, this, _1, _2));
 	//push ctx
 	m_Ctx.reset(new Context(m_Doc.get(), (ITextStoreACP2*)m_TextStore.Get()));
+	DisableIME();//Disable input before push, in case start composition
 	m_Doc->m_pDocMgr->Push(m_Ctx->m_pCtx.Get());
 }
 
@@ -42,9 +43,13 @@ VOID InputMethod::SetTextBox(TextBox* textBox)
 	}
 	//Cleanup new
 	m_TextBox = textBox;
-	if (!textBox) return;
+	if (!textBox) {
+		DisableIME();
+		return;
+	};
 	textBox->m_CompText = L"";
 	SetRectEmpty(&textBox->m_rectComp);
+	EnableIME();
 }
 
 VOID InputMethod::onCommit(TextStore* textStore, std::wstring commitStr)
@@ -65,4 +70,28 @@ VOID InputMethod::onGetCompsitionExt(TextStore* textStore, RECT* rect)
 {
 	if (textStore != m_TextStore.Get() || !m_TextBox) return;
 	m_TextBox->GetCompExt(rect);
+}
+
+VOID InputMethod::DisableIME()
+{
+	if (m_IsIMEEnabled) {
+		m_IsIMEEnabled = FALSE;
+		/*
+		By default, the TSF manager will process keystrokesand pass them to the text services.
+		An application prevents this by calling this method.
+		Typically, this method is called when text service input is inappropriate, for example when a menu is displayed.
+		Calls to this method are cumulative, so every call to this method requires a subsequent call to ITfConfigureSystemKeystrokeFeed::EnableSystemKeystrokeFeed.
+
+		So we use a bool to prevent multiple disable here
+		*/
+		m_App->m_pCfgSysKeyFeed->DisableSystemKeystrokeFeed();
+		m_Ctx->m_pCtxOwnerCompServices->TerminateComposition(NULL);//pass NULL to terminate all composition
+	}
+}
+
+VOID InputMethod::EnableIME()
+{
+	if (!m_IsIMEEnabled)
+		m_IsIMEEnabled = TRUE;
+	m_App->m_pCfgSysKeyFeed->EnableSystemKeystrokeFeed();
 }
