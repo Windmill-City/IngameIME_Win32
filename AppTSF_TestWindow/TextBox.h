@@ -1,4 +1,6 @@
 #pragma once
+#include <xstring>
+#include <wtypes.h>
 #include <windows.h>
 #include <stdlib.h>
 #include <malloc.h>
@@ -20,3 +22,20 @@
 
 #include <atlstr.h>
 #include <strsafe.h>
+class TextBox
+{
+public:
+	HWND m_hWnd;
+	std::wstring m_Text;
+	std::wstring m_CompText;
+	int m_maxLength = 20;
+	RECT m_rectComp;
+
+	TextBox(HWND hWnd);
+
+	VOID Draw(HWND hwnd, HDC hdc, PAINTSTRUCT* ps);
+	VOID onKeyDown(WPARAM wParam, LPARAM lParam);
+	VOID onKeyUp(WPARAM wParam, LPARAM lParam);
+	VOID GetCompExt(RECT* rect);
+	VOID QueryInsert(ULONG cch, LONG* pacpResultStart, LONG* pacpResultEnd);
+};

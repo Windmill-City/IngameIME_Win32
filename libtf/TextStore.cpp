@@ -1,5 +1,16 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "TextStore.h"
+#include<boost/bind.hpp>  
+
+TextStore::TextStore(HWND hWnd)
+{
+	m_hWnd = hWnd;
+}
+
+TFAPI HWND TextStore::GetWnd()
+{
+	return m_hWnd;
+}
 
 HRESULT __stdcall TextStore::AdviseSink(REFIID riid, IUnknown* punk, DWORD dwMask)
 {
@@ -171,21 +182,16 @@ HRESULT __stdcall TextStore::GetStatus(TS_STATUS* pdcs)
 
 HRESULT __stdcall TextStore::QueryInsert(LONG acpTestStart, LONG acpTestEnd, ULONG cch, LONG* pacpResultStart, LONG* pacpResultEnd)
 {
-	ACP* Acp = new ACP();
-	Acp->acpEnd = acpTestEnd;
-	Acp->acpStart = acpTestStart;
+	//Queryins
+	if (!pacpResultStart || !pacpResultEnd)
+		return E_INVALIDARG;
+	if (acpTestStart > m_StoredStr.size() || acpTestEnd > m_StoredStr.size())
+		return E_INVALIDARG;
+	//Microsoft Pinyin seems does not init the result value, so we set the test value here, in case crash
+	*pacpResultStart = acpTestStart;
+	*pacpResultEnd = acpTestEnd;
 
-	m_fNotify = false;
-
-	SendMessage(m_hWnd, TF_QUERYINSERT, (WPARAM)Acp, (LPARAM)cch);
-
-	m_fNotify = true;
-
-	if (Acp->acpStart == -1 || Acp->acpEnd == -1)
-		return S_OK;
-
-	*pacpResultStart = Acp->acpStart;
-	*pacpResultEnd = Acp->acpEnd;
+	m_sigQueryIns(this, acpTestStart, acpTestEnd, cch, pacpResultStart, pacpResultEnd);
 	return S_OK;
 }
 
@@ -319,11 +325,6 @@ HRESULT __stdcall TextStore::GetText(LONG acpStart, LONG acpEnd, WCHAR* pchPlain
 		*pcchPlainRet = 0;
 	}
 
-	if (fDoRunInfo)
-	{
-		*pcchPlainRet = 0;
-	}
-
 	if (pacpNext)
 	{
 		*pacpNext = acpStart;
@@ -424,7 +425,6 @@ HRESULT __stdcall TextStore::GetText(LONG acpStart, LONG acpEnd, WCHAR* pchPlain
 				If there were multiple runs, it would be an error to have consecuative runs
 				of the same type.
 				*/
-				* pcchPlainRet = 1;
 				prgRunInfo[0].type = TS_RT_PLAIN;
 				prgRunInfo[0].uCount = cchReq;
 			}
@@ -638,15 +638,15 @@ HRESULT __stdcall TextStore::GetTextExt(TsViewCookie vcView, LONG acpStart, LONG
 		return TS_E_NOLOCK;
 	}
 
-	//is this an empty request?
-	if (acpStart == acpEnd)
-	{
-		return E_INVALIDARG;
-	}
-	ACP* acp = new ACP();
-	acp->acpEnd = acpEnd;
-	acp->acpStart = acpStart;
-	*pfClipped = SendMessage(m_hWnd, TF_GETTEXTEXT, (WPARAM)prc, (LPARAM)acp);
+	//According to Microsoft's doc, an ime should not make empty request,
+	//but some ime draw comp text themseleves, when empty req will be make
+	//Check empty request
+	//if (acpStart == acpEnd) {
+	//	return E_INVALIDARG;
+	//}
+
+	m_sigGetCompExt(this, prc);
+	MapWindowPoints(m_hWnd, HWND_DESKTOP, (LPPOINT)prc, 2);
 
 	return S_OK;
 }
@@ -667,7 +667,7 @@ HRESULT __stdcall TextStore::GetScreenExt(TsViewCookie vcView, RECT* prc)
 	return S_OK;
 }
 
-TF_COM_QUERYINF(TextStore, TF_COM_ASUNK(ITextStoreACP2));
+TF_COM_QUERYINF(TextStore, TF_COM_ASUNK(ITextStoreACP2) TF_COM_ASUNK(ITfContextOwnerCompositionSink) TF_COM_ASUNK(ITfContextOwner));
 
 HRESULT TextStore::_ClearAdviseSink(PADVISE_SINK pAdviseSink)
 {
@@ -706,6 +706,29 @@ void TextStore::_UnlockDocument()
 	HRESULT hr;
 	m_fLocked = FALSE;
 	m_dwLockType = 0;
+
+	if (m_Commit) {
+		m_Commit = FALSE;
+		LONG commitLen = m_CommitEnd - m_CommitStart;
+		m_sigCommitStr(this, m_StoredStr.substr(m_CommitStart, commitLen));
+		m_StoredStr.erase(m_CommitStart, commitLen);
+		TS_TEXTCHANGE textChange;
+		textChange.acpStart = m_CommitStart;
+		textChange.acpOldEnd = m_CommitEnd;
+		textChange.acpNewEnd = m_CommitStart;
+		m_AdviseSink.pTextStoreACPSink->OnTextChange(0, &textChange);
+		m_acpStart = m_acpEnd = m_StoredStr.size();
+		m_AdviseSink.pTextStoreACPSink->OnSelectionChange();
+		m_CommitStart = m_CommitEnd = 0;
+		m_fLayoutChanged = TRUE;
+	}
+
+	if (m_Composing) {
+		m_sigUpdateCompStr(this, m_StoredStr.substr(m_CompStart, m_CompEnd - m_CompStart));
+	}
+	else {
+		m_sigUpdateCompStr(this, L"");
+	}
 
 	//if there is a queued lock, grant it
 	if (!m_queuedLockReq.empty())

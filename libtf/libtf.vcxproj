@@ -73,9 +73,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\Windmill_City\source\repos\boost_1_73_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Windmill_City\source\repos\boost_1_73_0;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Users\Windmill_City\source\repos\boost_1_73_0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Windmill_City\source\repos\boost_1_73_0;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -156,6 +160,7 @@
   <ItemGroup>
     <ClInclude Include="Context.h" />
     <ClInclude Include="ContextOwner.h" />
+    <ClInclude Include="ContextOwnerCompositionSink.h" />
     <ClInclude Include="Document.h" />
     <ClInclude Include="COMBase.h" />
     <ClInclude Include="framework.h" />

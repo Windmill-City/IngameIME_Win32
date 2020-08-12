@@ -8,17 +8,14 @@ INITGUID.H just before the first time you include TSATTRS.H
 #include <initguid.h>
 #include <tsattrs.h>
 
-#include "COMBase.h"
 #include <queue>
-#include <shared_mutex>
+#include <boost/signals2.hpp>
+
+#include "tf_common.h"
+#include "COMBase.h"
+#include "ContextOwnerCompositionSink.h"
 
 #define EDIT_VIEW_COOKIE    0
-
-#define TF_GETTEXTLENGTH    0x0601
-#define TF_GETTEXT          0x0602
-#define TF_GETTEXTEXT       0x0603
-#define TF_GETSELSTATE      0x0604
-#define TF_QUERYINSERT      0x0605
 
 typedef struct
 {
@@ -34,10 +31,15 @@ typedef struct
 }ACP, * PACP;
 
 class TextStore :
-	public COMBase,
+	public ContextOwnerCompositionSink,
 	public ITextStoreACP2
 {
 private:
+	typedef boost::signals2::signal<VOID(TextStore*, LONG, LONG, ULONG, LONG*, LONG*)> signal_QueryIns;
+	typedef boost::signals2::signal<VOID(TextStore*, RECT*)> signal_GetCompExt;
+	typedef boost::signals2::signal<VOID(TextStore*, std::wstring)> signal_UpdateCompStr;
+	typedef boost::signals2::signal<VOID(TextStore*, std::wstring)> signal_CommitStr;
+
 	HWND                    m_hWnd;
 	//TextStore
 	LONG                    m_acpStart;
@@ -57,7 +59,25 @@ private:
 	//TextBox
 	TS_STATUS               m_status;
 	BOOL                    m_fLayoutChanged;
+	//Composition
+	std::wstring			m_CompStr;
 public:
+	BOOL					m_Commit;
+	BOOL					m_Composing;
+	LONG					m_CommitStart;
+	LONG					m_CommitEnd;
+	LONG					m_CompStart;
+	LONG					m_CompEnd;
+
+	//event
+	signal_GetCompExt		m_sigGetCompExt;
+	signal_QueryIns			m_sigQueryIns;
+	signal_UpdateCompStr	m_sigUpdateCompStr;
+	signal_CommitStr		m_sigCommitStr;
+
+	TFAPI TextStore(HWND hWnd);
+	TFAPI HWND GetWnd();
+
 	// Í¨¹ý ITextStoreACP2 ¼Ì³Ð
 	virtual HRESULT __stdcall AdviseSink(REFIID riid, IUnknown* punk, DWORD dwMask) override;
 	virtual HRESULT __stdcall UnadviseSink(IUnknown* punk) override;

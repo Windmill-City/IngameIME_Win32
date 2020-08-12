@@ -3,13 +3,16 @@
 #include "framework.h"
 #include "AppTSF_TestWindow.h"
 #include "InputMethod.h"
+#include "TextBox.h"
 
 #define MAX_LOADSTRING 100
 
 HINSTANCE hInst;
 WCHAR szTitle[MAX_LOADSTRING];
 WCHAR szWindowClass[MAX_LOADSTRING];
+//vars
 InputMethod* ime;
+TextBox* textBox;
 
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
@@ -24,10 +27,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
-	CoInitialize(NULL);
 	ime = new InputMethod();
-	ime->app->m_pThreadMgr->Activate(&(ime->app->m_ClientId));
-	ime->Initialize();
 
 	LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
 	LoadStringW(hInstance, IDC_APPTSFTESTWINDOW, szWindowClass, MAX_LOADSTRING);
@@ -78,15 +78,24 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
+	ULONG_PTR gdiplustoken;
+	Gdiplus::GdiplusStartupInput gdiplusstartupinput;
+	Gdiplus::GdiplusStartup(&gdiplustoken, &gdiplusstartupinput, NULL);
+
 	hInst = hInstance;
 
 	HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+		CW_USEDEFAULT, 0, 400, 360, HWND_DESKTOP, nullptr, hInstance, nullptr);
 
 	if (!hWnd)
 	{
 		return FALSE;
 	}
+
+	//Init TSF here
+	ime->Initialize(hWnd);
+	textBox = new TextBox(hWnd);
+	ime->SetTextBox(textBox);
 
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
@@ -98,6 +107,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
+	case WM_CREATE:
+		int scrWidth, scrHeight;
+		RECT rect;
+		//获得屏幕尺寸
+		scrWidth = GetSystemMetrics(SM_CXSCREEN);
+		scrHeight = GetSystemMetrics(SM_CYSCREEN);
+		//取得窗口尺寸
+		GetWindowRect(hWnd, &rect);
+		//重新设置rect里的值
+		rect.left = (scrWidth - rect.right) / 2;
+		rect.top = (scrHeight - rect.bottom) / 2;
+		//移动窗口到指定的位置
+		SetWindowPos(hWnd, HWND_TOP, rect.left, rect.top, rect.right, rect.bottom, SWP_SHOWWINDOW);
+		break;
 	case WM_COMMAND:
 	{
 		int wmId = LOWORD(wParam);
@@ -118,15 +141,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		PAINTSTRUCT ps;
 		HDC hdc = BeginPaint(hWnd, &ps);
-		//paint here
+		using namespace Gdiplus;
+		RECT rect;
+		GetClientRect(hWnd, &rect);
+		Graphics graphics(hdc);
+		SolidBrush brush_white(Color(255, 255, 255, 255));
+
+		graphics.FillRectangle(&brush_white, 0, 0, rect.right, rect.bottom);
+		if (ime->m_TextBox) ime->m_TextBox->Draw(hWnd, hdc, &ps);
 		EndPaint(hWnd, &ps);
 	}
 	break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
-	case WM_SETFOCUS:
-		ime->app->m_pThreadMgr->SetFocus(ime->doc->m_pDocMgr);
+	case WM_KEYDOWN:
+		if (ime->m_TextBox) ime->m_TextBox->onKeyDown(wParam, lParam);
+		break;
+	case WM_KEYUP:
+		if (ime->m_TextBox) ime->m_TextBox->onKeyUp(wParam, lParam);
 		break;
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);

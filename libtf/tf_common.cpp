@@ -3,12 +3,7 @@
 
 Common::~Common()
 {
-	if (m_pThreadMgr)
-	{
-		m_pThreadMgr->Release();
-		m_pThreadMgr = NULL;
-	}
-	m_ClientId = 0;
+	m_ClientId = TF_CLIENTID_NULL;
 	CoUninitialize();
 }
 

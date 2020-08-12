@@ -1,5 +1,6 @@
 #pragma once
 #include <msctf.h>
+#include <wrl/client.h>
 
 #define TF_COM_AS(Interface) \
 if (IsEqualIID(IID_##Interface, riid)) {	\

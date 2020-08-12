@@ -1,43 +1,22 @@
 #include "pch.h"
 #include "Context.h"
 #include "TextStore.h"
-#include "ContextOwner.h"
+#include "TextEditSink.h"
 
-Context::Context(Document* document) :Context(document, (ITfContextOwnerCompositionSink*)(new TextStore()))
+Microsoft::WRL::ComPtr<TextEditSink> sink;
+Context::Context(const Document* document, const HWND hWnd) :Context(document, (ITextStoreACP2*)new TextStore(hWnd))
 {
 }
 
-Context::Context(Document* document, IUnknown* punk)
+Context::Context(const Document* document, IUnknown* punk)
 {
 	m_pTextStore = punk;
 
-	HRESULT hr = document->m_pDocMgr->CreateContext(document->m_Common->m_ClientId, 0, m_pTextStore, &m_pCtx, &m_EditCookie);
+	HRESULT hr = document->m_pDocMgr->CreateContext(document->m_ClientId, 0, m_pTextStore.Get(), &m_pCtx, &m_EditCookie);
 
-	m_pCtx->QueryInterface(IID_ITfContextOwnerCompositionServices, (LPVOID*)&m_pCtxOwnerCompServices);
-	m_pCtx->QueryInterface(IID_ITfContextOwnerServices, (LPVOID*)&m_pCtxOwnerServices);
+	m_pCtx.As(&m_pCtxOwnerCompServices);
+	m_pCtx.As(&m_pCtxOwnerServices);
+	m_pCtx.As(&m_pCtxComposition);
 
-	if (m_pTextStore) m_pTextStore->AddRef();
-}
-
-Context::~Context()
-{
-	if (m_pCtxOwnerCompServices)
-	{
-		m_pCtxOwnerCompServices->Release();
-		m_pCtxOwnerCompServices = NULL;
-	}
-	if (m_pCtxOwnerServices)
-	{
-		m_pCtxOwnerServices->Release();
-		m_pCtxOwnerServices = NULL;
-	}
-	if (m_pCtx) {
-		m_pCtx->Release();
-		m_pCtx = NULL;
-	}
-	if (m_pTextStore) {
-		m_pTextStore->Release();
-		m_pTextStore = NULL;
-	}
-	m_EditCookie = TF_INVALID_COOKIE;
+	sink = new TextEditSink(this);
 }

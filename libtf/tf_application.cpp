@@ -15,7 +15,13 @@ HRESULT _stdcall Application::Initialize()
 		NULL,
 		CLSCTX_INPROC_SERVER,
 		IID_ITfThreadMgr,
-		(void**)&(Common::m_pThreadMgr));
+		&m_pThreadMgr);
+	if (FAILED(hr)) return hr;
+
+	hr = m_pThreadMgr.As(&m_pThreadMgrEx);
+	if (FAILED(hr)) return hr;
+
+	hr = m_pThreadMgr.As(&m_pUIElementMgr);
 	if (FAILED(hr)) return hr;
 
 	return hr;

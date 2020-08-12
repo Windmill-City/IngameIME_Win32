@@ -30,12 +30,18 @@
     <ClInclude Include="InputMethod.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="TextBox.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AppTSF_TestWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="InputMethod.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TextBox.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

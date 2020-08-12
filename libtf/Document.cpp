@@ -1,18 +1,19 @@
 #include "pch.h"
 #include "Document.h"
 
-Document::Document(Common* common, HWND hWnd)
+Document::Document(const Common* common, const HWND hWnd)
 {
-	m_Common = common;
-	m_hWnd = hWnd;
+	this->m_hWnd = hWnd;
+	this->m_pThreadMgr = common->m_pThreadMgr;
+	this->m_ClientId = common->m_ClientId;
 
-	m_Common->m_pThreadMgr->CreateDocumentMgr(&m_pDocMgr);
+	m_pThreadMgr->CreateDocumentMgr(&m_pDocMgr);
+	Microsoft::WRL::ComPtr<ITfDocumentMgr> prevDocMgr;
+	m_pThreadMgr->AssociateFocus(m_hWnd, m_pDocMgr.Get(), &prevDocMgr);
 }
 
 Document::~Document()
 {
-	if (m_pDocMgr) {
-		m_pDocMgr->Release();
-		m_pDocMgr = NULL;
-	}
+	Microsoft::WRL::ComPtr<ITfDocumentMgr> prevDocMgr;
+	m_pThreadMgr->AssociateFocus(m_hWnd, NULL, &prevDocMgr);
 }
