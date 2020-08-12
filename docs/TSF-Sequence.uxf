@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>6</zoom_level>
+  <element>
+    <id>UMLSequenceAllInOne</id>
+    <coordinates>
+      <x>0</x>
+      <y>0</y>
+      <w>2442</w>
+      <h>1488</h>
+    </coordinates>
+    <panel_attributes>title=TSF
+obj=App COM Thread (STA)~app
+obj=App UI Thread (MTA/STA)~ui ACTIVE
+obj=TextStore~textstore CREATED_LATER
+obj=EditSession~es CREATED_LATER
+obj=Composition~comp CREATED_LATER
+obj=Context~context CREATED_LATER
+obj=DocMgr~docmgr CREATED_LATER
+obj=Text Service~ts
+obj=KeyMgr~keymgr
+obj=ThreadMgr~threadmgr
+//init
+app-&gt;&gt;&gt;threadmgr : CoCreate;on=threadmgr;
+app-&gt;ui : Create; on=ui
+
+ui-&gt;&gt;&gt;threadmgr : Activate;on=threadmgr;
+threadmgr.&gt;ui : TfClientId;off=threadmgr
+//MessageQueue
+combinedFragment=MessageQueue~msgque ui threadmgr;
+combinedFragment=HandleKey~handlekey ui threadmgr;
+threadmgr-&gt;&gt;&gt;ui : GetMessage; on=ui
+ui.&gt;threadmgr : MSG; off=ui; 
+threadmgr-&gt;keymgr : Key MSG;
+--=handlekey
+keymgr-&gt;ts : KeyEvent
+--=msgque
+tick=2
+
+//TextStore
+ui-&gt;&gt;&gt;textstore : Create
+on=textstore
+
+//DocMgr
+ui-&gt;&gt;&gt;docmgr : Create;
+on=docmgr
+
+//Context
+docmgr-&gt;&gt;&gt;context : Create
+on=context
+ts-&gt;&gt;&gt;es : Create
+on=es
+ts-&gt;&gt;&gt;es : RequestLock
+es-&gt;&gt;&gt;textstore : RequestLock
+textstore.&gt;&gt;&gt;es : onLockGranted;es-&gt;&gt;&gt;es + : doEditSession
+tick=1
+//Composition
+es-&gt;&gt;&gt;comp : StartComposition
+on=comp
+es-&gt;&gt;&gt;comp : Edit Compsition Range
+es-&gt;&gt;&gt;comp : Get Compsition Range
+
+es-&gt;&gt;&gt;textstore : GetActiveView
+es-&gt;&gt;&gt;textstore : SetSelection
+es-&gt;&gt;&gt;textstore : InsertTextAtSelection
+es-&gt;&gt;&gt;textstore : GetText
+es-&gt;&gt;&gt;textstore : SetSelection
+es-&gt;&gt;&gt;textstore : GetSelection
+
+combinedFragment=CandidateList UI~listui ui ts;
+ts-&gt;&gt;&gt;ts + : UpdateCandidateList
+textstore-&gt;&gt;&gt;ui : GetTextExt;ts-&gt;&gt;&gt;textstore : GetTextExt;
+textstore-&gt;&gt;&gt;ui : GetScreenExt;ts-&gt;&gt;&gt;textstore : GetScreenExt;
+ts-&gt;&gt;&gt;ts + : UpdateUIElement
+--=listui
+//End Composition
+es-&gt;&gt;&gt;comp : EndComposition
+off=comp
+destroy=comp
+//End EditSession
+off=es
+destroy=es
+tick=2
+combinedFragment=Optional~termcomp ui context;
+ui-&gt;context : TerminateComposition
+--=termcomp
+//End context
+off=context
+destroy=context
+
+//End docmgr
+off=docmgr
+destroy=docmgr
+//Finally
+tick=10
+off=textstore
+destroy=textstore
+ui-&gt;&gt;&gt;threadmgr : Deactivate;
+off=ui
+destroy=ui;
+app-&gt;&gt;&gt;threadmgr : Release;off=threadmgr
+destroy=keymgr;destroy=threadmgr
+destroy=app;</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

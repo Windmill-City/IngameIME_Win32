@@ -1,8 +1,4 @@
 # Document
-## Text Service Framework - How can I open a composition window?
-![TSF-StartComposition](https://github.com/Windmill-City/libtf/blob/master/docs/TSF-StartComp.png)
+## Text Service Framework - Introduction
 ![TSF-Sequence](https://github.com/Windmill-City/libtf/blob/master/docs/TSF-Sequence.png)
-## libtf - Class Graph
-![Class Graph](https://github.com/Windmill-City/libtf/blob/master/docs/libtf-Class.png)
-## libtf - How to use
-![Class Graph](https://github.com/Windmill-City/libtf/blob/master/docs/TSF-Usage.png)
+![TSF-Context](https://github.com/Windmill-City/libtf/blob/master/docs/TSF-Context.png)
