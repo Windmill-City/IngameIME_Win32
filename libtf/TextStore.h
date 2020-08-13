@@ -101,7 +101,10 @@ public:
 	virtual HRESULT __stdcall GetScreenExt(TsViewCookie vcView, RECT* prc) override;
 
 	// Í¨¹ý COMBase ¼Ì³Ð
-	virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObject) override;
+	virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObject) override {
+		TF_COM_ASUNK(ITextStoreACP2);
+		TF_COM_AS(ITfContextOwnerCompositionSink);
+	}
 	TF_COM_REFS;
 private:
 	//TextStoreSink

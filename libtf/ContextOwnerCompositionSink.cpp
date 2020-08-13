@@ -19,5 +19,3 @@ HRESULT __stdcall ContextOwnerCompositionSink::OnEndComposition(ITfCompositionVi
 	m_sigEndComp((ITfContextOwnerCompositionSink*)this, pComposition);
 	return S_OK;
 }
-
-TF_COM_QUERYINF(ContextOwnerCompositionSink, TF_COM_ASUNK(ITfContextOwnerCompositionSink));

@@ -32,5 +32,3 @@ HRESULT __stdcall ContextOwner::GetAttribute(REFGUID rguidAttribute, VARIANT* pv
 {
 	return S_OK;
 }
-
-TF_COM_QUERYINF(ContextOwner, TF_COM_ASUNK(ITfContextOwner) TF_COM_AS(ITfContextOwnerCompositionSink));

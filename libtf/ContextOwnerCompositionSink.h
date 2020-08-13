@@ -23,7 +23,9 @@ public:
 	virtual HRESULT __stdcall OnEndComposition(ITfCompositionView* pComposition) override;
 
 	//COMBase
-	virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObject) override;
+	virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObject) override {
+		TF_COM_ASUNK(ITfContextOwnerCompositionSink);
+	}
 	TF_COM_REFS;
 };
 #endif // !_CONTEXTOWNERCOMPOSITIONSINK_H_

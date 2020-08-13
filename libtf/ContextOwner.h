@@ -16,7 +16,10 @@ class TFAPI ContextOwner :
 	virtual HRESULT __stdcall GetAttribute(REFGUID rguidAttribute, VARIANT* pvarValue) override;
 
 	//COMBase
-	virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObject) override;
+	virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObject) override {
+		TF_COM_ASUNK(ITfContextOwner);
+		TF_COM_AS(ITfContextOwnerCompositionSink);
+	}
 	TF_COM_REFS;
 };
 #endif // !_CONTEXTOWNER_H_
