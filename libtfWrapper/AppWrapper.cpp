@@ -17,8 +17,9 @@ AppWrapper::~AppWrapper()
 			m_App->m_pThreadMgr->Deactivate();
 }
 
-VOID AppWrapper::Initialize(HWND hWnd)
+VOID AppWrapper::Initialize(System::IntPtr handle)
 {
+	HWND hWnd = (HWND)handle.ToPointer();
 	//MS Pinyin cant open candidate window when using normal active with ITfContextOwnerCompositionSink
 	//m_App->m_pThreadMgrEx->ActivateEx(&(m_App->m_ClientId), TF_TMAE_UIELEMENTENABLEDONLY);
 	m_App->m_pThreadMgr->Activate(&(m_App->m_ClientId));
@@ -35,22 +36,24 @@ VOID AppWrapper::Initialize(HWND hWnd)
 	m_Ctx = new Context(m_Doc, (ITextStoreACP2*)m_TextStore);
 	DisableIME();//Disable input before push, in case start composition
 	m_Doc->m_pDocMgr->Push(m_Ctx->m_pCtx.p);
+	//SetFocus when ctx is vaild, it seems that some ime just handle ITfThreadMgrEventSink::OnSetFocus, so when we push context, we need to SetFocus to update their state
+	m_App->m_pThreadMgr->SetFocus(m_Doc->m_pDocMgr);
 	m_Initilized = TRUE;
 }
 
 VOID AppWrapper::onCommit(TextStore* textStore, const std::wstring commitStr)
 {
-	//todo: handle commit
+	eventCommit(textStore, commitStr);
 }
 
 VOID AppWrapper::onCompStr(TextStore* textStore, const  std::wstring compStr)
 {
-	//todo: handle compstr
+	eventCompStr(textStore, compStr);
 }
 
 VOID AppWrapper::onGetCompsitionExt(TextStore* textStore, RECT* rect)
 {
-	//todo: handle getext
+	eventGetCompExt(textStore, rect);
 }
 
 VOID AppWrapper::DisableIME()
@@ -72,7 +75,8 @@ VOID AppWrapper::DisableIME()
 
 VOID AppWrapper::EnableIME()
 {
-	if (!m_IsIMEEnabled)
+	if (!m_IsIMEEnabled) {
 		m_IsIMEEnabled = TRUE;
-	m_App->m_pCfgSysKeyFeed->EnableSystemKeystrokeFeed();
+		m_App->m_pCfgSysKeyFeed->EnableSystemKeystrokeFeed();
+	}
 }

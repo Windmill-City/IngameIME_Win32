@@ -15,20 +15,25 @@ typedef void (*GetCompExtCallback)(TextStore* ts, RECT* rect);
 typedef void (*CompStrCallback)(TextStore* textStore, const  std::wstring compStr);
 typedef void (*CommitCallback)(TextStore* textStore, const  std::wstring commitStr);
 
-ref class AppWrapper
+public ref class AppWrapper
 {
 public:
 	BOOL m_IsIMEEnabled = TRUE;
 	BOOL m_Initilized = FALSE;
 
-	AppWrapper();
-	~AppWrapper();
-
-	VOID Initialize(HWND hWnd);
 	//event handler
 	delegate VOID CommitDelegate(TextStore* textStore, const std::wstring commitStr);
 	delegate VOID CompStrDelegate(TextStore* textStore, const std::wstring compStr);
 	delegate VOID GetCompsitionExtDelegate(TextStore* textStore, RECT* rect);
+
+	event CommitDelegate^ eventCommit;
+	event CompStrDelegate^ eventCompStr;
+	event GetCompsitionExtDelegate^ eventGetCompExt;
+
+	AppWrapper();
+	~AppWrapper();
+
+	VOID Initialize(System::IntPtr handle);
 
 	VOID onCommit(TextStore* textStore, const std::wstring commitStr);
 	VOID onCompStr(TextStore* textStore, const  std::wstring compStr);

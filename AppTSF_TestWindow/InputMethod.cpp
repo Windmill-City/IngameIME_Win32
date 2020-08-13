@@ -94,7 +94,8 @@ VOID InputMethod::DisableIME()
 
 VOID InputMethod::EnableIME()
 {
-	if (!m_IsIMEEnabled)
+	if (!m_IsIMEEnabled) {
 		m_IsIMEEnabled = TRUE;
-	m_App->m_pCfgSysKeyFeed->EnableSystemKeystrokeFeed();
+		m_App->m_pCfgSysKeyFeed->EnableSystemKeystrokeFeed();
+	}
 }
