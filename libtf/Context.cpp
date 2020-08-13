@@ -3,7 +3,6 @@
 #include "TextStore.h"
 #include "TextEditSink.h"
 
-CComPtr<TextEditSink> sink;
 Context::Context(const Document* document, const HWND hWnd) :Context(document, (ITextStoreACP2*)new TextStore(hWnd))
 {
 }

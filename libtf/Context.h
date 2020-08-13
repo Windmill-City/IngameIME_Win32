@@ -12,6 +12,7 @@ public:
 	CComQIPtr<ITfContextComposition> m_pCtxComposition;
 	CComQIPtr<ITfContextOwnerServices> m_pCtxOwnerServices;
 	CComQIPtr<ITfContextOwnerCompositionServices> m_pCtxOwnerCompServices;
+	CComQIPtr<ITfTextEditSink> sink;
 	TfEditCookie m_EditCookie = TF_INVALID_EDIT_COOKIE;
 
 	Context(const Document* document, const HWND hWnd);
