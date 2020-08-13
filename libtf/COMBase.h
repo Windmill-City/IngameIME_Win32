@@ -33,7 +33,7 @@ HRESULT __stdcall CLASSNAME::QueryInterface(REFIID riid, void** ppvObject)	\
 virtual ULONG __stdcall AddRef(void) override { return COMBase::AddRef(); };	\
 virtual ULONG __stdcall Release(void) override { return COMBase::Release(); };
 
-class COMBase :
+class TFAPI COMBase :
 	public IUnknown
 {
 public:

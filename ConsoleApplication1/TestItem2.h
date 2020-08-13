@@ -4,7 +4,6 @@
 #include <queue>
 #include <boost/signals2.hpp>
 
-#include "../libtf/tf_common.h"
 #include "../libtf/COMBase.h"
 //#include "../libtf/ContextOwnerCompositionSink.h"
 

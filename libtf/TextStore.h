@@ -7,7 +7,6 @@
 #include <queue>
 #include <boost/signals2.hpp>
 
-#include "tf_common.h"
 #include "ContextOwnerCompositionSink.h"
 
 #define EDIT_VIEW_COOKIE    0
