@@ -14,7 +14,7 @@ public:
 		auto tobind = boost::bind(&item2::func, this, _1, _2);
 		m_TextStore->m_sigCommitStr.connect(tobind);//lock fail in x86 release enviroment
 		test = new TestItem2();
-		test->m_sigCommitStr.connect(tobind);
+		test->m_sigCommitStr.connect(tobind);//it is ok
 	}
 
 	void func(TextStore* p, std::wstring val) {
