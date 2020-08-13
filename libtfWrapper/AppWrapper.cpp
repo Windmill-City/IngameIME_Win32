@@ -28,7 +28,7 @@ VOID AppWrapper::Initialize(HWND hWnd)
 	m_TextStore->AddRef();
 	//reg events
 	using namespace System::Runtime::InteropServices;
-	m_TextStore->m_sigGetCompExt.connect(reinterpret_cast<TextStore::signal_GetCompExt::slot_type*>(Marshal::GetFunctionPointerForDelegate(gcnew GetCompsitionExtDelegate(this, &AppWrapper::onGetCompsitionExt)).ToPointer()));
+	m_TextStore->m_sigGetCompExt.connect(&onGetCompExtCall);
 	//m_TextStore->m_sigCommitStr.connect(Marshal::GetFunctionPointerForDelegate(gcnew CommitDelegate(this, &AppWrapper::onCommit)).ToPointer());
 	//m_TextStore->m_sigUpdateCompStr.connect(Marshal::GetFunctionPointerForDelegate(gcnew CompStrDelegate(this, &AppWrapper::onCompStr)).ToPointer());
 	//push ctx
@@ -38,12 +38,12 @@ VOID AppWrapper::Initialize(HWND hWnd)
 	m_Initilized = TRUE;
 }
 
-VOID AppWrapper::onCommit(TextStore* textStore, std::wstring commitStr)
+VOID AppWrapper::onCommit(TextStore* textStore, const std::wstring commitStr)
 {
 	//todo: handle commit
 }
 
-VOID AppWrapper::onCompStr(TextStore* textStore, std::wstring compStr)
+VOID AppWrapper::onCompStr(TextStore* textStore, const  std::wstring compStr)
 {
 	//todo: handle compstr
 }

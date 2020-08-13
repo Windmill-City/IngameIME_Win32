@@ -11,6 +11,10 @@ if (FAILED(hr))\
 	throw gcnew System::Exception(desc##":" + hr);
 #define PIN(x,type) pin_ptr<type> p##x = &x;
 
+typedef void (*GetCompExtCallback)(TextStore* ts, const std::wstring str);
+void onGetCompExtCall(TextStore* ts, const std::wstring str) {
+}
+
 ref class AppWrapper
 {
 public:
@@ -26,8 +30,8 @@ public:
 	delegate VOID CompStrDelegate(TextStore* textStore, std::wstring compStr);
 	delegate VOID GetCompsitionExtDelegate(TextStore* textStore, RECT* rect);
 
-	VOID onCommit(TextStore* textStore, std::wstring commitStr);
-	VOID onCompStr(TextStore* textStore, std::wstring compStr);
+	VOID onCommit(TextStore* textStore, const std::wstring commitStr);
+	VOID onCompStr(TextStore* textStore, const  std::wstring compStr);
 	VOID onGetCompsitionExt(TextStore* textStore, RECT* rect);
 
 	VOID DisableIME();
