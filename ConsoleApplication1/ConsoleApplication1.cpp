@@ -12,7 +12,7 @@ public:
 	item2() {
 		m_TextStore = new TextStore((HWND)NULL);
 		auto tobind = boost::bind(&item2::func, this, _1, _2);
-		//m_TextStore->m_sigCommitStr.connect(tobind);//lock fail in x86 release enviroment
+		m_TextStore->m_sigCommitStr.connect(tobind);//lock fail in x86 release enviroment
 		test = new TestItem2();
 		test->m_sigCommitStr.connect(tobind);
 	}

@@ -156,9 +156,6 @@
     <ClCompile Include="TestItem2.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AppTSF_TestWindow\AppTSF_TestWindow.vcxproj">
-      <Project>{f5e1d04c-8c8a-4136-b85a-54127ab043e7}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\libtf\libtf.vcxproj">
       <Project>{6b9e60b4-51b6-40b0-884a-a5d07081302a}</Project>
     </ProjectReference>
