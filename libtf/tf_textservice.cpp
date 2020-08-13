@@ -10,5 +10,3 @@ HRESULT __stdcall TextService::Deactivate(void)
 {
 	return S_OK;
 }
-
-TF_COM_QUERYINF(TextService, TF_COM_ASUNK(ITfTextInputProcessor))

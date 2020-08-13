@@ -104,6 +104,7 @@ public:
 	virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObject) override {
 		TF_COM_ASUNK(ITextStoreACP2);
 		TF_COM_AS(ITfContextOwnerCompositionSink);
+		TF_COM_RETURN;
 	}
 	TF_COM_REFS;
 private:

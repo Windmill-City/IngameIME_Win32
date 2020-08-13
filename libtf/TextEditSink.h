@@ -20,7 +20,10 @@ public:
 	virtual HRESULT __stdcall OnEndEdit(ITfContext* pic, TfEditCookie ecReadOnly, ITfEditRecord* pEditRecord) override;
 
 	//COMBase
-	virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObject) override;
+	virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObject) override {
+		TF_COM_ASUNK(ITfTextEditSink);
+		TF_COM_RETURN;
+	}
 	TF_COM_REFS;
 };
 #endif // !_TEXTEDITSINK_H_

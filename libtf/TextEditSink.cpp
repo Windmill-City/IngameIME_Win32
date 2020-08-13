@@ -110,5 +110,3 @@ HRESULT __stdcall TextEditSink::OnEndEdit(ITfContext* pic, TfEditCookie ecReadOn
 	}
 	return S_OK;
 }
-
-TF_COM_QUERYINF(TextEditSink, TF_COM_ASUNK(ITfTextEditSink))

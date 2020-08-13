@@ -14,7 +14,10 @@ public:
 	virtual HRESULT __stdcall Deactivate(void) override;
 
 	//COMBase
-	virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObject) override;
+	virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObject) override {
+		TF_COM_ASUNK(ITfTextInputProcessor);
+		TF_COM_RETURN;
+	}
 	TF_COM_REFS;
 };
 #endif // !_TF_TEXTSERVICE_H_
