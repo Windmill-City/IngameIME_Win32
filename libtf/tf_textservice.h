@@ -4,7 +4,7 @@
 
 #include "COMBase.h"
 #include "tf_common.h"
-class TextService :
+class TFAPI TextService :
 	public COMBase,
 	public ITfTextInputProcessor
 {

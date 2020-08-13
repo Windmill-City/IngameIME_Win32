@@ -4,7 +4,7 @@
 
 #include "Document.h"
 
-class Context
+class TFAPI Context
 {
 public:
 	CComPtr<IUnknown> m_pTextStore;
@@ -14,7 +14,7 @@ public:
 	CComQIPtr<ITfContextOwnerCompositionServices> m_pCtxOwnerCompServices;
 	TfEditCookie m_EditCookie = TF_INVALID_EDIT_COOKIE;
 
-	TFAPI Context(const Document* document, const HWND hWnd);
-	TFAPI Context(const Document* document, IUnknown* punk);
+	Context(const Document* document, const HWND hWnd);
+	Context(const Document* document, IUnknown* punk);
 };
 #endif // !_CONTEXT_H_

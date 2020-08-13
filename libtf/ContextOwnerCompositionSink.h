@@ -5,7 +5,7 @@
 #include <boost/signals2.hpp>
 #include "COMBase.h"
 
-class ContextOwnerCompositionSink :
+class TFAPI ContextOwnerCompositionSink :
 	public COMBase,
 	public ITfContextOwnerCompositionSink
 {

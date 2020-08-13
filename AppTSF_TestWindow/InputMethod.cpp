@@ -55,14 +55,14 @@ VOID InputMethod::SetTextBox(TextBox* textBox)
 	EnableIME();
 }
 
-VOID InputMethod::onCommit(TextStore* textStore, std::wstring commitStr)
+VOID InputMethod::onCommit(TextStore* textStore, const std::wstring commitStr)
 {
 	if (textStore != m_TextStore.p || !m_TextBox) return;
 	m_TextBox->m_Text.append(commitStr);
 	InvalidateRect(textStore->GetWnd(), NULL, NULL);
 }
 
-VOID InputMethod::onCompStr(TextStore* textStore, std::wstring compStr)
+VOID InputMethod::onCompStr(TextStore* textStore, const std::wstring compStr)
 {
 	if (textStore != m_TextStore.p || !m_TextBox) return;
 	m_TextBox->m_CompText = compStr;

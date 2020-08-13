@@ -3,6 +3,7 @@
 #define _COMBASE_H_
 
 #include <msctf.h>
+#include "tf_common.h"
 
 #define TF_COM_AS(Interface) \
 if (IsEqualIID(IID_##Interface, riid)) {	\

@@ -18,8 +18,8 @@ public:
 
 	VOID Initialize(HWND hWnd);
 	VOID SetTextBox(TextBox* textBox);
-	VOID onCommit(TextStore* textStore, std::wstring commitStr);
-	VOID onCompStr(TextStore* textStore, std::wstring compStr);
+	VOID onCommit(TextStore* textStore, const std::wstring commitStr);
+	VOID onCompStr(TextStore* textStore, const std::wstring compStr);
 	VOID onGetCompsitionExt(TextStore* textStore, RECT* rect);
 	VOID DisableIME();
 	VOID EnableIME();

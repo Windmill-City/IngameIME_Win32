@@ -658,7 +658,7 @@ HRESULT __stdcall TextStore::GetScreenExt(TsViewCookie vcView, RECT* prc)
 	return S_OK;
 }
 
-TF_COM_QUERYINF(TextStore, TF_COM_ASUNK(ITextStoreACP2) TF_COM_ASUNK(ITfContextOwnerCompositionSink) TF_COM_ASUNK(ITfContextOwner));
+TF_COM_QUERYINF(TextStore, TF_COM_ASUNK(ITextStoreACP2) TF_COM_AS(ITfContextOwnerCompositionSink));
 
 HRESULT TextStore::_ClearAdviseSink(PADVISE_SINK pAdviseSink)
 {

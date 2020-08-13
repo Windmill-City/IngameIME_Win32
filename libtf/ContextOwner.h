@@ -3,7 +3,7 @@
 #define _CONTEXTOWNER_H_
 
 #include "ContextOwnerCompositionSink.h"
-class ContextOwner :
+class TFAPI ContextOwner :
 	public ITfContextOwner,
 	public ContextOwnerCompositionSink
 {

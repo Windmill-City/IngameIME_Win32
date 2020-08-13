@@ -3,7 +3,7 @@
 #define _TF_APPLICATION_H_
 
 #include "tf_common.h"
-class Application :
+class TFAPI Application :
 	public Common
 {
 public:
@@ -11,7 +11,7 @@ public:
 	CComQIPtr<ITfKeystrokeMgr> m_pKeyMgr;
 	CComQIPtr<ITfMessagePump> m_pMsgPump;
 
-	TFAPI ~Application();
-	TFAPI virtual HRESULT _stdcall Initialize() override;
+	~Application();
+	virtual HRESULT _stdcall Initialize() override;
 };
 #endif // !_TF_APPLICATION_H_

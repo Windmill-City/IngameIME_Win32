@@ -25,7 +25,7 @@ typedef struct
 	LONG acpEnd;
 }ACP, * PACP;
 
-class TextStore :
+class TFAPI TextStore :
 	public ContextOwnerCompositionSink,
 	public ITextStoreACP2
 {
@@ -53,8 +53,11 @@ private:
 	std::wstring			m_CompStr;
 public:
 	typedef boost::signals2::signal<VOID(TextStore*, RECT*)> signal_GetCompExt;
-	typedef boost::signals2::signal<VOID(TextStore*, std::wstring)> signal_UpdateCompStr;
-	typedef boost::signals2::signal<VOID(TextStore*, std::wstring)> signal_CommitStr;
+	typedef signal_GetCompExt::slot_type type_GetCompExt;
+	typedef boost::signals2::signal<VOID(TextStore*, const std::wstring)> signal_UpdateCompStr;
+	typedef signal_UpdateCompStr::slot_type type_UpdateCompStr;
+	typedef boost::signals2::signal<VOID(TextStore*, const std::wstring)> signal_CommitStr;
+	typedef signal_CommitStr::slot_type type_CommitStr;
 
 	BOOL					m_Commit;
 	BOOL					m_Composing;
@@ -68,8 +71,8 @@ public:
 	signal_UpdateCompStr	m_sigUpdateCompStr;
 	signal_CommitStr		m_sigCommitStr;
 
-	TFAPI TextStore(HWND hWnd);
-	TFAPI HWND GetWnd();
+	TextStore(HWND hWnd);
+	HWND GetWnd();
 
 	// Í¨¹ý ITextStoreACP2 ¼Ì³Ð
 	virtual HRESULT __stdcall AdviseSink(REFIID riid, IUnknown* punk, DWORD dwMask) override;

@@ -8,7 +8,7 @@
 #define TFAPI  __declspec(dllexport)
 #define THROWHR(hr, msg) if(FAILED(hr)) throw msg ## ":" + hr;
 #define RETURNHR(hr) if(FAILED(hr)) return hr;
-class Common
+class TFAPI Common
 {
 public:
 	CComQIPtr<ITfThreadMgr> m_pThreadMgr;
@@ -16,7 +16,7 @@ public:
 	CComQIPtr<ITfUIElementMgr> m_pUIElementMgr;
 	TfClientId m_ClientId = TF_CLIENTID_NULL;
 
-	TFAPI ~Common();
-	TFAPI virtual HRESULT _stdcall Initialize();
+	~Common();
+	virtual HRESULT _stdcall Initialize();
 };
 #endif // !_TF_COMMON_H_

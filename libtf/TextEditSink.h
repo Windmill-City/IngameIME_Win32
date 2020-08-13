@@ -5,7 +5,7 @@
 #include <boost/signals2.hpp>
 #include "COMBase.h"
 #include "Context.h"
-class TextEditSink :
+class TFAPI TextEditSink :
 	public COMBase,
 	public ITfTextEditSink
 {

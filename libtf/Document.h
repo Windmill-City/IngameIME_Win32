@@ -3,7 +3,7 @@
 #define _DOCUMENT_H_
 
 #include "tf_common.h"
-class Document
+class TFAPI Document
 {
 public:
 
@@ -12,7 +12,7 @@ public:
 	HWND m_hWnd;
 	TfClientId m_ClientId;
 
-	TFAPI Document(const Common* common, const HWND hWnd);
-	TFAPI ~Document();
+	Document(const Common* common, const HWND hWnd);
+	~Document();
 };
 #endif // !_DOCUMENT_H_

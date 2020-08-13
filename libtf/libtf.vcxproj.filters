@@ -86,6 +86,9 @@
     <ClCompile Include="TextStore.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Test.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
