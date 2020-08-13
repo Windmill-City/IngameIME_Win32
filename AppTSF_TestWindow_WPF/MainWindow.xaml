@@ -1,0 +1,14 @@
+﻿<Window x:Class="AppTSF_TestWindow_WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AppTSF_TestWindow_WPF"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid Margin="0,43,0,0">
+        <TextBlock HorizontalAlignment="Left" Height="379" TextWrapping="Wrap" Text="Input something" VerticalAlignment="Top" Width="792" Margin="0,-3,0,0" />
+        <Button Content="EnableIME" HorizontalAlignment="Left" Height="40" Margin="0,-43,0,0" VerticalAlignment="Top" Width="160" />
+        <Button Content="DisableIME" HorizontalAlignment="Left" Height="40" Margin="160,-43,0,0" VerticalAlignment="Top" Width="160" />
+    </Grid>
+</Window>

@@ -28,9 +28,9 @@ VOID AppWrapper::Initialize(HWND hWnd)
 	m_TextStore->AddRef();
 	//reg events
 	using namespace System::Runtime::InteropServices;
-	m_TextStore->m_sigGetCompExt.connect(&onGetCompExtCall);
-	//m_TextStore->m_sigCommitStr.connect(Marshal::GetFunctionPointerForDelegate(gcnew CommitDelegate(this, &AppWrapper::onCommit)).ToPointer());
-	//m_TextStore->m_sigUpdateCompStr.connect(Marshal::GetFunctionPointerForDelegate(gcnew CompStrDelegate(this, &AppWrapper::onCompStr)).ToPointer());
+	m_TextStore->m_sigGetCompExt.connect(reinterpret_cast<GetCompExtCallback>(Marshal::GetFunctionPointerForDelegate(gcnew GetCompsitionExtDelegate(this, &AppWrapper::onGetCompsitionExt)).ToPointer()));
+	m_TextStore->m_sigCommitStr.connect(reinterpret_cast<CommitCallback>(Marshal::GetFunctionPointerForDelegate(gcnew CommitDelegate(this, &AppWrapper::onCommit)).ToPointer()));
+	m_TextStore->m_sigUpdateCompStr.connect(reinterpret_cast<CompStrCallback>(Marshal::GetFunctionPointerForDelegate(gcnew CompStrDelegate(this, &AppWrapper::onCompStr)).ToPointer()));
 	//push ctx
 	m_Ctx = new Context(m_Doc, (ITextStoreACP2*)m_TextStore);
 	DisableIME();//Disable input before push, in case start composition
