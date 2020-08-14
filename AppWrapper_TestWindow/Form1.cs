@@ -36,7 +36,7 @@ namespace AppWrapper_TestWindow
 
         private void AppWrapper_eventGetCompExt(IntPtr source, refRECT rRect)
         {
-            Font f = new Font("Microsoft YaHei", 16F, System.Drawing.FontStyle.Regular, GraphicsUnit.Pixel);
+            Font f = new Font("Microsoft YaHei", 20F, System.Drawing.FontStyle.Regular, GraphicsUnit.Pixel);
             Size sif = TextRenderer.MeasureText(storedStr, f, new Size(0, 0), TextFormatFlags.NoPadding);
             Size sif2 = TextRenderer.MeasureText(compStr, f, new Size(0, 0), TextFormatFlags.NoPadding);
             rRect.left = label2.Location.X + sif.Width;
