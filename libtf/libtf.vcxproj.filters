@@ -51,6 +51,9 @@
     <ClInclude Include="ContextOwnerCompositionSink.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="UIElementSink.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -84,6 +87,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="TextStore.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIElementSink.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
