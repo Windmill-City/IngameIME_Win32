@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
-    <BoostRoot>C:\Users\Windmill_City\source\repos\boost_1_74_0</BoostRoot>
+    <BoostRoot>E:\source\repos\boost_1_74_0</BoostRoot>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />
