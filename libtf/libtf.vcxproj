@@ -217,14 +217,12 @@
     <ClInclude Include="TextStore.h" />
     <ClInclude Include="tf_application.h" />
     <ClInclude Include="tf_common.h" />
-    <ClInclude Include="tf_textservice.h" />
     <ClInclude Include="UIElementSink.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Context.cpp" />
     <ClCompile Include="ContextOwner.cpp" />
     <ClCompile Include="ContextOwnerCompositionSink.cpp" />
-    <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Document.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -236,7 +234,6 @@
     <ClCompile Include="TextStore.cpp" />
     <ClCompile Include="tf_application.cpp" />
     <ClCompile Include="tf_common.cpp" />
-    <ClCompile Include="tf_textservice.cpp" />
     <ClCompile Include="UIElementSink.cpp" />
   </ItemGroup>
   <ItemGroup>

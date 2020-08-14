@@ -7,6 +7,9 @@ class UIElementSink :
 	public ITfUIElementSink
 {
 public:
+	typedef boost::signals2::signal<VOID(DWORD dwUIElementId, BOOL* pbShow)> signal_BeginUIElement;
+	typedef boost::signals2::signal<VOID(DWORD dwUIElementId)> signal_UpdateUIElement;
+	typedef boost::signals2::signal<VOID(DWORD dwUIElementId)> signal_EndUIElement;
 	// Inherited via ITfUIElementSink
 	virtual HRESULT __stdcall BeginUIElement(DWORD dwUIElementId, BOOL* pbShow) override;
 	virtual HRESULT __stdcall UpdateUIElement(DWORD dwUIElementId) override;
