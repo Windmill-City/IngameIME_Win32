@@ -42,7 +42,7 @@ namespace AppWrapper_TestWindow
             rRect.left = label2.Location.X + sif.Width;
             rRect.top = label2.Location.Y;
             rRect.right = rRect.left + sif2.Width;
-            rRect.bottom = rRect.top + f.Height;
+            rRect.bottom = rRect.top + f.Height;//follow Font height
         }
 
         private void AppWrapper_eventCompStr(IntPtr source, string str)

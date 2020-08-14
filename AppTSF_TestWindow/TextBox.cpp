@@ -12,7 +12,7 @@ VOID TextBox::Draw(HWND hwnd, HDC hdc, PAINTSTRUCT* ps)
 	Graphics graphics(hdc);
 	PointF origin(8.0f, 8.0f);
 	m_rectComp.top = origin.Y;
-	m_rectComp.bottom = m_rectComp.top + fontText.GetHeight(&graphics);
+	m_rectComp.bottom = m_rectComp.top + fontText.GetHeight(&graphics);//follow Font height
 
 	Gdiplus::SolidBrush BrushFront(Color(255, 34, 142, 230));
 	Gdiplus::StringFormat format = Gdiplus::StringFormat::GenericTypographic();
