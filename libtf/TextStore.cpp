@@ -567,7 +567,15 @@ HRESULT __stdcall TextStore::RequestAttrsTransitioningAtPosition(LONG acpPos, UL
 
 HRESULT __stdcall TextStore::FindNextAttrTransition(LONG acpStart, LONG acpHalt, ULONG cFilterAttrs, const TS_ATTRID* paFilterAttrs, DWORD dwFlags, LONG* pacpNext, BOOL* pfFound, LONG* plFoundOffset)
 {
-	return E_NOTIMPL;
+	if (!pacpNext || !pfFound || !plFoundOffset)
+		return E_INVALIDARG;
+	///Note  If an application does not implement ITextStoreACP::FindNextAttrTransition, ITfReadOnlyProperty::EnumRanges fails with E_FAIL.
+	// We don't support any attributes.
+	// So we always return "not found".
+	*pacpNext = 0;
+	*pfFound = FALSE;
+	*plFoundOffset = 0;
+	return S_OK;
 }
 
 HRESULT __stdcall TextStore::RetrieveRequestedAttrs(ULONG ulCount, TS_ATTRVAL* paAttrVals, ULONG* pcFetched)
@@ -578,7 +586,7 @@ HRESULT __stdcall TextStore::RetrieveRequestedAttrs(ULONG ulCount, TS_ATTRVAL* p
 HRESULT __stdcall TextStore::GetEndACP(LONG* pacp)
 {
 	//does the caller have a lock
-	if (!_IsLocked(TS_LF_READWRITE))
+	if (!_IsLocked(TS_LF_READ))
 	{
 		//the caller doesn't have a lock
 		return TS_E_NOLOCK;
@@ -589,7 +597,7 @@ HRESULT __stdcall TextStore::GetEndACP(LONG* pacp)
 		return E_INVALIDARG;
 	}
 
-	*pacp = m_acpEnd;
+	*pacp = m_StoredStr.size();
 
 	return S_OK;
 }
@@ -695,27 +703,31 @@ void TextStore::_UnlockDocument()
 	HRESULT hr;
 	m_fLocked = FALSE;
 	m_dwLockType = 0;
+	if (m_fhasEdited) {
+		m_fhasEdited = FALSE;
+		if (m_Commit) {
+			m_Commit = FALSE;
+			LONG commitLen = m_CommitEnd - m_CommitStart;
+			m_sigCommitStr(this, m_StoredStr.substr(m_CommitStart, commitLen));
+			m_StoredStr.erase(m_CommitStart, commitLen);
+			TS_TEXTCHANGE textChange;
+			textChange.acpStart = m_CommitStart;
+			textChange.acpOldEnd = m_CommitEnd;
+			textChange.acpNewEnd = m_CommitStart;
+			m_AdviseSink.pTextStoreACPSink->OnTextChange(0, &textChange);
+			m_acpStart = m_acpEnd = m_StoredStr.size();
+			m_AdviseSink.pTextStoreACPSink->OnSelectionChange();
+			m_CommitStart = m_CommitEnd = 0;
+		}
 
-	if (m_Commit) {
-		m_Commit = FALSE;
-		LONG commitLen = m_CommitEnd - m_CommitStart;
-		m_sigCommitStr(this, m_StoredStr.substr(m_CommitStart, commitLen));
-		m_StoredStr.erase(m_CommitStart, commitLen);
-		TS_TEXTCHANGE textChange;
-		textChange.acpStart = m_CommitStart;
-		textChange.acpOldEnd = m_CommitEnd;
-		textChange.acpNewEnd = m_CommitStart;
-		m_AdviseSink.pTextStoreACPSink->OnTextChange(0, &textChange);
-		m_acpStart = m_acpEnd = m_StoredStr.size();
-		m_AdviseSink.pTextStoreACPSink->OnSelectionChange();
-		m_CommitStart = m_CommitEnd = 0;
-	}
-
-	if (m_Composing) {
-		m_sigUpdateCompStr(this, m_StoredStr.substr(m_CompStart, m_CompEnd - m_CompStart));
-	}
-	else {
-		m_sigUpdateCompStr(this, L"");
+		if (m_Composing) {
+			m_sigUpdateCompStr(this, m_StoredStr.substr(m_CompStart, m_CompEnd - m_CompStart));
+			m_sigUpdateCompSel(this, m_acpStart, m_acpEnd);
+		}
+		else {
+			m_sigUpdateCompStr(this, L"");
+			m_sigUpdateCompSel(this, 0, 0);
+		}
 	}
 
 	//if there is a queued lock, grant it

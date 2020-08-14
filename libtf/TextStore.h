@@ -53,8 +53,10 @@ private:
 public:
 	typedef boost::signals2::signal<VOID(TextStore*, RECT*)> signal_GetCompExt;
 	typedef boost::signals2::signal<VOID(TextStore*, const std::wstring)> signal_UpdateCompStr;
+	typedef boost::signals2::signal<VOID(TextStore*, int acpStart, int acpEnd)> signal_UpdateCompSel;
 	typedef boost::signals2::signal<VOID(TextStore*, const std::wstring)> signal_CommitStr;
 
+	BOOL					m_fhasEdited;
 	BOOL					m_Commit;
 	BOOL					m_Composing;
 	LONG					m_CommitStart;
@@ -65,6 +67,7 @@ public:
 	//event
 	signal_GetCompExt		m_sigGetCompExt;
 	signal_UpdateCompStr	m_sigUpdateCompStr;
+	signal_UpdateCompSel	m_sigUpdateCompSel;
 	signal_CommitStr		m_sigCommitStr;
 
 	TextStore(HWND hWnd);

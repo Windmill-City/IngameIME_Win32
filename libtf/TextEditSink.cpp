@@ -28,6 +28,7 @@ HRESULT __stdcall TextEditSink::OnEndEdit(ITfContext* pic, TfEditCookie ecReadOn
 	TextStore* _TextStore = dynamic_cast<TextStore*> (m_Ctx->m_pTextStore.p);
 	if (m_Ctx->m_pCtx.p != pic || !_TextStore)
 		return S_OK;
+	_TextStore->m_fhasEdited = TRUE;
 	_TextStore->m_Composing = FALSE;
 	_TextStore->m_Commit = FALSE;
 	_TextStore->m_CompStart = _TextStore->m_CompEnd = 0;

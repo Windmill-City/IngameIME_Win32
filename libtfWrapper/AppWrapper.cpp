@@ -11,6 +11,7 @@ AppWrapper::AppWrapper()
 
 AppWrapper::~AppWrapper()
 {
+	DisableIME();
 	if (m_TextStore) m_TextStore->Release();
 	if (m_App)
 		if (m_App->m_ClientId != TF_CLIENTID_NULL)
@@ -32,34 +33,49 @@ VOID AppWrapper::Initialize(System::IntPtr handle)
 	m_TextStore->m_sigGetCompExt.connect(reinterpret_cast<GetCompExtCallback>(Marshal::GetFunctionPointerForDelegate(gcnew GetCompsitionExtDelegate(this, &AppWrapper::onGetCompsitionExt)).ToPointer()));
 	m_TextStore->m_sigCommitStr.connect(reinterpret_cast<CommitCallback>(Marshal::GetFunctionPointerForDelegate(gcnew CommitDelegate(this, &AppWrapper::onCommit)).ToPointer()));
 	m_TextStore->m_sigUpdateCompStr.connect(reinterpret_cast<CompStrCallback>(Marshal::GetFunctionPointerForDelegate(gcnew CompStrDelegate(this, &AppWrapper::onCompStr)).ToPointer()));
+	m_TextStore->m_sigUpdateCompSel.connect(reinterpret_cast<CompSelCallback>(Marshal::GetFunctionPointerForDelegate(gcnew CompSelDelegate(this, &AppWrapper::onCompSel)).ToPointer()));
 	//push ctx
 	m_Ctx = new Context(m_Doc, (ITextStoreACP2*)m_TextStore);
 	DisableIME();//Disable input before push, in case start composition
 	m_Doc->m_pDocMgr->Push(m_Ctx->m_pCtx.p);
 	//SetFocus when ctx is vaild, it seems that some ime just handle ITfThreadMgrEventSink::OnSetFocus, so when we push context, we need to SetFocus to update their state
 	m_App->m_pThreadMgr->SetFocus(m_Doc->m_pDocMgr);
-	m_Initilized = TRUE;
+	m_Initilized = true;
 }
 
+#include <msclr\marshal_cppstd.h>
+
+using namespace System;
+using namespace msclr::interop;
 VOID AppWrapper::onCommit(TextStore* textStore, const std::wstring commitStr)
 {
-	eventCommit(textStore, commitStr);
+	eventCommit((IntPtr)textStore, marshal_as<String^>(commitStr));
 }
 
 VOID AppWrapper::onCompStr(TextStore* textStore, const  std::wstring compStr)
 {
-	eventCompStr(textStore, compStr);
+	eventCompStr((IntPtr)textStore, marshal_as<String^>(compStr));
+}
+
+VOID AppWrapper::onCompSel(TextStore* textStore, int acpStart, int acpEnd)
+{
+	eventCompSel((IntPtr)textStore, acpStart, acpEnd);
 }
 
 VOID AppWrapper::onGetCompsitionExt(TextStore* textStore, RECT* rect)
 {
-	eventGetCompExt(textStore, rect);
+	refRECT^ rRect = gcnew refRECT();
+	eventGetCompExt((IntPtr)textStore, rRect);
+	rect->left = rRect->left;
+	rect->top = rRect->top;
+	rect->right = rRect->right;
+	rect->bottom = rRect->bottom;
 }
 
 VOID AppWrapper::DisableIME()
 {
 	if (m_IsIMEEnabled) {
-		m_IsIMEEnabled = FALSE;
+		m_IsIMEEnabled = false;
 		/*
 		By default, the TSF manager will process keystrokesand pass them to the text services.
 		An application prevents this by calling this method.
@@ -76,7 +92,7 @@ VOID AppWrapper::DisableIME()
 VOID AppWrapper::EnableIME()
 {
 	if (!m_IsIMEEnabled) {
-		m_IsIMEEnabled = TRUE;
+		m_IsIMEEnabled = true;
 		m_App->m_pCfgSysKeyFeed->EnableSystemKeystrokeFeed();
 	}
 }
