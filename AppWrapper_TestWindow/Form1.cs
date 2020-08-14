@@ -39,10 +39,13 @@ namespace AppWrapper_TestWindow
             Font f = new Font("Microsoft YaHei", 20F, System.Drawing.FontStyle.Regular, GraphicsUnit.Pixel);
             Size sif = TextRenderer.MeasureText(storedStr, f, new Size(0, 0), TextFormatFlags.NoPadding);
             Size sif2 = TextRenderer.MeasureText(compStr, f, new Size(0, 0), TextFormatFlags.NoPadding);
+            //Map rect
             rRect.left = label2.Location.X + sif.Width;
             rRect.top = label2.Location.Y;
+            //should use Font height, because some IME draw CompStr themselves, when CompStr is Empty
+            //so the candidate window wont cover the text
+            rRect.bottom = rRect.top + f.Height;
             rRect.right = rRect.left + sif2.Width;
-            rRect.bottom = rRect.top + f.Height;//follow Font height
         }
 
         private void AppWrapper_eventCompStr(IntPtr source, string str)
