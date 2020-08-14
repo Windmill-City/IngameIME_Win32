@@ -31,8 +31,11 @@ VOID TextBox::Draw(HWND hwnd, HDC hdc, PAINTSTRUCT* ps)
 	graphics.MeasureString(m_CompText.c_str(), (INT)m_CompText.size(), &fontText, originComp, &rectfComp);
 	//Map Comp
 	m_rectComp.right = m_rectComp.left + rectfComp.Width;
+	RectF rectfCaret;
+	std::wstring toMeasure = m_CompText.substr(m_CompSelStart);
+	graphics.MeasureString(toMeasure.c_str(), (INT)toMeasure.size(), &fontText, originComp, &rectfCaret);
 	//Draw Caret
-	graphics.FillRectangle(&BrushFront, m_rectComp.right, m_rectComp.top, 2, (int)fontText.GetHeight(&graphics));
+	graphics.FillRectangle(&BrushFront, (int)(m_rectComp.right - rectfCaret.Width), m_rectComp.top, 2, (int)fontText.GetHeight(&graphics));
 }
 
 VOID TextBox::onKeyDown(WPARAM wParam, LPARAM lParam)

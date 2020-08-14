@@ -31,6 +31,9 @@ public:
 	int m_maxLength = 5;
 	RECT m_rectComp;
 
+	LONG m_CompSelStart;
+	LONG m_CompSelEnd;
+
 	TextBox(HWND hWnd);
 
 	VOID Draw(HWND hwnd, HDC hdc, PAINTSTRUCT* ps);

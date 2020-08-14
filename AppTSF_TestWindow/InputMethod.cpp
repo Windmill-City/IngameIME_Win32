@@ -28,6 +28,7 @@ VOID InputMethod::Initialize(HWND hWnd)
 	m_TextStore->m_sigGetCompExt.connect(boost::bind(&InputMethod::onGetCompsitionExt, this, _1, _2));
 	m_TextStore->m_sigCommitStr.connect(boost::bind(&InputMethod::onCommit, this, _1, _2));
 	m_TextStore->m_sigUpdateCompStr.connect(boost::bind(&InputMethod::onCompStr, this, _1, _2));
+	m_TextStore->m_sigUpdateCompSel.connect(boost::bind(&InputMethod::onCompSel, this, _1, _2, _3));
 	//push ctx
 	m_Ctx.reset(new Context(m_Doc.get(), (ITextStoreACP2*)m_TextStore.p));
 	DisableIME();//Disable input before push, in case start composition
@@ -67,6 +68,14 @@ VOID InputMethod::onCompStr(TextStore* textStore, const std::wstring compStr)
 {
 	if (textStore != m_TextStore.p || !m_TextBox) return;
 	m_TextBox->m_CompText = compStr;
+	InvalidateRect(textStore->GetWnd(), NULL, NULL);
+}
+
+VOID InputMethod::onCompSel(TextStore* textStore, int acpStart, int acpEnd)
+{
+	if (textStore != m_TextStore.p || !m_TextBox) return;
+	m_TextBox->m_CompSelStart = acpStart;
+	m_TextBox->m_CompSelEnd = acpEnd;
 	InvalidateRect(textStore->GetWnd(), NULL, NULL);
 }
 
