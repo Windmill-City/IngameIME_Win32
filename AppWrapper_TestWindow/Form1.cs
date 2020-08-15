@@ -30,7 +30,7 @@ namespace AppWrapper_TestWindow
 
         private void AppWrapper_eventBeginEle1(uint UIElementId, ref ValueType Show)
         {
-            Show = false;
+            Show = true;
         }
 
         private void AppWrapper_eventCompSel(IntPtr source, int acpStart, int acpEnd)
