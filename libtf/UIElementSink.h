@@ -2,8 +2,9 @@
 #include <boost/signals2.hpp>
 #include "COMBase.h"
 #include "Context.h"
+#include "tf_application.h"
 
-class UIElementSink :
+class TFAPI UIElementSink :
 	public COMBase,
 	public ITfUIElementSink
 {
@@ -16,10 +17,10 @@ public:
 	signal_UpdateUIElement			m_sigUpdateUIElement;
 	signal_EndUIElement				m_sigEndUIElement;
 
-	CComQIPtr<ITfContext>			m_pCtx;
+	Application* m_app;
 	DWORD							m_dwCookie = TF_INVALID_COOKIE;
 
-	UIElementSink(Context* ctx);
+	UIElementSink(Application* app);
 	~UIElementSink();
 
 	// Inherited via ITfUIElementSink

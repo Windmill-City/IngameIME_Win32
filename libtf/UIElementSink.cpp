@@ -1,21 +1,22 @@
 #include "pch.h"
 #include "UIElementSink.h"
 
-UIElementSink::UIElementSink(Context* ctx)
+UIElementSink::UIElementSink(Application* app)
 {
-	m_pCtx = ctx->m_pCtx;
+	m_app = app;
 	CComQIPtr<ITfSource> source;
-	source = ctx->m_pCtx;
-	source->AdviseSink(IID_ITfUIElementSink, (ITfUIElementSink*)this, &m_dwCookie);
+	source = m_app->m_pUIElementMgr;
+	HRESULT hr = source->AdviseSink(IID_ITfUIElementSink, (ITfUIElementSink*)this, &m_dwCookie);
+	THROWHR(hr, "Failed to Advisesink");
 }
 
 UIElementSink::~UIElementSink()
 {
 	if (m_dwCookie != TF_INVALID_COOKIE) {
 		CComQIPtr<ITfSource> source;
-		source = m_pCtx;
+		source = m_app->m_pUIElementMgr;
 		HRESULT hr = source->UnadviseSink(m_dwCookie);
-		THROWHR(hr, "Failed to Unadvicesink");
+		THROWHR(hr, "Failed to Unadvisesink");
 	}
 }
 

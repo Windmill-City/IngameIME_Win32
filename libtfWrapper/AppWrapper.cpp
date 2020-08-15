@@ -36,12 +36,12 @@ VOID AppWrapper::Initialize(System::IntPtr handle, ActivateMode activateMode)
 	m_TextStore->m_sigUpdateCompStr.connect(reinterpret_cast<CompStrCallback>(Marshal::GetFunctionPointerForDelegate(gcnew CompStrDelegate(this, &AppWrapper::onCompStr)).ToPointer()));
 	m_TextStore->m_sigUpdateCompSel.connect(reinterpret_cast<CompSelCallback>(Marshal::GetFunctionPointerForDelegate(gcnew CompSelDelegate(this, &AppWrapper::onCompSel)).ToPointer()));
 
-	m_Ctx = new Context(m_Doc, (ITextStoreACP2*)m_TextStore);
-	m_UIEleSink = new UIElementSink(m_Ctx);
+	m_UIEleSink = new UIElementSink(m_App);
 	m_UIEleSink->m_sigBeginUIElement.connect(reinterpret_cast<BeginUIEleCallback>(Marshal::GetFunctionPointerForDelegate(gcnew BeginUIEleDelegate(this, &AppWrapper::onBeginUIEle)).ToPointer()));
 	m_UIEleSink->m_sigUpdateUIElement.connect(reinterpret_cast<UpdateUIEleCallback>(Marshal::GetFunctionPointerForDelegate(gcnew UpdateUIEleDelegate(this, &AppWrapper::onUpdateUIEle)).ToPointer()));
 	m_UIEleSink->m_sigEndUIElement.connect(reinterpret_cast<EndUIEleCallback>(Marshal::GetFunctionPointerForDelegate(gcnew EndUIEleDelegate(this, &AppWrapper::onEndUIEle)).ToPointer()));
 
+	m_Ctx = new Context(m_Doc, (ITextStoreACP2*)m_TextStore);
 	//push ctx
 	DisableIME();//Disable input before push, in case start composition
 	m_Doc->m_pDocMgr->Push(m_Ctx->m_pCtx.p);

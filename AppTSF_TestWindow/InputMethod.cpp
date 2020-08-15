@@ -1,5 +1,6 @@
 ﻿#include <boost/bind.hpp>   
 #include "InputMethod.h"
+#include "../libtf/UIElementSink.h"
 InputMethod::InputMethod()
 {
 	m_App.reset(new Application());
