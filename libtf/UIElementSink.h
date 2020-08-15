@@ -1,6 +1,7 @@
 #pragma once
 #include <boost/signals2.hpp>
 #include "COMBase.h"
+#include "Context.h"
 
 class UIElementSink :
 	public COMBase,
@@ -10,6 +11,17 @@ public:
 	typedef boost::signals2::signal<VOID(DWORD dwUIElementId, BOOL* pbShow)> signal_BeginUIElement;
 	typedef boost::signals2::signal<VOID(DWORD dwUIElementId)> signal_UpdateUIElement;
 	typedef boost::signals2::signal<VOID(DWORD dwUIElementId)> signal_EndUIElement;
+
+	signal_BeginUIElement			m_sigBeginUIElement;
+	signal_UpdateUIElement			m_sigUpdateUIElement;
+	signal_EndUIElement				m_sigEndUIElement;
+
+	CComQIPtr<ITfContext>			m_pCtx;
+	DWORD							m_dwCookie = TF_INVALID_COOKIE;
+
+	UIElementSink(Context* ctx);
+	~UIElementSink();
+
 	// Inherited via ITfUIElementSink
 	virtual HRESULT __stdcall BeginUIElement(DWORD dwUIElementId, BOOL* pbShow) override;
 	virtual HRESULT __stdcall UpdateUIElement(DWORD dwUIElementId) override;
