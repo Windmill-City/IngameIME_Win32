@@ -62,7 +62,7 @@ public:
 	delegate void CompSelEventHandler(System::IntPtr source, int acpStart, int acpEnd);
 	delegate void GetCompsitionExtEventHandler(System::IntPtr source, refRECT^ rRect);
 
-	delegate void BeginUIEleHandler(unsigned long UIElementId, bool^ Show);
+	delegate void BeginUIEleHandler(unsigned long UIElementId, bool^% Show);
 	delegate void UpdateUIEleHandler(unsigned long UIElementId);
 	delegate void EndUIEleHandler(unsigned long UIElementId);
 

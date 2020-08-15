@@ -24,6 +24,13 @@ namespace AppWrapper_TestWindow
             Program.appWrapper.eventCompStr += AppWrapper_eventCompStr;
             Program.appWrapper.eventGetCompExt += AppWrapper_eventGetCompExt;
             Program.appWrapper.eventCompSel += AppWrapper_eventCompSel;
+
+            Program.appWrapper.eventBeginEle += AppWrapper_eventBeginEle1; ;
+        }
+
+        private void AppWrapper_eventBeginEle1(uint UIElementId, ref ValueType Show)
+        {
+            Show = false;
         }
 
         private void AppWrapper_eventCompSel(IntPtr source, int acpStart, int acpEnd)
