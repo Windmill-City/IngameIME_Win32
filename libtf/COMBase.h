@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _COMBASE_H_
-#define _COMBASE_H_
 
 #include <msctf.h>
 #include "tf_common.h"
@@ -47,4 +45,3 @@ public:
 private:
 	ULONG m_ulRef;
 };
-#endif // !_COMBASE_H_

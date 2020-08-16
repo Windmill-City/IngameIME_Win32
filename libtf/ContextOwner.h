@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _CONTEXTOWNER_H_
-#define _CONTEXTOWNER_H_
 
 #include "ContextOwnerCompositionSink.h"
 class TFAPI ContextOwner :
@@ -24,4 +22,3 @@ public:
 	}
 	TF_COM_REFS;
 };
-#endif // !_CONTEXTOWNER_H_

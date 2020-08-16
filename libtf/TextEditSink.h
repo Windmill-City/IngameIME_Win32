@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _TEXTEDITSINK_H_
-#define _TEXTEDITSINK_H_
 
 #include <boost/signals2.hpp>
 #include "COMBase.h"
@@ -26,4 +24,3 @@ public:
 	}
 	TF_COM_REFS;
 };
-#endif // !_TEXTEDITSINK_H_

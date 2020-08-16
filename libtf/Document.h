@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _DOCUMENT_H_
-#define _DOCUMENT_H_
 
 #include "tf_common.h"
 class TFAPI Document
@@ -15,4 +13,3 @@ public:
 	Document(const Common* common, const HWND hWnd);
 	~Document();
 };
-#endif // !_DOCUMENT_H_

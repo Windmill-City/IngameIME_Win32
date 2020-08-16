@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _TF_APPLICATION_H_
-#define _TF_APPLICATION_H_
 
 #include "tf_common.h"
 class TFAPI Application :
@@ -14,4 +12,3 @@ public:
 	~Application();
 	virtual HRESULT _stdcall Initialize() override;
 };
-#endif // !_TF_APPLICATION_H_

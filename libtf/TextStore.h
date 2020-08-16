@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _TEXTSTORE_H_
-#define _TEXTSTORE_H_
 
 #include <xstring>
 
@@ -115,4 +113,3 @@ private:
 	void _UnlockDocument();
 	BOOL _IsLocked(DWORD dwLockType);
 };
-#endif // !_TEXTSTORE_H_

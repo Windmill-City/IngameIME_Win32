@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _CONTEXTOWNERCOMPOSITIONSINK_H_
-#define _CONTEXTOWNERCOMPOSITIONSINK_H_
 
 #include <boost/signals2.hpp>
 #include "COMBase.h"
@@ -29,4 +27,3 @@ public:
 	}
 	TF_COM_REFS;
 };
-#endif // !_CONTEXTOWNERCOMPOSITIONSINK_H_

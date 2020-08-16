@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _TF_COMMON_H_
-#define _TF_COMMON_H_
 
 #include <vector>
 #include <msctf.h>
@@ -19,4 +17,3 @@ public:
 	~Common();
 	virtual HRESULT _stdcall Initialize();
 };
-#endif // !_TF_COMMON_H_
