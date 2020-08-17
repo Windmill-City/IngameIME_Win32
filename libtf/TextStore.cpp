@@ -284,16 +284,6 @@ HRESULT __stdcall TextStore::SetSelection(ULONG ulCount, const TS_SELECTION_ACP*
 		m_ActiveSelEnd = pSelection[0].style.ase;
 	}
 
-	//if the selection end is at the start of the selection, reverse the parameters
-	LONG    lStart = m_acpStart;
-	LONG    lEnd = m_acpEnd;
-
-	if (TS_AE_START == m_ActiveSelEnd)
-	{
-		lStart = m_acpEnd;
-		lEnd = m_acpStart;
-	}
-
 	return S_OK;
 }
 
