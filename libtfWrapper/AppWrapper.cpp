@@ -29,17 +29,26 @@ VOID AppWrapper::Initialize(System::IntPtr handle, ActivateMode activateMode)
 	m_TextStore = new TextStore(hWnd);
 	m_TextStore->AddRef();
 
+	//init evnets
+	m_nativeGetCompExt = gcnew GetCompsitionExtDelegate(this, &AppWrapper::onGetCompsitionExt);
+	m_nativeCommit = gcnew CommitDelegate(this, &AppWrapper::onCommit);
+	m_nativeCompStr = gcnew CompStrDelegate(this, &AppWrapper::onCompStr);
+	m_nativeCompSel = gcnew CompSelDelegate(this, &AppWrapper::onCompSel);
+	m_nativeBeginUIEle = gcnew BeginUIEleDelegate(this, &AppWrapper::onBeginUIEle);
+	m_nativeUpdateUIEle = gcnew UpdateUIEleDelegate(this, &AppWrapper::onUpdateUIEle);
+	m_nativeEndUIEle = gcnew EndUIEleDelegate(this, &AppWrapper::onEndUIEle);
+
 	//reg events
 	using namespace System::Runtime::InteropServices;
-	m_TextStore->m_sigGetCompExt.connect(reinterpret_cast<GetCompExtCallback>(Marshal::GetFunctionPointerForDelegate(gcnew GetCompsitionExtDelegate(this, &AppWrapper::onGetCompsitionExt)).ToPointer()));
-	m_TextStore->m_sigCommitStr.connect(reinterpret_cast<CommitCallback>(Marshal::GetFunctionPointerForDelegate(gcnew CommitDelegate(this, &AppWrapper::onCommit)).ToPointer()));
-	m_TextStore->m_sigUpdateCompStr.connect(reinterpret_cast<CompStrCallback>(Marshal::GetFunctionPointerForDelegate(gcnew CompStrDelegate(this, &AppWrapper::onCompStr)).ToPointer()));
-	m_TextStore->m_sigUpdateCompSel.connect(reinterpret_cast<CompSelCallback>(Marshal::GetFunctionPointerForDelegate(gcnew CompSelDelegate(this, &AppWrapper::onCompSel)).ToPointer()));
+	m_TextStore->m_sigGetCompExt.connect(reinterpret_cast<GetCompExtCallback>(Marshal::GetFunctionPointerForDelegate(m_nativeGetCompExt).ToPointer()));
+	m_TextStore->m_sigCommitStr.connect(reinterpret_cast<CommitCallback>(Marshal::GetFunctionPointerForDelegate(m_nativeCommit).ToPointer()));
+	m_TextStore->m_sigUpdateCompStr.connect(reinterpret_cast<CompStrCallback>(Marshal::GetFunctionPointerForDelegate(m_nativeCompStr).ToPointer()));
+	m_TextStore->m_sigUpdateCompSel.connect(reinterpret_cast<CompSelCallback>(Marshal::GetFunctionPointerForDelegate(m_nativeCompSel).ToPointer()));
 
 	m_UIEleSink = new UIElementSink(m_App);
-	m_UIEleSink->m_sigBeginUIElement.connect(reinterpret_cast<BeginUIEleCallback>(Marshal::GetFunctionPointerForDelegate(gcnew BeginUIEleDelegate(this, &AppWrapper::onBeginUIEle)).ToPointer()));
-	m_UIEleSink->m_sigUpdateUIElement.connect(reinterpret_cast<UpdateUIEleCallback>(Marshal::GetFunctionPointerForDelegate(gcnew UpdateUIEleDelegate(this, &AppWrapper::onUpdateUIEle)).ToPointer()));
-	m_UIEleSink->m_sigEndUIElement.connect(reinterpret_cast<EndUIEleCallback>(Marshal::GetFunctionPointerForDelegate(gcnew EndUIEleDelegate(this, &AppWrapper::onEndUIEle)).ToPointer()));
+	m_UIEleSink->m_sigBeginUIElement.connect(reinterpret_cast<BeginUIEleCallback>(Marshal::GetFunctionPointerForDelegate(m_nativeBeginUIEle).ToPointer()));
+	m_UIEleSink->m_sigUpdateUIElement.connect(reinterpret_cast<UpdateUIEleCallback>(Marshal::GetFunctionPointerForDelegate(m_nativeUpdateUIEle).ToPointer()));
+	m_UIEleSink->m_sigEndUIElement.connect(reinterpret_cast<EndUIEleCallback>(Marshal::GetFunctionPointerForDelegate(m_nativeEndUIEle).ToPointer()));
 
 	m_Ctx = new Context(m_Doc, (ITextStoreACP2*)m_TextStore);
 	//push ctx

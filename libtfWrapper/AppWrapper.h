@@ -43,10 +43,7 @@ public ref struct refRECT
 
 public ref class AppWrapper
 {
-public:
-	bool m_IsIMEEnabled = true;
-	bool m_Initilized;
-
+private:
 	//c++ event handler
 	delegate VOID CommitDelegate(TextStore* textStore, const std::wstring commitStr);
 	delegate VOID CompStrDelegate(TextStore* textStore, const std::wstring compStr);
@@ -56,6 +53,18 @@ public:
 	delegate VOID BeginUIEleDelegate(DWORD dwUIElementId, BOOL* pbShow);
 	delegate VOID UpdateUIEleDelegate(DWORD dwUIElementId);
 	delegate VOID EndUIEleDelegate(DWORD dwUIElementId);
+
+	CommitDelegate^ m_nativeCommit;
+	CompStrDelegate^ m_nativeCompStr;
+	CompSelDelegate^ m_nativeCompSel;
+	GetCompsitionExtDelegate^ m_nativeGetCompExt;
+
+	BeginUIEleDelegate^ m_nativeBeginUIEle;
+	UpdateUIEleDelegate^ m_nativeUpdateUIEle;
+	EndUIEleDelegate^ m_nativeEndUIEle;
+public:
+	bool m_IsIMEEnabled = true;
+	bool m_Initilized;
 	//C# event handler
 	delegate void CommitEventHandler(System::IntPtr source, System::String^ str);
 	delegate void CompStrEventHandler(System::IntPtr source, System::String^ str);
