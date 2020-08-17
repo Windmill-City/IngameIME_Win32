@@ -90,7 +90,7 @@ VOID AppWrapper::onGetCompsitionExt(TextStore* textStore, RECT* rect)
 
 VOID AppWrapper::onBeginUIEle(DWORD dwUIElementId, BOOL* pbShow)
 {
-	bool^ show;
+	bool^ show = gcnew System::Boolean();
 	eventBeginEle(dwUIElementId, show);
 	*pbShow = *show;
 }
