@@ -21,7 +21,9 @@ HRESULT hr = m_App->Initialize();
 m_App->m_pThreadMgr->Activate(&(m_App->m_ClientId));
 //Associate the window
 m_Doc.reset(new Document(m_App.get(), hWnd));
-
+```
+#### Events
+```c++
 //A textStore, you should register event to it
 m_TextStore = new TextStore(hWnd);
 //reg events
@@ -33,7 +35,9 @@ m_TextStore->m_sigCommitStr.connect(boost::bind(&InputMethod::onCommit, this, _1
 m_TextStore->m_sigUpdateCompStr.connect(boost::bind(&InputMethod::onCompStr, this, _1, _2));
 //the Caret position of the Composition
 m_TextStore->m_sigUpdateCompSel.connect(boost::bind(&InputMethod::onCompSel, this, _1, _2, _3));
-
+```
+#### Push Context
+```c++
 //push ctx, to allow IME input
 m_Ctx.reset(new Context(m_Doc.get(), (ITextStoreACP2*)m_TextStore.p));
 m_Doc->m_pDocMgr->Push(m_Ctx->m_pCtx.p);
@@ -55,7 +59,7 @@ m_UIEleSink->m_sigUpdateUIElement.connect(your handler here);
 m_UIEleSink->m_sigEndUIElement.connect(your handler here);
 ```
 #### UIElementHandler example： https://github.com/yangyuan/meow/blob/master/src/meow-uiless/meow_textapp.cpp
-```
+```c++
 HRESULT MeowTextApp::BeginUIElement(DWORD dwUIElementId, BOOL *pbShow)
 {
  	if (pbShow)
@@ -139,31 +143,31 @@ HRESULT MeowTextApp::EndUIElement(DWORD dwUIElementId)
 ```
 ### DisableIME
 1. DisableSystemKeyStrokeFeed
-```
-/*
-By default, the TSF manager will process keystrokesand pass them to the text services.
-An application prevents this by calling this method.
-Typically, this method is called when text service input is inappropriate, for example when a menu is displayed.
-Calls to this method are cumulative, so every call to this method requires a subsequent call to ITfConfigureSystemKeystrokeFeed::EnableSystemKeystrokeFeed.
 
-So we use a bool to prevent multiple disable here
+>By default, the TSF manager will process keystrokesand pass them to the text services.
+>An application prevents this by calling this method.
+>Typically, this method is called when text service input is inappropriate, for example when a menu is displayed.
+>Calls to this method are cumulative, so every call to this method requires a subsequent call to ITfConfigureSystemKeystrokeFeed::EnableSystemKeystrokeFeed.
 
-**Won't cancel candidate list window if you are composing**
-Context->m_pCtxOwnerCompServices->TerminateComposition(NULL);//pass NULL to terminate all composition
-
-*/
+>So we should use a bool to prevent multiple disable here
+```c++
 Application->m_pCfgSysKeyFeed->DisableSystemKeystrokeFeed();
 ```
-2. Pop all the context
+
+**Won't cancel candidate list window if you are composing**
+```c++
+Context->m_pCtxOwnerCompServices->TerminateComposition(NULL);//pass NULL to terminate all composition
 ```
+2. Pop all the context
+```c++
 //Pop all the context
 DocumentMgr->Pop(TF_POPF_ALL)
 ```
 3. Set TextStore ReadOnly
-```
+```c++
 	/*
 	Can be zero or:
-  Zero means enable read/write
+  	Zero means enable read/write
   
 	TS_SD_READONLY  // if set, document is read only; writes will fail
 	TS_SD_LOADING   // if set, document is loading, expect additional inserts
@@ -172,13 +176,13 @@ DocumentMgr->Pop(TF_POPF_ALL)
   m_Ctx->m_pCtxOwnerServices->OnStatusChange(TS_SD_READONLY);
 ```
 4. SetFocus to a NULL DocumentMgr
-```
+```c++
 //Not suggest
 ITfThreadMgr->AssociateFocus(m_hWnd, NULL, &prevDocMgr);
 ```
 ## C#
 Use Appwrapper
-```
+```c#
 //Need to init in STA UIThread
 AppWrapper appWrapper = new AppWrapper();
 appWrapper.Initialize(form.Handle, ActivateMode.DEFAULT);
@@ -196,7 +200,7 @@ appWrapper.eventUpdateEle += AppWrapper_eventUpdateEle1;
 appWrapper.eventEndEle += AppWrapper_eventEndEle1;
 ```
 EnableIME/DisableIME
-```
+```c#
 appWrapper.DisableIME();
 appWrapper.EnableIME();
 ```
