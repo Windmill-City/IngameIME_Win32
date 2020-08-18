@@ -144,12 +144,15 @@ HRESULT MeowTextApp::EndUIElement(DWORD dwUIElementId)
 ### DisableIME
 1. DisableSystemKeyStrokeFeed
 
->By default, the TSF manager will process keystrokesand pass them to the text services.
->An application prevents this by calling this method.
->Typically, this method is called when text service input is inappropriate, for example when a menu is displayed.
->Calls to this method are cumulative, so every call to this method requires a subsequent call to ITfConfigureSystemKeystrokeFeed::EnableSystemKeystrokeFeed.
+> By default, the TSF manager will process keystrokesand pass them to the text services.
 
->So we should use a bool to prevent multiple disable here
+> An application prevents this by calling this method.
+
+> Typically, this method is called when text service input is inappropriate, for example when a menu is displayed.
+
+> Calls to this method are cumulative, so every call to this method requires a subsequent call to ITfConfigureSystemKeystrokeFeed::EnableSystemKeystrokeFeed.
+
+**So we should prevent multiple disable here(or any other solutions)**
 ```c++
 Application->m_pCfgSysKeyFeed->DisableSystemKeystrokeFeed();
 ```
