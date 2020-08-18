@@ -17,7 +17,7 @@ namespace AppWrapper_TestWindow
             Application.SetCompatibleTextRenderingDefault(false);
             Form1 form = new Form1();
             appWrapper = new AppWrapper();
-            appWrapper.Initialize(form.Handle, ActivateMode.DEFAULT);
+            appWrapper.Initialize(form.Handle, ActivateMode.UIELEMENTENABLEDONLY);
             Application.Run(form);
         }
     }

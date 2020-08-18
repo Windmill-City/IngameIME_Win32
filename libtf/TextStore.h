@@ -43,9 +43,6 @@ private:
 	BOOL                    m_fLocked;
 	DWORD                   m_dwLockType;
 	std::queue<DWORD>		m_queuedLockReq;
-	//TextBox
-	TS_STATUS               m_status;
-	BOOL                    m_fLayoutChanged;
 	//Composition
 	std::wstring			m_CompStr;
 public:
@@ -61,6 +58,11 @@ public:
 	LONG					m_CommitEnd;
 	LONG					m_CompStart;
 	LONG					m_CompEnd;
+
+	//Status
+	TS_STATUS               m_status;
+	//Layout
+	BOOL                    m_fLayoutChanged;
 
 	//event
 	signal_GetCompExt		m_sigGetCompExt;
