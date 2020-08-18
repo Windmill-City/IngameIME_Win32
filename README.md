@@ -140,18 +140,19 @@ HRESULT MeowTextApp::EndUIElement(DWORD dwUIElementId)
 ### DisableIME
 1. DisableSystemKeyStrokeFeed
 ```
-    /*
-		By default, the TSF manager will process keystrokesand pass them to the text services.
-		An application prevents this by calling this method.
-		Typically, this method is called when text service input is inappropriate, for example when a menu is displayed.
-		Calls to this method are cumulative, so every call to this method requires a subsequent call to ITfConfigureSystemKeystrokeFeed::EnableSystemKeystrokeFeed.
+/*
+By default, the TSF manager will process keystrokesand pass them to the text services.
+An application prevents this by calling this method.
+Typically, this method is called when text service input is inappropriate, for example when a menu is displayed.
+Calls to this method are cumulative, so every call to this method requires a subsequent call to ITfConfigureSystemKeystrokeFeed::EnableSystemKeystrokeFeed.
 
-		So we use a bool to prevent multiple disable here
-    
-    **Won't cancel candidate list window if you are composing**
-    Context->m_pCtxOwnerCompServices->TerminateComposition(NULL);//pass NULL to terminate all composition
-		*/
-		Application->m_pCfgSysKeyFeed->DisableSystemKeystrokeFeed();
+So we use a bool to prevent multiple disable here
+
+**Won't cancel candidate list window if you are composing**
+Context->m_pCtxOwnerCompServices->TerminateComposition(NULL);//pass NULL to terminate all composition
+
+*/
+Application->m_pCfgSysKeyFeed->DisableSystemKeystrokeFeed();
 ```
 2. Pop all the context
 ```
@@ -170,7 +171,7 @@ DocumentMgr->Pop(TF_POPF_ALL)
   m_TextStore->m_status.dwDynamicFlags = TS_SD_READONLY;
   m_Ctx->m_pCtxOwnerServices->OnStatusChange(TS_SD_READONLY);
 ```
-4. SetFocus a NULL DocumentMgr
+4. SetFocus to a NULL DocumentMgr
 ```
 //Not suggest
 ITfThreadMgr->AssociateFocus(m_hWnd, NULL, &prevDocMgr);
