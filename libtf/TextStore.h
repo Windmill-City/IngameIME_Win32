@@ -58,9 +58,6 @@ public:
 	LONG					m_CommitEnd;
 	LONG					m_CompStart;
 	LONG					m_CompEnd;
-
-	//TextStoreSink
-	ADVISE_SINK             m_AdviseSink;
 	//Status
 	TS_STATUS               m_status;
 	//Layout
