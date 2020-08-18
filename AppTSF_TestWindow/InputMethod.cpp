@@ -30,9 +30,9 @@ VOID InputMethod::Initialize(HWND hWnd)
 	m_TextStore->m_sigCommitStr.connect(boost::bind(&InputMethod::onCommit, this, _1, _2));
 	m_TextStore->m_sigUpdateCompStr.connect(boost::bind(&InputMethod::onCompStr, this, _1, _2));
 	m_TextStore->m_sigUpdateCompSel.connect(boost::bind(&InputMethod::onCompSel, this, _1, _2, _3));
-	m_TextStore->m_status.dwDynamicFlags
-		//push ctx
-		m_Ctx.reset(new Context(m_Doc.get(), (ITextStoreACP2*)m_TextStore.p));
+
+	//push ctx
+	m_Ctx.reset(new Context(m_Doc.get(), (ITextStoreACP2*)m_TextStore.p));
 	DisableIME();//Disable input before push, in case start composition
 	m_Doc->m_pDocMgr->Push(m_Ctx->m_pCtx.p);
 	//SetFocus when ctx is vaild, it seems that some ime just handle ITfThreadMgrEventSink::OnSetFocus, so when we push context, we need to SetFocus to update their state
