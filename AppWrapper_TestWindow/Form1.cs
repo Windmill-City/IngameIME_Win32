@@ -47,8 +47,7 @@ namespace AppWrapper_TestWindow
 
         private void AppWrapper_eventGetCompExt(IntPtr rRect)
         {
-            RECT rect = new RECT();
-            Marshal.PtrToStructure(rRect, rect);//Map from
+            RECT rect = (RECT)Marshal.PtrToStructure(rRect, typeof(RECT));//Map from
 
             Font f = new Font("Microsoft YaHei", 20F, System.Drawing.FontStyle.Regular, GraphicsUnit.Pixel);
             Size sif = TextRenderer.MeasureText(storedStr, f, new Size(0, 0), TextFormatFlags.NoPadding);
