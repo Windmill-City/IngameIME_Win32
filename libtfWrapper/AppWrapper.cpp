@@ -65,23 +65,23 @@ using namespace System;
 using namespace msclr::interop;
 VOID AppWrapper::onCommit(TextStore* textStore, const std::wstring commitStr)
 {
-	eventCommit((IntPtr)textStore, marshal_as<String^>(commitStr));
+	eventCommit(marshal_as<String^>(commitStr));
 }
 
 VOID AppWrapper::onCompStr(TextStore* textStore, const  std::wstring compStr)
 {
-	eventCompStr((IntPtr)textStore, marshal_as<String^>(compStr));
+	eventCompStr(marshal_as<String^>(compStr));
 }
 
 VOID AppWrapper::onCompSel(TextStore* textStore, int acpStart, int acpEnd)
 {
-	eventCompSel((IntPtr)textStore, acpStart, acpEnd);
+	eventCompSel(acpStart, acpEnd);
 }
 
 VOID AppWrapper::onGetCompsitionExt(TextStore* textStore, RECT* rect)
 {
 	refRECT^ rRect = gcnew refRECT();
-	eventGetCompExt((IntPtr)textStore, rRect);
+	eventGetCompExt(rRect);
 	rect->left = rRect->left;
 	rect->top = rRect->top;
 	rect->right = rRect->right;
@@ -90,9 +90,9 @@ VOID AppWrapper::onGetCompsitionExt(TextStore* textStore, RECT* rect)
 
 VOID AppWrapper::onBeginUIEle(DWORD dwUIElementId, BOOL* pbShow)
 {
-	bool^ show = gcnew System::Boolean(true);
+	bool show = *pbShow;
 	eventBeginEle(dwUIElementId, show);
-	*pbShow = *show;
+	*pbShow = show;
 }
 
 VOID AppWrapper::onUpdateUIEle(DWORD dwUIElementId)
