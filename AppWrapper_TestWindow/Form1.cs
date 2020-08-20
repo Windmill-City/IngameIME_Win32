@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace AppWrapper_TestWindow
@@ -19,7 +20,7 @@ namespace AppWrapper_TestWindow
             Program.appWrapper.eventGetCompExt += AppWrapper_eventGetCompExt;
             Program.appWrapper.eventCompSel += AppWrapper_eventCompSel;
 
-            Program.appWrapper.eventBeginEle += AppWrapper_eventBeginEle; ;
+            Program.appWrapper.eventBeginEle += AppWrapper_eventBeginEle;
         }
 
         private void AppWrapper_eventBeginEle(uint UIElementId, ref bool Show)
@@ -35,18 +36,32 @@ namespace AppWrapper_TestWindow
         private String compStr = "";
         private String storedStr = "";
 
-        private void AppWrapper_eventGetCompExt(refRECT rRect)
+        [StructLayout(LayoutKind.Sequential)]
+        public struct RECT
         {
+            public int left;
+            public int top;
+            public int right;
+            public int bottom;
+        }
+
+        private void AppWrapper_eventGetCompExt(IntPtr rRect)
+        {
+            RECT rect = new RECT();
+            Marshal.PtrToStructure(rRect, rect);//Map from
+
             Font f = new Font("Microsoft YaHei", 20F, System.Drawing.FontStyle.Regular, GraphicsUnit.Pixel);
             Size sif = TextRenderer.MeasureText(storedStr, f, new Size(0, 0), TextFormatFlags.NoPadding);
             Size sif2 = TextRenderer.MeasureText(compStr, f, new Size(0, 0), TextFormatFlags.NoPadding);
             //Map rect
-            rRect.left = label2.Location.X + sif.Width;
-            rRect.top = label2.Location.Y;
+            rect.left = label2.Location.X + sif.Width;
+            rect.top = label2.Location.Y;
             //should use Font height, because some IME draw CompStr themselves, when CompStr is Empty
             //so the candidate window wont cover the text
-            rRect.bottom = rRect.top + f.Height;
-            rRect.right = rRect.left + sif2.Width;
+            rect.bottom = rect.top + f.Height;
+            rect.right = rect.left + sif2.Width;
+
+            Marshal.StructureToPtr(rect, rRect, true);//Map to
         }
 
         private void AppWrapper_eventCompStr(string str)

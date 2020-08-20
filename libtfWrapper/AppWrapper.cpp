@@ -80,12 +80,7 @@ VOID AppWrapper::onCompSel(TextStore* textStore, int acpStart, int acpEnd)
 
 VOID AppWrapper::onGetCompsitionExt(TextStore* textStore, RECT* rect)
 {
-	refRECT^ rRect = gcnew refRECT();
-	eventGetCompExt(rRect);
-	rect->left = rRect->left;
-	rect->top = rRect->top;
-	rect->right = rRect->right;
-	rect->bottom = rRect->bottom;
+	eventGetCompExt((IntPtr)rect);
 }
 
 VOID AppWrapper::onBeginUIEle(DWORD dwUIElementId, BOOL* pbShow)

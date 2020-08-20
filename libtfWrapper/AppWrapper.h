@@ -33,14 +33,6 @@ public enum class ActivateMode
 	CONSOLE = TF_TMAE_CONSOLE
 };
 
-public ref struct refRECT
-{
-	int left;
-	int top;
-	int right;
-	int bottom;
-};
-
 public ref class AppWrapper
 {
 private:
@@ -69,7 +61,7 @@ public:
 	delegate void CommitEventHandler(System::String^ str);
 	delegate void CompStrEventHandler(System::String^ str);
 	delegate void CompSelEventHandler(int acpStart, int acpEnd);
-	delegate void GetCompsitionExtEventHandler(refRECT^ rRect);
+	delegate void GetCompsitionExtEventHandler(System::IntPtr rRect);
 
 	delegate void BeginUIEleHandler(unsigned long UIElementId, bool% Show);
 	delegate void UpdateUIEleHandler(unsigned long UIElementId);
