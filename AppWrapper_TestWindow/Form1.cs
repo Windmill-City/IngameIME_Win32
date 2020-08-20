@@ -19,15 +19,15 @@ namespace AppWrapper_TestWindow
             Program.appWrapper.eventGetCompExt += AppWrapper_eventGetCompExt;
             Program.appWrapper.eventCompSel += AppWrapper_eventCompSel;
 
-            Program.appWrapper.eventBeginEle += AppWrapper_eventBeginEle1;
+            Program.appWrapper.eventBeginEle += AppWrapper_eventBeginEle; ;
         }
 
-        private void AppWrapper_eventBeginEle1(uint UIElementId, ref ValueType Show)
+        private void AppWrapper_eventBeginEle(uint UIElementId, ref bool Show)
         {
             Show = true;
         }
 
-        private void AppWrapper_eventCompSel(IntPtr source, int acpStart, int acpEnd)
+        private void AppWrapper_eventCompSel(int acpStart, int acpEnd)
         {
             label3.Text = String.Format("CompSel: {0} | {1}", acpStart, acpEnd);
         }
@@ -35,7 +35,7 @@ namespace AppWrapper_TestWindow
         private String compStr = "";
         private String storedStr = "";
 
-        private void AppWrapper_eventGetCompExt(IntPtr source, refRECT rRect)
+        private void AppWrapper_eventGetCompExt(refRECT rRect)
         {
             Font f = new Font("Microsoft YaHei", 20F, System.Drawing.FontStyle.Regular, GraphicsUnit.Pixel);
             Size sif = TextRenderer.MeasureText(storedStr, f, new Size(0, 0), TextFormatFlags.NoPadding);
@@ -49,13 +49,13 @@ namespace AppWrapper_TestWindow
             rRect.right = rRect.left + sif2.Width;
         }
 
-        private void AppWrapper_eventCompStr(IntPtr source, string str)
+        private void AppWrapper_eventCompStr(string str)
         {
             compStr = str;
             this.label2.Text = storedStr + compStr;
         }
 
-        private void AppWrapper_eventCommit(IntPtr source, string str)
+        private void AppWrapper_eventCommit(string str)
         {
             storedStr += str;
             this.label2.Text = storedStr + compStr;
