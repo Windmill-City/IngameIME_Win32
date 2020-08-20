@@ -22,7 +22,13 @@ TextEditSink::~TextEditSink()
 		THROWHR(hr, "Failed to UnadviseSink");
 	}
 }
-
+/// <summary>
+/// We Seperate Commit Text and Composing Text here
+/// </summary>
+/// <param name="pic"></param>
+/// <param name="ecReadOnly"></param>
+/// <param name="pEditRecord"></param>
+/// <returns></returns>
 HRESULT __stdcall TextEditSink::OnEndEdit(ITfContext* pic, TfEditCookie ecReadOnly, ITfEditRecord* pEditRecord)
 {
 	TextStore* _TextStore = dynamic_cast<TextStore*> (m_Ctx->m_pTextStore.p);
