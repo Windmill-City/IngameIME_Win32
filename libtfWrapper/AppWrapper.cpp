@@ -13,9 +13,16 @@ AppWrapper::~AppWrapper()
 {
 	DisableIME();
 	if (m_TextStore) m_TextStore->Release();
+	if (m_Ctx)
+		delete m_Ctx;
+	if (m_Doc)
+		delete m_Doc;
 	if (m_App)
+	{
 		if (m_App->m_ClientId != TF_CLIENTID_NULL)
 			m_App->m_pThreadMgr->Deactivate();
+		delete m_App;
+	}
 }
 
 VOID AppWrapper::Initialize(System::IntPtr handle, ActivateMode activateMode)
