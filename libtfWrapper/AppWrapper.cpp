@@ -11,7 +11,7 @@ AppWrapper::AppWrapper()
 
 AppWrapper::~AppWrapper()
 {
-	DisableIME();
+	EnableIME();//Default state is Enabled
 	if (m_TextStore) m_TextStore->Release();
 	if (m_Ctx)
 		delete m_Ctx;
