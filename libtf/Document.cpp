@@ -19,4 +19,6 @@ Document::~Document()
 	CComPtr<ITfDocumentMgr> prevDocMgr;
 	HRESULT hr = m_pThreadMgr->AssociateFocus(m_hWnd, NULL, &prevDocMgr);
 	THROWHR(hr, "Failed to AssociateFocus");
+	hr = m_pThreadMgr->SetFocus(NULL);
+	THROWHR(hr, "Failed to SetFocus->NULL")
 }
