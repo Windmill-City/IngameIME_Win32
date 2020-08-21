@@ -3,9 +3,10 @@
 
 Application::~Application()
 {
+	m_pCfgSysKeyFeed.Release();
+	m_pKeyMgr.Release();
+	m_pMsgPump.Release();
 	Common::~Common();
-	if (m_ClientId != TF_CLIENTID_NULL)
-		m_pThreadMgr->Deactivate();
 }
 
 HRESULT _stdcall Application::Initialize()
