@@ -11,12 +11,13 @@ AppWrapper::AppWrapper()
 
 AppWrapper::~AppWrapper()
 {
-	EnableIME();//Default state is Enabled
+	DisableIME();//in case start a new composition
 	if (m_TextStore) m_TextStore->Release();
 	if (m_Ctx)
 		delete m_Ctx;
 	if (m_Doc)
 		delete m_Doc;
+	EnableIME();//Default state is Enabled
 	if (m_App)
 	{
 		if (m_App->m_ClientId != TF_CLIENTID_NULL)
