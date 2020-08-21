@@ -11,10 +11,7 @@ InputMethod::InputMethod()
 
 InputMethod::~InputMethod()
 {
-	DisableIME();
-	if (m_App) {
-		if (m_App->m_ClientId != TF_CLIENTID_NULL) m_App->m_pThreadMgr->Deactivate();
-	}
+	EnableIME();//Default state is Enabled
 }
 
 VOID InputMethod::Initialize(HWND hWnd)

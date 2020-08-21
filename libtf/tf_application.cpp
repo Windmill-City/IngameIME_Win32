@@ -4,6 +4,8 @@
 Application::~Application()
 {
 	Common::~Common();
+	if (m_ClientId != TF_CLIENTID_NULL)
+		m_pThreadMgr->Deactivate();
 }
 
 HRESULT _stdcall Application::Initialize()

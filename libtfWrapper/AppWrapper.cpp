@@ -11,19 +11,17 @@ AppWrapper::AppWrapper()
 
 AppWrapper::~AppWrapper()
 {
-	DisableIME();//in case start a new composition
-	if (m_TextStore) m_TextStore->Release();
 	if (m_Ctx)
+	{
+		DisableIME();//in case start a new composition
 		delete m_Ctx;
+	}
+	if (m_TextStore) m_TextStore->Release();
 	if (m_Doc)
 		delete m_Doc;
 	EnableIME();//Default state is Enabled
 	if (m_App)
-	{
-		if (m_App->m_ClientId != TF_CLIENTID_NULL)
-			m_App->m_pThreadMgr->Deactivate();
 		delete m_App;
-	}
 }
 
 VOID AppWrapper::Initialize(System::IntPtr handle, ActivateMode activateMode)
