@@ -178,7 +178,7 @@ namespace libtf {
 		//Queryins
 		if (!pacpResultStart || !pacpResultEnd)
 			return E_INVALIDARG;
-		if (acpTestStart >= m_StoredStr.size() || acpTestEnd >= m_StoredStr.size())
+		if (acpTestStart > m_StoredStr.size() || acpTestEnd > m_StoredStr.size())
 			return E_INVALIDARG;
 		//Microsoft Pinyin seems does not init the result value, so we set the test value here, in case crash
 		*pacpResultStart = acpTestStart;
