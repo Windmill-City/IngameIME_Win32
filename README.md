@@ -29,12 +29,8 @@ m_TextStore = new TextStore(hWnd);
 //reg events
 //IME need to get the Composition String's bounding box, for CandidateList Window drawing
 m_TextStore->m_sigGetCompExt.connect(boost::bind(&InputMethod::onGetCompsitionExt, this, _1, _2));
-//Get the Commited Text from IME
-m_TextStore->m_sigCommitStr.connect(boost::bind(&InputMethod::onCommit, this, _1, _2));
-//Update the Composition string
-m_TextStore->m_sigUpdateCompStr.connect(boost::bind(&InputMethod::onCompStr, this, _1, _2));
-//the Caret position of the Composition
-m_TextStore->m_sigUpdateCompSel.connect(boost::bind(&InputMethod::onCompSel, this, _1, _2, _3));
+//Get Composition Text|Caret Pos|Commit Text
+m_TextStore->m_sigComposition.connect(boost::bind(&InputMethod::onComposition, this, _1, _2));
 ```
 #### Push Context
 ```c++
@@ -52,95 +48,12 @@ if you want to use UILess mode
 //m_App->m_pThreadMgr->Activate(&(m_App->m_ClientId));
 //Use this
 m_App->m_pThreadMgrEx->ActivateEx(&(m_App->m_ClientId), TF_TMAE_UIELEMENTENABLEDONLY);
-//Register the UIElementSink
-m_UIEleSink = new UIElementSink(m_App);
-m_UIEleSink->m_sigBeginUIElement.connect(your handler here);
-m_UIEleSink->m_sigUpdateUIElement.connect(your handler here);
-m_UIEleSink->m_sigEndUIElement.connect(your handler here);
+m_UIEleSink = new UIElementSink(m_App.get());
+m_CandListHandler.reset(new CandidateListHandler(m_UIEleSink.p, m_App.get()));
+//Get CandidateList info from this event
+m_CandListHandler->m_sigCandidateList.connect(boost::bind(&InputMethod::onCandidateList, this, _1));
 ```
-#### UIElementHandler example： https://github.com/yangyuan/meow/blob/master/src/meow-uiless/meow_textapp.cpp
-```c++
-HRESULT MeowTextApp::BeginUIElement(DWORD dwUIElementId, BOOL *pbShow)
-{
- 	if (pbShow)
-	{
-		*pbShow = FALSE;
-		return S_OK;
-	}
-	else
-	{
-		return E_INVALIDARG;
-	}
-}
-
-HRESULT MeowTextApp::UpdateUIElement(DWORD dwUIElementId)
-{
-	CComPtr<ITfUIElement> uiElement;
-	if (SUCCEEDED(uielementmgr->GetUIElement(dwUIElementId, &uiElement)))
-	{
-		CComPtr<ITfCandidateListUIElement> candidatelistuielement;
-		if (SUCCEEDED(uiElement->QueryInterface(IID_ITfCandidateListUIElement, (LPVOID*)&candidatelistuielement)))
-		{
-			candidatelist.clear();
-
-			UINT count;
-			candidatelistuielement->GetCount(&count);
-			UINT pcount;
-			UINT pages[10];
-			candidatelistuielement->GetPageIndex(pages, 10, &pcount);
-
-			UINT cpage;
-			candidatelistuielement->GetCurrentPage(&cpage);
-
-			UINT end = count;
-			UINT start = 0;
-			if (cpage != pcount - 1) {
-				end = pages[cpage + 1];
-			}
-			start = pages[cpage];
-			if (pcount == 0) {
-				end = start = 0;
-			}
-	
-			{
-				for (UINT i = start; i<end; ++i)
-				{
-					CComBSTR candidate;
-					if (SUCCEEDED(candidatelistuielement->GetString(i, &candidate)))
-					{
-						LPWSTR text = candidate;
-
-						candidatelist.push_back(text);
-					}
-				}
-			}
-
-			
-
-		
-
-			InvalidateRect(hwnd, NULL, NULL);
-			candidatelistuielement->GetSelection(&m_candidateSelection);
-		}
-	}
-
-	return S_OK;
-}
-
-HRESULT MeowTextApp::EndUIElement(DWORD dwUIElementId)
-{
-	CComPtr<ITfUIElement> uielement;
-	if (SUCCEEDED(uielementmgr->GetUIElement(dwUIElementId, &uielement)))
-	{
-		CComPtr<ITfCandidateListUIElement> candidatelistuielement;
-		if (SUCCEEDED(uielement->QueryInterface(IID_ITfCandidateListUIElement, (LPVOID*)&candidatelistuielement)))
-		{
-			candidatelist.clear();
-		}
-	}
-	return S_OK;
-}
-```
+UIElementHandler reference： https://github.com/yangyuan/meow/blob/master/src/meow-uiless/meow_textapp.cpp
 ### DisableIME
 1. DisableSystemKeyStrokeFeed
 
@@ -180,7 +93,6 @@ DocumentMgr->Pop(TF_POPF_ALL)
 ```
 4. SetFocus to a NULL DocumentMgr
 ```c++
-//Not suggest
 ITfThreadMgr->AssociateFocus(m_hWnd, NULL, &prevDocMgr);
 ```
 ## C#
@@ -189,20 +101,13 @@ Use Appwrapper
 //Need to init in STA UIThread
 AppWrapper appWrapper = new AppWrapper();
 appWrapper.Initialize(form.Handle, ActivateMode.DEFAULT);
+```
+### UILess
+```c#
 //UIElementOnly
 //appWrapper.Initialize(form.Handle, ActivateMode.UIELEMENTENABLEDONLY);
-
-//register events
-appWrapper.eventCommit += AppWrapper_eventCommit;
-appWrapper.eventCompStr += AppWrapper_eventCompStr;
-appWrapper.eventGetCompExt += AppWrapper_eventGetCompExt;
-appWrapper.eventCompSel += AppWrapper_eventCompSel;
-//you can get candidatelist here, reference to c++ example
-appWrapper.eventBeginEle += AppWrapper_eventBeginEle1;
-appWrapper.eventUpdateEle += AppWrapper_eventUpdateEle1;
-appWrapper.eventEndEle += AppWrapper_eventEndEle1;
 ```
-EnableIME/DisableIME
+### EnableIME/DisableIME
 ```c#
 appWrapper.DisableIME();
 appWrapper.EnableIME();
