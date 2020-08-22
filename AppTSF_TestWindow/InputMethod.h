@@ -1,5 +1,5 @@
 #pragma once
-#define UILESS
+//#define UILESS
 #include <xstring>
 
 #include "../libtf/tf_application.h"
@@ -25,7 +25,7 @@ public:
 	VOID onComposition(ITfContextOwnerCompositionSink* sink, CompositionEventArgs* comp);
 	VOID onGetCompsitionExt(TextStore* textStore, RECT* rect);
 #ifdef UILESS
-	VOID onCandidateList(CandidateList list);
+	VOID onCandidateList(CandidateList* list);
 #endif // UILESS
 
 	VOID DisableIME();

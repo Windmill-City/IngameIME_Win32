@@ -10,7 +10,7 @@ namespace libtf {
 		LONG			CurSel;
 		LONG			PageSize;
 		LONG			CurPage;
-		std::wstring* Candidates;
+		std::wstring* Candidates;//PageSize indicates its array length
 
 		CandidateList() {
 			Reset();
@@ -81,10 +81,12 @@ namespace libtf {
 					m_list->Count = count;
 					m_list->CurPage = cpage;
 
+					UINT pageSize = cpage == pcount - 1 ? count % pcount : count / pcount;
+					m_list->PageSize = pageSize;
 					UINT start = pages[cpage];
-					UINT end = start + count;
+					UINT end = start + pageSize;
 
-					m_list->Candidates = new std::wstring[end - start];
+					m_list->Candidates = new std::wstring[pageSize];
 					int j = 0;
 					for (UINT i = start; i < end; i++, j++)
 					{
