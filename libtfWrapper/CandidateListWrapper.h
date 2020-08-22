@@ -13,14 +13,6 @@ private:
 public:
 	event CandidateSink::EVENT eventCandidateList;
 
-	CandidateListWrapper(UIElementSink* sink, Common* common) {
-		handler = new CandidateListHandler(sink, common);
-
-		sink_candidateList = gcnew CandidateSink::CLI_CALL(this, &CandidateListWrapper::onCandidateList);
-		sink->m_sigUIElement.connect(CandidateSink::GetPointerForNative(sink_candidateList));
-	}
-
-	VOID onCandidateList(CandidateList* list) {
-		eventCandidateList((System::IntPtr)list);
-	}
+	CandidateListWrapper(UIElementSink* sink, Common* common);
+	VOID onCandidateList(CandidateList* list);
 };

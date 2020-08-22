@@ -1,6 +1,5 @@
 ﻿#include <boost/bind.hpp>   
 #include "InputMethod.h"
-#include "../libtf/UIElementSink.h"
 using namespace libtf;
 InputMethod::InputMethod()
 {
@@ -19,7 +18,16 @@ VOID InputMethod::Initialize(HWND hWnd)
 {
 	//MS Pinyin cant open candidate window when using normal active with ITfContextOwnerCompositionSink
 	//m_App->m_pThreadMgrEx->ActivateEx(&(m_App->m_ClientId), TF_TMAE_UIELEMENTENABLEDONLY);
+#ifndef UILESS
 	m_App->m_pThreadMgr->Activate(&(m_App->m_ClientId));
+#endif // !UILESS
+#ifdef UILESS
+	m_App->m_pThreadMgrEx->ActivateEx(&(m_App->m_ClientId), TF_TMAE_UIELEMENTENABLEDONLY);
+	m_UIEleSink = new UIElementSink(m_App.get());
+	m_CandListHandler.reset(new CandidateListHandler(m_UIEleSink.p, m_App.get()));
+	m_CandListHandler->m_sigCandidateList.connect(boost::bind(&InputMethod::onCandidateList, this, _1));
+#endif // UILESS
+
 	m_Doc.reset(new Document(m_App.get(), hWnd));
 
 	m_TextStore = new TextStore(hWnd);
@@ -74,6 +82,12 @@ VOID InputMethod::onGetCompsitionExt(TextStore* textStore, RECT* rect)
 	if (textStore != m_TextStore.p || !m_TextBox) return;
 	m_TextBox->GetCompExt(rect);
 }
+#ifdef UILESS
+VOID InputMethod::onCandidateList(CandidateList list)
+{
+	//Todo:handle list here
+}
+#endif // UILESS
 
 VOID InputMethod::DisableIME()
 {

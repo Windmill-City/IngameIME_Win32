@@ -1,12 +1,12 @@
 #pragma once
 
 template<typename CPP_CALL, typename CS_CALL>
-public ref class Delegate
+ref class Delegate
 {
 public:
 	typedef CPP_CALL* PCPP_CALL;
-	delegate CPP_CALL CLI_CALL;
-	typedef CLI_CALL^ PCLI_CALL;
+	delegate CPP_CALL CLI_DLG;
+	typedef CLI_DLG^ PCLI_CALL;
 
 	delegate CS_CALL CS_DLG;
 	typedef CS_DLG^ EVENT;

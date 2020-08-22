@@ -24,13 +24,13 @@
     <ClInclude Include="AppWrapper.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="CompositionHandler.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="Delegate.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="CandidateListWrapper.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CompositionHandler.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -39,6 +39,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="AppWrapper.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CompositionHandler.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CandidateListWrapper.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

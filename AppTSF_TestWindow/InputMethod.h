@@ -1,10 +1,13 @@
 #pragma once
+#define UILESS
 #include <xstring>
 
 #include "../libtf/tf_application.h"
 #include "../libtf/Document.h"
 #include "../libtf/Context.h"
 #include "../libtf/TextStore.h"
+#include "../libtf/UIElementSink.h"
+#include "../libtf/CandidateListHandler.h"
 #include "TextBox.h"
 using namespace libtf;
 class InputMethod
@@ -21,6 +24,10 @@ public:
 	VOID SetTextBox(TextBox* textBox);
 	VOID onComposition(ITfContextOwnerCompositionSink* sink, CompositionEventArgs* comp);
 	VOID onGetCompsitionExt(TextStore* textStore, RECT* rect);
+#ifdef UILESS
+	VOID onCandidateList(CandidateList list);
+#endif // UILESS
+
 	VOID DisableIME();
 	VOID EnableIME();
 
@@ -29,4 +36,8 @@ public:
 	std::unique_ptr <Document> m_Doc;
 	std::unique_ptr <Context> m_Ctx;
 	CComPtr<TextStore> m_TextStore;
+#ifdef UILESS
+	CComPtr<UIElementSink> m_UIEleSink;
+	std::unique_ptr<CandidateListHandler> m_CandListHandler;
+#endif // UILESS
 };
