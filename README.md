@@ -105,8 +105,8 @@ appWrapper.Initialize(form.Handle, ActivateMode.DEFAULT);
 ```
 ### UILess
 ```c#
-//UIElementOnly
-//appWrapper.Initialize(form.Handle, ActivateMode.UIELEMENTENABLEDONLY);
+//Only activate the IME who supports UILess Mode
+appWrapper.Initialize(form.Handle, ActivateMode.UIELEMENTENABLEDONLY);
 ```
 ### EnableIME/DisableIME
 ```c#
