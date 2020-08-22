@@ -5,12 +5,13 @@ A library for text service framework
 # Build
 Set Boost Root before build
 
-Path:TextServiceFramework\libtf\PropertySheet.props
+Path:`TextServiceFramework\libtf\PropertySheet.props`
 
 BoostVersion boost_1_74_0
 
 Download Boost: https://www.boost.org/
-Unzip, and copy the boost path to PropertySheet.props
+
+Unzip, and copy the boost path to `PropertySheet.props`
 # How to use
 ## C++
 ```c++
