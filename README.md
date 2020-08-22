@@ -82,15 +82,15 @@ DocumentMgr->Pop(TF_POPF_ALL)
 ```
 3. Set TextStore ReadOnly
 ```c++
-	/*
-	Can be zero or:
-  	Zero means enable read/write
-  
-	TS_SD_READONLY  // if set, document is read only; writes will fail
-	TS_SD_LOADING   // if set, document is loading, expect additional inserts
-	*/
-  m_TextStore->m_status.dwDynamicFlags = TS_SD_READONLY;
-  m_Ctx->m_pCtxOwnerServices->OnStatusChange(TS_SD_READONLY);
+/*
+Can be zero or:
+Zero means enable read/write
+
+TS_SD_READONLY  // if set, document is read only; writes will fail
+TS_SD_LOADING   // if set, document is loading, expect additional inserts
+*/
+m_TextStore->m_status.dwDynamicFlags = TS_SD_READONLY;
+m_Ctx->m_pCtxOwnerServices->OnStatusChange(TS_SD_READONLY);
 ```
 4. SetFocus to a NULL DocumentMgr
 ```c++
