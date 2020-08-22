@@ -6,6 +6,7 @@
 #include "../libtf/Context.h"
 #include "../libtf/TextStore.h"
 #include "TextBox.h"
+using namespace libtf;
 class InputMethod
 {
 public:
@@ -18,9 +19,7 @@ public:
 
 	VOID Initialize(HWND hWnd);
 	VOID SetTextBox(TextBox* textBox);
-	VOID onCommit(TextStore* textStore, const std::wstring commitStr);
-	VOID onCompStr(TextStore* textStore, const std::wstring compStr);
-	VOID onCompSel(TextStore* textStore, int acpStart, int acpEnd);
+	VOID onComposition(ITfContextOwnerCompositionSink* sink, CompositionEventArgs* comp);
 	VOID onGetCompsitionExt(TextStore* textStore, RECT* rect);
 	VOID DisableIME();
 	VOID EnableIME();

@@ -178,6 +178,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
+	case WM_CHAR:
+		if (ime->m_TextBox) ime->m_TextBox->onChar(wParam, lParam);
+		break;
 	case WM_KEYDOWN:
 		if (ime->m_TextBox) ime->m_TextBox->onKeyDown(wParam, lParam);
 		break;

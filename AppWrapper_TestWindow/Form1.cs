@@ -15,17 +15,6 @@ namespace AppWrapper_TestWindow
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            Program.appWrapper.eventCommit += AppWrapper_eventCommit;
-            Program.appWrapper.eventCompStr += AppWrapper_eventCompStr;
-            Program.appWrapper.eventGetCompExt += AppWrapper_eventGetCompExt;
-            Program.appWrapper.eventCompSel += AppWrapper_eventCompSel;
-
-            Program.appWrapper.eventBeginEle += AppWrapper_eventBeginEle;
-        }
-
-        private void AppWrapper_eventBeginEle(uint UIElementId, ref bool Show)
-        {
-            Show = true;
         }
 
         private void AppWrapper_eventCompSel(int acpStart, int acpEnd)

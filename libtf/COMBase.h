@@ -2,7 +2,7 @@
 
 #include <msctf.h>
 #include "tf_common.h"
-
+namespace libtf {
 #define TF_COM_AS(Interface) \
 if (IsEqualIID(IID_##Interface, riid)) {	\
 	*ppvObject = (Interface*)this;	\
@@ -24,24 +24,25 @@ return E_NOINTERFACE;
 virtual ULONG __stdcall AddRef(void) override { return COMBase::AddRef(); };	\
 virtual ULONG __stdcall Release(void) override { return COMBase::Release(); };
 
-class TFAPI COMBase :
-	public IUnknown
-{
-public:
-	//IUnknown
-	virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObject) override {
-		return E_NOTIMPL;
+	class TFAPI COMBase :
+		public IUnknown
+	{
+	public:
+		//IUnknown
+		virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObject) override {
+			return E_NOTIMPL;
+		};
+		virtual ULONG __stdcall AddRef(void) override {
+			return ++m_ulRef;
+		};
+		virtual ULONG __stdcall Release(void) override {
+			if (--m_ulRef <= 0) {
+				delete this;
+				return 0;
+			}
+			return m_ulRef;
+		};
+	private:
+		ULONG m_ulRef;
 	};
-	virtual ULONG __stdcall AddRef(void) override {
-		return ++m_ulRef;
-	};
-	virtual ULONG __stdcall Release(void) override {
-		if (--m_ulRef <= 0) {
-			delete this;
-			return 0;
-		}
-		return m_ulRef;
-	};
-private:
-	ULONG m_ulRef;
-};
+}

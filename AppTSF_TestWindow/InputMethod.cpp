@@ -1,6 +1,7 @@
 ﻿#include <boost/bind.hpp>   
 #include "InputMethod.h"
 #include "../libtf/UIElementSink.h"
+using namespace libtf;
 InputMethod::InputMethod()
 {
 	m_App.reset(new Application());
@@ -24,9 +25,7 @@ VOID InputMethod::Initialize(HWND hWnd)
 	m_TextStore = new TextStore(hWnd);
 	//reg events
 	m_TextStore->m_sigGetCompExt.connect(boost::bind(&InputMethod::onGetCompsitionExt, this, _1, _2));
-	m_TextStore->m_sigCommitStr.connect(boost::bind(&InputMethod::onCommit, this, _1, _2));
-	m_TextStore->m_sigUpdateCompStr.connect(boost::bind(&InputMethod::onCompStr, this, _1, _2));
-	m_TextStore->m_sigUpdateCompSel.connect(boost::bind(&InputMethod::onCompSel, this, _1, _2, _3));
+	m_TextStore->m_sigComposition.connect(boost::bind(&InputMethod::onComposition, this, _1, _2));
 
 	//push ctx
 	m_Ctx.reset(new Context(m_Doc.get(), (ITextStoreACP2*)m_TextStore.p));
@@ -40,42 +39,34 @@ VOID InputMethod::Initialize(HWND hWnd)
 VOID InputMethod::SetTextBox(TextBox* textBox)
 {
 	//Cleanup old
-	if (textBox) {
-		m_Ctx->m_pCtxOwnerCompServices->TerminateComposition(NULL);
-		textBox->m_CompText = L"";
-		SetRectEmpty(&textBox->m_rectComp);
-	}
-	//Cleanup new
+	m_Ctx->m_pCtxOwnerCompServices->TerminateComposition(NULL);
+	//Set New
 	m_TextBox = textBox;
 	if (!textBox) {
 		DisableIME();
 		return;
 	};
-	textBox->m_CompText = L"";
-	SetRectEmpty(&textBox->m_rectComp);
 	EnableIME();
 }
 
-VOID InputMethod::onCommit(TextStore* textStore, const std::wstring commitStr)
+VOID InputMethod::onComposition(ITfContextOwnerCompositionSink* sink, CompositionEventArgs* comp)
 {
-	if (textStore != m_TextStore.p || !m_TextBox) return;
-	m_TextBox->m_Text.append(commitStr);
-	InvalidateRect(textStore->GetWnd(), NULL, NULL);
-}
-
-VOID InputMethod::onCompStr(TextStore* textStore, const std::wstring compStr)
-{
-	if (textStore != m_TextStore.p || !m_TextBox) return;
-	m_TextBox->m_CompText = compStr;
-	InvalidateRect(textStore->GetWnd(), NULL, NULL);
-}
-
-VOID InputMethod::onCompSel(TextStore* textStore, int acpStart, int acpEnd)
-{
-	if (textStore != m_TextStore.p || !m_TextBox) return;
-	m_TextBox->m_CompSelStart = acpStart;
-	m_TextBox->m_CompSelEnd = acpEnd;
-	InvalidateRect(textStore->GetWnd(), NULL, NULL);
+	if (sink != m_TextStore.p || !m_TextBox) return;
+	switch (comp->m_state)
+	{
+	case CompositionState::StartComposition:
+	case CompositionState::EndComposition:
+	case CompositionState::Composing:
+		m_TextBox->m_CompText = comp->m_strComp;
+		m_TextBox->m_CaretPos = comp->m_caretPos;
+		break;
+	case CompositionState::Commit:
+		m_TextBox->m_Text.append(comp->m_strCommit);
+		break;
+	default:
+		break;
+	}
+	InvalidateRect(m_TextStore->GetWnd(), NULL, NULL);
 }
 
 VOID InputMethod::onGetCompsitionExt(TextStore* textStore, RECT* rect)

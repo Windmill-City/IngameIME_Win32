@@ -210,6 +210,8 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CandidateListHandler.h" />
+    <ClInclude Include="CompositionEventArgs.h" />
     <ClInclude Include="Context.h" />
     <ClInclude Include="ContextOwner.h" />
     <ClInclude Include="ContextOwnerCompositionSink.h" />
@@ -221,9 +223,11 @@
     <ClInclude Include="TextStore.h" />
     <ClInclude Include="tf_application.h" />
     <ClInclude Include="tf_common.h" />
+    <ClInclude Include="UIElementEventArgs.h" />
     <ClInclude Include="UIElementSink.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CompositionEventArgs.cpp" />
     <ClCompile Include="Context.cpp" />
     <ClCompile Include="ContextOwner.cpp" />
     <ClCompile Include="ContextOwnerCompositionSink.cpp" />
@@ -238,6 +242,7 @@
     <ClCompile Include="TextStore.cpp" />
     <ClCompile Include="tf_application.cpp" />
     <ClCompile Include="tf_common.cpp" />
+    <ClCompile Include="UIElementEventArgs.cpp" />
     <ClCompile Include="UIElementSink.cpp" />
   </ItemGroup>
   <ItemGroup>

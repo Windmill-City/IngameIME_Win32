@@ -34,10 +34,14 @@ VOID TextBox::Draw(HWND hwnd, HDC hdc, PAINTSTRUCT* ps)
 	//Map Comp
 	m_rectComp.right = m_rectComp.left + rectfComp.Width;
 	RectF rectfCaret;
-	std::wstring toMeasure = m_CompText.substr(m_CompSelStart);
+	std::wstring toMeasure = m_CompText.substr(m_CaretPos);
 	graphics.MeasureString(toMeasure.c_str(), (INT)toMeasure.size(), &fontText, originComp, &rectfCaret);
 	//Draw Caret
 	graphics.FillRectangle(&BrushFront, (int)(m_rectComp.right - rectfCaret.Width), m_rectComp.top, 2, (int)fontText.GetHeight(&graphics));
+}
+
+VOID TextBox::onChar(WPARAM wParam, LPARAM lParam)
+{
 }
 
 VOID TextBox::onKeyDown(WPARAM wParam, LPARAM lParam)

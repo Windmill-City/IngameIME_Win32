@@ -170,6 +170,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AppWrapper.h" />
+    <ClInclude Include="CandidateListWrapper.h" />
+    <ClInclude Include="CompositionHandler.h" />
+    <ClInclude Include="Delegate.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>

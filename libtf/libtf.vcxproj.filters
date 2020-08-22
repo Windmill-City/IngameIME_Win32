@@ -51,6 +51,15 @@
     <ClInclude Include="UIElementSink.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="CompositionEventArgs.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIElementEventArgs.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CandidateListHandler.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -81,6 +90,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="UIElementSink.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CompositionEventArgs.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIElementEventArgs.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

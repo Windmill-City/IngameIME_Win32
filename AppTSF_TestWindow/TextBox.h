@@ -28,15 +28,14 @@ public:
 	HWND m_hWnd;
 	std::wstring m_Text;
 	std::wstring m_CompText;
-	int m_maxLength = 5;
 	RECT m_rectComp;
 
-	LONG m_CompSelStart;
-	LONG m_CompSelEnd;
+	LONG m_CaretPos;
 
 	TextBox(HWND hWnd);
 
 	VOID Draw(HWND hwnd, HDC hdc, PAINTSTRUCT* ps);
+	VOID onChar(WPARAM wParam, LPARAM lParam);
 	VOID onKeyDown(WPARAM wParam, LPARAM lParam);
 	VOID onKeyUp(WPARAM wParam, LPARAM lParam);
 	VOID GetCompExt(RECT* rect);
