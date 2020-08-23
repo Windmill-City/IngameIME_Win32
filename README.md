@@ -102,11 +102,22 @@ Use Appwrapper
 //Need to init in STA UIThread
 AppWrapper appWrapper = new AppWrapper();
 appWrapper.Initialize(form.Handle, ActivateMode.DEFAULT);
+
+//Composition
+compHandler = appWrapper.GetCompHandler();
+//IME need this to position the Candidate window
+compHandler.eventGetCompExt += CompHandler_eventGetCompExt;
+//Get Composition Text|Caret Pos|Commit Text
+compHandler.eventComposition += CompHandler_eventComposition;
 ```
 ### UILess
 ```c#
 //Only activate the IME who supports UILess Mode
 appWrapper.Initialize(form.Handle, ActivateMode.UIELEMENTENABLEDONLY);
+//CandidateList
+candWrapper = appWrapper.GetCandWapper();
+//GetCandidateList Data from it
+candWrapper.eventCandidateList += CandWrapper_eventCandidateList;
 ```
 ### EnableIME/DisableIME
 ```c#
