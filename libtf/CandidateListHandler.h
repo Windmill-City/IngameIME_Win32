@@ -10,7 +10,7 @@ namespace libtf {
 		LONG			CurSel;
 		LONG			PageSize;
 		LONG			CurPage;
-		std::wstring* Candidates;//PageSize indicates its array length
+		std::shared_ptr<std::wstring[]> Candidates;//PageSize indicates its array length
 
 		CandidateList() {
 			Reset();
@@ -22,7 +22,7 @@ namespace libtf {
 			CurSel = 0;
 			PageSize = 0;
 			CurPage = 0;
-			Candidates = new std::wstring[0];
+			Candidates.reset(new std::wstring[0]);
 		}
 	};
 
@@ -46,7 +46,7 @@ namespace libtf {
 			switch (args->m_state)
 			{
 			case UIElementState::Begin:
-				args->m_pfShow = FALSE;
+				*(args->m_pfShow) = FALSE;
 			case UIElementState::End:
 				m_list->Reset();
 				break;
@@ -96,7 +96,7 @@ namespace libtf {
 					UINT start = pages[cpage];
 					UINT end = start + pageSize;
 
-					m_list->Candidates = new std::wstring[pageSize];
+					m_list->Candidates.reset(new std::wstring[pageSize]);
 					int j = 0;
 					for (UINT i = start; i < end; i++, j++)
 					{

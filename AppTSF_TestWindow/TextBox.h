@@ -22,6 +22,7 @@
 
 #include <atlstr.h>
 #include <strsafe.h>
+#include <boost\smart_ptr\shared_ptr.hpp>
 class TextBox
 {
 public:
@@ -29,14 +30,19 @@ public:
 	std::wstring m_Text;
 	std::wstring m_CompText;
 	RECT m_rectComp;
+	std::shared_ptr<std::wstring[]> Candidates;
+	LONG Count;
 
 	LONG m_CaretPos;
 
 	TextBox(HWND hWnd);
 
 	VOID Draw(HWND hwnd, HDC hdc, PAINTSTRUCT* ps);
+	VOID DrawCand(Gdiplus::Graphics graphics, Gdiplus::Font font, Gdiplus::PointF origin, Gdiplus::StringFormat format, Gdiplus::SolidBrush brush);
+	//For IME CandidateWnd
+	VOID GetCompExt(RECT* rect);
+
 	VOID onChar(WPARAM wParam, LPARAM lParam);
 	VOID onKeyDown(WPARAM wParam, LPARAM lParam);
 	VOID onKeyUp(WPARAM wParam, LPARAM lParam);
-	VOID GetCompExt(RECT* rect);
 };

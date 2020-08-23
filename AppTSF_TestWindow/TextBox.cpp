@@ -38,6 +38,20 @@ VOID TextBox::Draw(HWND hwnd, HDC hdc, PAINTSTRUCT* ps)
 	graphics.MeasureString(toMeasure.c_str(), (INT)toMeasure.size(), &fontText, originComp, &rectfCaret);
 	//Draw Caret
 	graphics.FillRectangle(&BrushFront, (int)(m_rectComp.right - rectfCaret.Width), m_rectComp.top, 2, (int)fontText.GetHeight(&graphics));
+	//Draw Candidates
+	int yOffset = fontText.GetHeight(&graphics);
+	for (size_t i = 0; i < Count; i++)
+	{
+		std::wstring str = Candidates[i];
+		origin.Y += yOffset;
+		graphics.DrawString(str.c_str(), str.size(), &fontText, origin, &format, &BrushFront);
+	}
+}
+
+VOID TextBox::GetCompExt(RECT* rect)
+{
+	InvalidateRect(m_hWnd, NULL, NULL);
+	SetRect(rect, m_rectComp.left, m_rectComp.top, m_rectComp.right, m_rectComp.bottom);
 }
 
 VOID TextBox::onChar(WPARAM wParam, LPARAM lParam)
@@ -54,10 +68,4 @@ VOID TextBox::onKeyDown(WPARAM wParam, LPARAM lParam)
 VOID TextBox::onKeyUp(WPARAM wParam, LPARAM lParam)
 {
 	InvalidateRect(m_hWnd, NULL, NULL);
-}
-
-VOID TextBox::GetCompExt(RECT* rect)
-{
-	InvalidateRect(m_hWnd, NULL, NULL);
-	SetRect(rect, m_rectComp.left, m_rectComp.top, m_rectComp.right, m_rectComp.bottom);
 }

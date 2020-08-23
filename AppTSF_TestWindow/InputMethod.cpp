@@ -85,11 +85,10 @@ VOID InputMethod::onGetCompsitionExt(TextStore* textStore, RECT* rect)
 #ifdef UILESS
 VOID InputMethod::onCandidateList(CandidateList* list)
 {
-	//Todo:handle list here
-	for (size_t i = 0; i < list->PageSize; i++)
-	{
-		std::wstring str = list->Candidates[i];
-	}
+	if (!m_TextBox) return;
+	m_TextBox->Count = list->PageSize;
+	m_TextBox->Candidates = list->Candidates;
+	InvalidateRect(m_TextBox->m_hWnd, NULL, NULL);
 }
 #endif // UILESS
 
