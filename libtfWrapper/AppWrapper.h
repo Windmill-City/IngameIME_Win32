@@ -6,6 +6,8 @@
 #include "../libtf/Context.h"
 #include "../libtf/TextStore.h"
 #include "../libtf/UIElementSink.h"
+#include "CandidateListWrapper.h"
+#include "CompositionHandler.h"
 #define THROWHR(hr,desc) \
 if (FAILED(hr))\
 	throw gcnew System::Exception(desc##":" + hr);
@@ -30,6 +32,8 @@ public:
 
 	AppWrapper();
 	~AppWrapper();
+	CompositionHandler^ GetCompHandler();
+	CandidateListWrapper^ GetCandWapper();
 
 	VOID Initialize(System::IntPtr handle, ActivateMode activateMode);
 	VOID DisableIME();

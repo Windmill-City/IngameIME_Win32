@@ -1,17 +1,18 @@
 #pragma once
 #include "../libtf/CandidateListHandler.h"
 #include "../libtf/tf_application.h"
-#include "Delegate.h"
 using namespace libtf;
 public ref class CandidateListWrapper
 {
 private:
-	typedef Delegate<VOID(CandidateList* list), VOID(System::IntPtr list)> CandidateSink;
-	CandidateSink::PCLI_CALL sink_candidateList;
+	typedef VOID(*nativeType)(CandidateList* list);
+	delegate VOID CandidateSink_native(CandidateList* list);
 
 	CandidateListHandler* handler;
+	CandidateSink_native^ sink_candidateList;
 public:
-	event CandidateSink::EVENT eventCandidateList;
+	delegate VOID CandidateSink_cli(System::IntPtr list);
+	event CandidateSink_cli^ eventCandidateList;
 
 	CandidateListWrapper(UIElementSink* sink, Common* common);
 	VOID onCandidateList(CandidateList* list);

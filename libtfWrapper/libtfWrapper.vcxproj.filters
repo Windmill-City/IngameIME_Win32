@@ -24,9 +24,6 @@
     <ClInclude Include="AppWrapper.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Delegate.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="CandidateListWrapper.h">
       <Filter>头文件</Filter>
     </ClInclude>

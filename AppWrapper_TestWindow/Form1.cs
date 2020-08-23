@@ -7,6 +7,12 @@ namespace AppWrapper_TestWindow
 {
     public partial class Form1 : Form
     {
+        private CompositionHandler compHandler;
+        private CandidateListWrapper candWrapper;
+
+        private String compStr = "";
+        private String storedStr = "";
+
         public Form1()
         {
             InitializeComponent();
@@ -15,15 +21,52 @@ namespace AppWrapper_TestWindow
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            compHandler = Program.appWrapper.GetCompHandler();
+            candWrapper = Program.appWrapper.GetCandWapper();
+
+            compHandler.eventGetCompExt += CompHandler_eventGetCompExt;
+            compHandler.eventComposition += CompHandler_eventComposition;
+
+            Program.appWrapper.EnableIME();
         }
 
-        private void AppWrapper_eventCompSel(int acpStart, int acpEnd)
+        #region Handle Composition
+
+        public enum CompositionState
         {
-            label3.Text = String.Format("CompSel: {0} | {1}", acpStart, acpEnd);
+            StartComposition = 0,
+            Composing,
+            Commit,
+            EndComposition
+        };
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct CompositionEventArgs
+        {
+            public CompositionState state;
+            public int caretPos;
+
+            [MarshalAs(UnmanagedType.LPWStr)]
+            public string compStr;
+
+            [MarshalAs(UnmanagedType.LPWStr)]
+            public string commitStr;
         }
 
-        private String compStr = "";
-        private String storedStr = "";
+        private void CompHandler_eventComposition(IntPtr comp)
+        {
+            CompositionEventArgs args = (CompositionEventArgs)Marshal.PtrToStructure(comp, typeof(CompositionEventArgs));
+            label_CompCaret.Text = string.Format("Comp CaretPos: {0} ", args.caretPos);
+
+            //storedStr += Marshal.PtrToStringAuto(args.commitStr);
+            compStr = args.compStr;
+
+            label_DisplayStr.Text = storedStr + compStr;
+        }
+
+        #endregion Handle Composition
+
+        #region Handle CompExt
 
         [StructLayout(LayoutKind.Sequential)]
         public struct RECT
@@ -34,35 +77,27 @@ namespace AppWrapper_TestWindow
             public int bottom;
         }
 
-        private void AppWrapper_eventGetCompExt(IntPtr rRect)
+        private void CompHandler_eventGetCompExt(IntPtr rect)
         {
-            RECT rect = (RECT)Marshal.PtrToStructure(rRect, typeof(RECT));//Map from
+            RECT rect_ = (RECT)Marshal.PtrToStructure(rect, typeof(RECT));//Map from
 
             Font f = new Font("Microsoft YaHei", 20F, System.Drawing.FontStyle.Regular, GraphicsUnit.Pixel);
             Size sif = TextRenderer.MeasureText(storedStr, f, new Size(0, 0), TextFormatFlags.NoPadding);
             Size sif2 = TextRenderer.MeasureText(compStr, f, new Size(0, 0), TextFormatFlags.NoPadding);
             //Map rect
-            rect.left = label2.Location.X + sif.Width;
-            rect.top = label2.Location.Y;
+            rect_.left = label_DisplayStr.Location.X + sif.Width;
+            rect_.top = label_DisplayStr.Location.Y;
             //should use Font height, because some IME draw CompStr themselves, when CompStr is Empty
             //so the candidate window wont cover the text
-            rect.bottom = rect.top + f.Height;
-            rect.right = rect.left + sif2.Width;
+            rect_.bottom = rect_.top + f.Height;
+            rect_.right = rect_.left + sif2.Width;
 
-            Marshal.StructureToPtr(rect, rRect, true);//Map to
+            Marshal.StructureToPtr(rect_, rect, true);//Map to
         }
 
-        private void AppWrapper_eventCompStr(string str)
-        {
-            compStr = str;
-            this.label2.Text = storedStr + compStr;
-        }
+        #endregion Handle CompExt
 
-        private void AppWrapper_eventCommit(string str)
-        {
-            storedStr += str;
-            this.label2.Text = storedStr + compStr;
-        }
+        #region Handle WinForm
 
         private void label1_Click(object sender, EventArgs e)
         {
@@ -86,10 +121,12 @@ namespace AppWrapper_TestWindow
                 case Keys.Back:
                     if (storedStr.Length > 0)
                         storedStr = storedStr.Remove(storedStr.Length - 1, 1);
-                    this.label2.Text = storedStr + compStr;
+                    this.label_DisplayStr.Text = storedStr + compStr;
                     return true;
             }
             return base.ProcessCmdKey(ref msg, keyData);
         }
+
+        #endregion Handle WinForm
     }
 }

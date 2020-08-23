@@ -1,16 +1,16 @@
 #include "pch.h"
 #include "CompositionHandler.h"
 
-CompositionHandler::CompositionHandler(TextStore ts)
+CompositionHandler::CompositionHandler(TextStore* ts)
 {
-	sink_comp = gcnew CompositionSink::CLI_DLG(this, &CompositionHandler::onComposition);
-	ts.m_sigComposition.connect(CompositionSink::GetPointerForNative(sink_comp));
+	sink_comp = gcnew CompositionSink_native(this, &CompositionHandler::onComposition);
+	ts->m_sigComposition.connect(reinterpret_cast<CompositionSink_nativeType>(System::Runtime::InteropServices::Marshal::GetFunctionPointerForDelegate(sink_comp).ToPointer()));
 
-	sink_ext = gcnew CompositionExtSink::CLI_DLG(this, &CompositionHandler::onCompositionExt);
-	ts.m_sigGetCompExt.connect(CompositionExtSink::GetPointerForNative(sink_ext));
+	sink_ext = gcnew CompositionExtSink_native(this, &CompositionHandler::onCompositionExt);
+	ts->m_sigGetCompExt.connect(reinterpret_cast<CompositionExtSink_nativeType>(System::Runtime::InteropServices::Marshal::GetFunctionPointerForDelegate(sink_ext).ToPointer()));
 }
 
-VOID CompositionHandler::onComposition(ContextOwnerCompositionSink* sink, CompositionEventArgs* comp)
+VOID CompositionHandler::onComposition(ITfContextOwnerCompositionSink* sink, CompositionEventArgs* comp)
 {
 	eventComposition((System::IntPtr)comp);
 }

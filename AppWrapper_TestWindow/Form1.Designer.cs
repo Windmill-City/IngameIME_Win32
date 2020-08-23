@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
+            this.label_DisplayStr = new System.Windows.Forms.Label();
+            this.label_CompCaret = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -39,38 +39,38 @@
             this.label1.Font = new System.Drawing.Font("SimSun", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label1.Location = new System.Drawing.Point(12, 419);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(362, 22);
+            this.label1.Size = new System.Drawing.Size(351, 22);
             this.label1.TabIndex = 2;
-            this.label1.Text = "IMEState:Disabled(ClickToChange)";
+            this.label1.Text = "IMEState:Enabled(ClickToChange)";
             this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
-            // label2
+            // label_DisplayStr
             // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft YaHei", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label2.Location = new System.Drawing.Point(12, 9);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(119, 30);
-            this.label2.TabIndex = 3;
-            this.label2.Text = "Test Input";
+            this.label_DisplayStr.AutoSize = true;
+            this.label_DisplayStr.Font = new System.Drawing.Font("Microsoft YaHei", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label_DisplayStr.Location = new System.Drawing.Point(12, 9);
+            this.label_DisplayStr.Name = "label_DisplayStr";
+            this.label_DisplayStr.Size = new System.Drawing.Size(119, 30);
+            this.label_DisplayStr.TabIndex = 3;
+            this.label_DisplayStr.Text = "Test Input";
             // 
-            // label3
+            // label_CompCaret
             // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("SimSun", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label3.Location = new System.Drawing.Point(624, 419);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(164, 22);
-            this.label3.TabIndex = 4;
-            this.label3.Text = "CompSel: 0 | 0";
+            this.label_CompCaret.AutoSize = true;
+            this.label_CompCaret.Font = new System.Drawing.Font("SimSun", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label_CompCaret.Location = new System.Drawing.Point(602, 419);
+            this.label_CompCaret.Name = "label_CompCaret";
+            this.label_CompCaret.Size = new System.Drawing.Size(186, 22);
+            this.label_CompCaret.TabIndex = 4;
+            this.label_CompCaret.Text = "Comp CaretPos: 0";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label_CompCaret);
+            this.Controls.Add(this.label_DisplayStr);
             this.Controls.Add(this.label1);
             this.ImeMode = System.Windows.Forms.ImeMode.On;
             this.Name = "Form1";
@@ -83,8 +83,8 @@
         #endregion
 
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label_DisplayStr;
+        private System.Windows.Forms.Label label_CompCaret;
     }
 }
 

@@ -23,6 +23,16 @@ AppWrapper::~AppWrapper()
 		delete m_App;
 }
 
+CompositionHandler^ AppWrapper::GetCompHandler()
+{
+	return gcnew CompositionHandler(m_TextStore);
+}
+
+CandidateListWrapper^ AppWrapper::GetCandWapper()
+{
+	return gcnew CandidateListWrapper(m_UIEleSink, m_App);
+}
+
 VOID AppWrapper::Initialize(System::IntPtr handle, ActivateMode activateMode)
 {
 	HWND hWnd = (HWND)handle.ToPointer();

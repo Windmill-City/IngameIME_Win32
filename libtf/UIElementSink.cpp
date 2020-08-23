@@ -22,6 +22,7 @@ namespace libtf {
 
 	HRESULT __stdcall UIElementSink::BeginUIElement(DWORD dwUIElementId, BOOL* pbShow)
 	{
+		*pbShow = TRUE;//Show by default
 		m_sigUIElement(new UIElementEventArgs(dwUIElementId, pbShow));
 		return S_OK;
 	}
