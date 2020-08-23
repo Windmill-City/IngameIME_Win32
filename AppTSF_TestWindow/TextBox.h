@@ -38,7 +38,6 @@ public:
 	TextBox(HWND hWnd);
 
 	VOID Draw(HWND hwnd, HDC hdc, PAINTSTRUCT* ps);
-	VOID DrawCand(Gdiplus::Graphics graphics, Gdiplus::Font font, Gdiplus::PointF origin, Gdiplus::StringFormat format, Gdiplus::SolidBrush brush);
 	//For IME CandidateWnd
 	VOID GetCompExt(RECT* rect);
 

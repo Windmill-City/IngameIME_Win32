@@ -28,21 +28,24 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.label1 = new System.Windows.Forms.Label();
+            this.IMEStateChange = new System.Windows.Forms.Label();
             this.label_DisplayStr = new System.Windows.Forms.Label();
             this.label_CompCaret = new System.Windows.Forms.Label();
+            this.label_CandName = new System.Windows.Forms.Label();
+            this.CandListData = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
-            // label1
+            // IMEStateChange
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("SimSun", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label1.Location = new System.Drawing.Point(12, 419);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(351, 22);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "IMEState:Enabled(ClickToChange)";
-            this.label1.Click += new System.EventHandler(this.label1_Click);
+            this.IMEStateChange.AutoSize = true;
+            this.IMEStateChange.Font = new System.Drawing.Font("SimSun", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.IMEStateChange.Location = new System.Drawing.Point(12, 419);
+            this.IMEStateChange.Name = "IMEStateChange";
+            this.IMEStateChange.Size = new System.Drawing.Size(186, 22);
+            this.IMEStateChange.TabIndex = 2;
+            this.IMEStateChange.Text = "IMEState:Unknown";
+            this.IMEStateChange.Click += new System.EventHandler(this.IMEStateChange_Click);
             // 
             // label_DisplayStr
             // 
@@ -58,20 +61,52 @@
             // 
             this.label_CompCaret.AutoSize = true;
             this.label_CompCaret.Font = new System.Drawing.Font("SimSun", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label_CompCaret.Location = new System.Drawing.Point(602, 419);
+            this.label_CompCaret.Location = new System.Drawing.Point(567, 419);
             this.label_CompCaret.Name = "label_CompCaret";
             this.label_CompCaret.Size = new System.Drawing.Size(186, 22);
             this.label_CompCaret.TabIndex = 4;
             this.label_CompCaret.Text = "Comp CaretPos: 0";
+            // 
+            // label_CandName
+            // 
+            this.label_CandName.AutoSize = true;
+            this.label_CandName.Font = new System.Drawing.Font("SimSun", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label_CandName.Location = new System.Drawing.Point(13, 109);
+            this.label_CandName.Name = "label_CandName";
+            this.label_CandName.Size = new System.Drawing.Size(164, 22);
+            this.label_CandName.TabIndex = 5;
+            this.label_CandName.Text = "CandidateList:";
+            // 
+            // CandListData
+            // 
+            this.CandListData.AutoSize = true;
+            this.CandListData.Font = new System.Drawing.Font("SimSun", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.CandListData.Location = new System.Drawing.Point(15, 144);
+            this.CandListData.Name = "CandListData";
+            this.CandListData.Size = new System.Drawing.Size(88, 16);
+            this.CandListData.TabIndex = 6;
+            this.CandListData.Text = "Candidates";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(15, 407);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(83, 12);
+            this.label2.TabIndex = 7;
+            this.label2.Text = "ClickToChange";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.CandListData);
+            this.Controls.Add(this.label_CandName);
             this.Controls.Add(this.label_CompCaret);
             this.Controls.Add(this.label_DisplayStr);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.IMEStateChange);
             this.ImeMode = System.Windows.Forms.ImeMode.On;
             this.Name = "Form1";
             this.Text = "Form1";
@@ -82,9 +117,12 @@
 
         #endregion
 
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label IMEStateChange;
         private System.Windows.Forms.Label label_DisplayStr;
         private System.Windows.Forms.Label label_CompCaret;
+        private System.Windows.Forms.Label label_CandName;
+        private System.Windows.Forms.Label CandListData;
+        private System.Windows.Forms.Label label2;
     }
 }
 

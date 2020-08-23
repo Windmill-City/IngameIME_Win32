@@ -1,5 +1,5 @@
 #pragma once
-#define UILESS 1
+#define UILESS
 #include <xstring>
 
 #include "../libtf/tf_application.h"

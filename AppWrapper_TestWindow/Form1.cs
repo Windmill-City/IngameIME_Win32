@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define UILess
+
+using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -7,6 +9,8 @@ namespace AppWrapper_TestWindow
 {
     public partial class Form1 : Form
     {
+        private AppWrapper appWrapper;
+
         private CompositionHandler compHandler;
         private CandidateListWrapper candWrapper;
 
@@ -21,45 +25,49 @@ namespace AppWrapper_TestWindow
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            compHandler = Program.appWrapper.GetCompHandler();
-            candWrapper = Program.appWrapper.GetCandWapper();
+            appWrapper = new AppWrapper();
+#if UILess
+            appWrapper.Initialize(Handle, ActivateMode.UIELEMENTENABLEDONLY);
+#else
+            appWrapper.Initialize(Handle, ActivateMode.DEFAULT);
+#endif
 
+            //Composition
+            compHandler = appWrapper.GetCompHandler();
             compHandler.eventGetCompExt += CompHandler_eventGetCompExt;
             compHandler.eventComposition += CompHandler_eventComposition;
+#if UILess
+            //CandidateList
+            candWrapper = appWrapper.GetCandWapper();
+            candWrapper.eventCandidateList += CandWrapper_eventCandidateList;
+#endif
 
-            Program.appWrapper.EnableIME();
+            appWrapper.EnableIME();
+            IMEStateChange.Text = "IMEState:" + (appWrapper.m_IsIMEEnabled ? "Enabled" : "Disabled");
         }
+
+        #region Handle CandidateList
+
+        private void CandWrapper_eventCandidateList(refCandidateList list)
+        {
+            CandListData.Text = "";
+            foreach (var cand in list.Candidates)
+            {
+                CandListData.Text += cand;
+                CandListData.Text += "\r\n";
+            }
+        }
+
+        #endregion Handle CandidateList
 
         #region Handle Composition
 
-        public enum CompositionState
+        private void CompHandler_eventComposition(refCompositionEventArgs args)
         {
-            StartComposition = 0,
-            Composing,
-            Commit,
-            EndComposition
-        };
+            label_CompCaret.Text = string.Format("Comp CaretPos: {0} ", args.m_caretPos);
 
-        [StructLayout(LayoutKind.Sequential)]
-        public struct CompositionEventArgs
-        {
-            public CompositionState state;
-            public int caretPos;
-
-            [MarshalAs(UnmanagedType.LPWStr)]
-            public string compStr;
-
-            [MarshalAs(UnmanagedType.LPWStr)]
-            public string commitStr;
-        }
-
-        private void CompHandler_eventComposition(IntPtr comp)
-        {
-            CompositionEventArgs args = (CompositionEventArgs)Marshal.PtrToStructure(comp, typeof(CompositionEventArgs));
-            label_CompCaret.Text = string.Format("Comp CaretPos: {0} ", args.caretPos);
-
-            //storedStr += Marshal.PtrToStringAuto(args.commitStr);
-            compStr = args.compStr;
+            storedStr += args.m_strCommit;
+            compStr = args.m_strComp;
 
             label_DisplayStr.Text = storedStr + compStr;
         }
@@ -99,19 +107,13 @@ namespace AppWrapper_TestWindow
 
         #region Handle WinForm
 
-        private void label1_Click(object sender, EventArgs e)
+        private void IMEStateChange_Click(object sender, EventArgs e)
         {
-            Label label = (Label)sender;
-            if (Program.appWrapper.m_IsIMEEnabled)
-            {
-                Program.appWrapper.DisableIME();
-                label.Text = "IMEState:Disabled";
-            }
+            if (appWrapper.m_IsIMEEnabled)
+                appWrapper.DisableIME();
             else
-            {
-                Program.appWrapper.EnableIME();
-                label.Text = "IMEState:Enabled";
-            }
+                appWrapper.EnableIME();
+            IMEStateChange.Text = "IMEState:" + (appWrapper.m_IsIMEEnabled ? "Enabled" : "Disabled");
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)

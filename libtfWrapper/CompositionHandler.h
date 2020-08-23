@@ -1,6 +1,23 @@
 #pragma once
 #include "../libtf/TextStore.h"
 
+public enum class refCompositionState
+{
+	StartComposition,
+	Composing,
+	Commit,
+	EndComposition
+};
+
+public ref struct refCompositionEventArgs
+{
+public:
+	refCompositionState				m_state;
+	LONG                            m_caretPos;
+	System::String^ m_strComp;
+	System::String^ m_strCommit;
+};
+
 using namespace libtf;
 public ref class CompositionHandler
 {
@@ -16,7 +33,7 @@ public ref class CompositionHandler
 	CompositionExtSink_native^ sink_ext;
 #pragma endregion
 public:
-	delegate VOID CompositionSink_cli(System::IntPtr comp);
+	delegate VOID CompositionSink_cli(refCompositionEventArgs^ comp);
 	delegate VOID CompositionExtSink_cli(System::IntPtr rect);
 	event CompositionSink_cli^ eventComposition;
 	event CompositionExtSink_cli^ eventGetCompExt;
