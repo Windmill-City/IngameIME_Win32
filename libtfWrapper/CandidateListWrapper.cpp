@@ -6,7 +6,12 @@ CandidateListWrapper::CandidateListWrapper(UIElementSink* sink, Common* common)
 	handler = new CandidateListHandler(sink, common);
 
 	sink_candidateList = gcnew CandidateSink_native(this, &CandidateListWrapper::onCandidateList);
-	handler->m_sigCandidateList.connect(reinterpret_cast<nativeType>(System::Runtime::InteropServices::Marshal::GetFunctionPointerForDelegate(sink_candidateList).ToPointer()));
+	handler->m_sigCandidateList.connect(static_cast<nativeType>(System::Runtime::InteropServices::Marshal::GetFunctionPointerForDelegate(sink_candidateList).ToPointer()));
+}
+
+CandidateListWrapper::~CandidateListWrapper()
+{
+	delete handler;
 }
 
 #include <msclr\marshal_cppstd.h>

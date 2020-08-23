@@ -31,6 +31,7 @@ namespace libtf {
 	private:
 		Common* m_common;
 		typedef boost::signals2::signal<VOID(CandidateList* list)> signal_CandidateList;
+		boost::signals2::connection connectCandidateSink;
 	public:
 		CandidateList* m_list;
 		signal_CandidateList m_sigCandidateList;
@@ -39,7 +40,11 @@ namespace libtf {
 			m_common = common;
 			m_list = new CandidateList();
 
-			sink->m_sigUIElement.connect(boost::bind(&CandidateListHandler::onUIEle, this, _1));
+			connectCandidateSink = sink->m_sigUIElement.connect(boost::bind(&CandidateListHandler::onUIEle, this, _1));
+		}
+
+		~CandidateListHandler() {
+			connectCandidateSink.disconnect();
 		}
 
 		VOID onUIEle(UIElementEventArgs* args) {

@@ -41,7 +41,6 @@ namespace AppWrapper_TestWindow
             candWrapper = appWrapper.GetCandWapper();
             candWrapper.eventCandidateList += CandWrapper_eventCandidateList;
 #endif
-
             appWrapper.EnableIME();
             IMEStateChange.Text = "IMEState:" + (appWrapper.m_IsIMEEnabled ? "Enabled" : "Disabled");
         }

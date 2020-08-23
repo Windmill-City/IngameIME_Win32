@@ -19,6 +19,8 @@ public:
 };
 
 using namespace libtf;
+//Wraning, due to some unknown error, this handler cant remove its connect to the signal, dont release this if any composition will make
+//it is rarely to release this handler in the whole app lifetime, so just ignore this problem
 public ref class CompositionHandler
 {
 #pragma region EventHandler Def&Var

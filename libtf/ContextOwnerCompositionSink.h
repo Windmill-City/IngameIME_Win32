@@ -8,9 +8,8 @@ namespace libtf {
 		public COMBase,
 		public ITfContextOwnerCompositionSink
 	{
-	private:
-		typedef boost::signals2::signal <VOID(ITfContextOwnerCompositionSink*, CompositionEventArgs*)> signal_Comp;
 	public:
+		typedef boost::signals2::signal <VOID(ITfContextOwnerCompositionSink*, CompositionEventArgs*)> signal_Comp;
 		signal_Comp				m_sigComposition;
 
 		// Í¨¹ý ITfContextOwnerCompositionSink ¼Ì³Ð

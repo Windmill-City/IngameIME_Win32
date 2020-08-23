@@ -3,11 +3,13 @@
 
 CompositionHandler::CompositionHandler(TextStore* ts)
 {
+	tracker = new SinkLifeTracker();
+
 	sink_comp = gcnew CompositionSink_native(this, &CompositionHandler::onComposition);
-	ts->m_sigComposition.connect(reinterpret_cast<CompositionSink_nativeType>(System::Runtime::InteropServices::Marshal::GetFunctionPointerForDelegate(sink_comp).ToPointer()));
+	ts->m_sigComposition.connect(static_cast<CompositionSink_nativeType>(System::Runtime::InteropServices::Marshal::GetFunctionPointerForDelegate(sink_comp).ToPointer()));
 
 	sink_ext = gcnew CompositionExtSink_native(this, &CompositionHandler::onCompositionExt);
-	ts->m_sigGetCompExt.connect(reinterpret_cast<CompositionExtSink_nativeType>(System::Runtime::InteropServices::Marshal::GetFunctionPointerForDelegate(sink_ext).ToPointer()));
+	ts->m_sigGetCompExt.connect(static_cast<CompositionExtSink_nativeType>(System::Runtime::InteropServices::Marshal::GetFunctionPointerForDelegate(sink_ext).ToPointer()));
 }
 #include <msclr\marshal_cppstd.h>
 using namespace msclr::interop;

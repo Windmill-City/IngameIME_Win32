@@ -28,5 +28,6 @@ public:
 	event CandidateSink_cli^ eventCandidateList;
 
 	CandidateListWrapper(UIElementSink* sink, Common* common);
+	~CandidateListWrapper();
 	VOID onCandidateList(CandidateList* list);
 };
