@@ -3,8 +3,6 @@
 
 CompositionHandler::CompositionHandler(TextStore* ts)
 {
-	tracker = new SinkLifeTracker();
-
 	sink_comp = gcnew CompositionSink_native(this, &CompositionHandler::onComposition);
 	ts->m_sigComposition.connect(static_cast<CompositionSink_nativeType>(System::Runtime::InteropServices::Marshal::GetFunctionPointerForDelegate(sink_comp).ToPointer()));
 
