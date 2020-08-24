@@ -29,11 +29,13 @@ public ref class AppWrapper
 public:
 	bool m_IsIMEEnabled = true;
 	bool m_Initilized;
+	HWND m_hWnd;
 
 	AppWrapper();
 	~AppWrapper();
 	CompositionHandler^ GetCompHandler();
 	CandidateListWrapper^ GetCandWapper();
+	VOID PumpMessage();//for MS Pinyin, which will make Winform dont trigger Idle event while it processing keys
 
 	VOID Initialize(System::IntPtr handle, ActivateMode activateMode);
 	VOID DisableIME();

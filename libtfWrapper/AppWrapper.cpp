@@ -33,9 +33,51 @@ CandidateListWrapper^ AppWrapper::GetCandWapper()
 	return gcnew CandidateListWrapper(m_UIEleSink, m_App);
 }
 
+VOID AppWrapper::PumpMessage()
+{
+	MSG msg;
+	BOOL    fResult = TRUE;
+	while (SUCCEEDED(m_App->m_pMsgPump->PeekMessage(&msg, m_hWnd, 0, 0, PM_REMOVE, &fResult)) && fResult)
+	{
+		BOOL    fEaten;
+		if (WM_KEYDOWN == msg.message)
+		{
+			// does an ime want it?
+			if (m_App->m_pKeyMgr->TestKeyDown(msg.wParam, msg.lParam, &fEaten) == S_OK && fEaten &&
+				m_App->m_pKeyMgr->KeyDown(msg.wParam, msg.lParam, &fEaten) == S_OK && fEaten)
+			{
+				continue;
+			}
+		}
+		else if (WM_KEYUP == msg.message)
+		{
+			// does an ime want it?
+			if (m_App->m_pKeyMgr->TestKeyUp(msg.wParam, msg.lParam, &fEaten) == S_OK && fEaten &&
+				m_App->m_pKeyMgr->KeyUp(msg.wParam, msg.lParam, &fEaten) == S_OK && fEaten)
+			{
+				continue;
+			}
+		}
+
+		if (WM_QUIT == msg.message)
+		{
+			PostMessage(m_hWnd, msg.message, msg.wParam, msg.lParam);
+			return;
+		}
+
+		if (fResult)
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+	}
+	PostMessage(m_hWnd, WM_NULL, 0, 0);//Prevent window from waiting msg
+}
+
 VOID AppWrapper::Initialize(System::IntPtr handle, ActivateMode activateMode)
 {
 	HWND hWnd = (HWND)handle.ToPointer();
+	m_hWnd = hWnd;
 	//MS Pinyin cant open candidate window when using normal active with ITfContextOwnerCompositionSink
 	//Should activate as TF_TMAE_UIELEMENTENABLEDONLY
 	m_App->m_pThreadMgrEx->ActivateEx(&(m_App->m_ClientId), (DWORD)activateMode);
