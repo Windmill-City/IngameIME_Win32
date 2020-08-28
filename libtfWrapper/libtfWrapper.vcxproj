@@ -178,6 +178,7 @@
     <ClInclude Include="CompositionHandler.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AppWrapper.cpp" />
@@ -194,6 +195,9 @@
     <ProjectReference Include="..\libtf\libtf.vcxproj">
       <Project>{6b9e60b4-51b6-40b0-884a-a5d07081302a}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="libtfWrapper.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
