@@ -96,24 +96,12 @@ VOID AppWrapper::Initialize(System::IntPtr handle, ActivateMode activateMode)
 	m_Initilized = true;
 }
 
-#include <msclr\marshal_cppstd.h>
-
-using namespace System;
-using namespace msclr::interop;
-
 VOID AppWrapper::DisableIME()
 {
 	if (m_IsIMEEnabled) {
 		m_IsIMEEnabled = false;
-		/*
-		By default, the TSF manager will process keystrokesand pass them to the text services.
-		An application prevents this by calling this method.
-		Typically, this method is called when text service input is inappropriate, for example when a menu is displayed.
-		Calls to this method are cumulative, so every call to this method requires a subsequent call to ITfConfigureSystemKeystrokeFeed::EnableSystemKeystrokeFeed.
-
-		So we use a bool to prevent multiple disable here
-		*/
-		m_App->m_pCfgSysKeyFeed->DisableSystemKeystrokeFeed();
+		m_TextStore->m_status.dwDynamicFlags = TS_SD_READONLY;//Make textStore Readonly, prevent IME input
+		m_Ctx->m_pCtxOwnerServices->OnStatusChange(m_TextStore->m_status.dwDynamicFlags);
 		m_Ctx->m_pCtxOwnerCompServices->TerminateComposition(NULL);//pass NULL to terminate all composition
 	}
 }
@@ -122,6 +110,7 @@ VOID AppWrapper::EnableIME()
 {
 	if (!m_IsIMEEnabled) {
 		m_IsIMEEnabled = true;
-		m_App->m_pCfgSysKeyFeed->EnableSystemKeystrokeFeed();
+		m_TextStore->m_status.dwDynamicFlags = 0;//Set to 0, enable IME input
+		m_Ctx->m_pCtxOwnerServices->OnStatusChange(m_TextStore->m_status.dwDynamicFlags);
 	}
 }
