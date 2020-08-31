@@ -719,7 +719,7 @@ namespace libtf {
 			}
 
 			if (m_Composing) {
-				m_sigComposition(this, new CompositionEventArgs(m_StoredStr.substr(m_CompStart, m_CompEnd - m_CompStart), m_acpStart));
+				m_sigComposition(this, new CompositionEventArgs(m_StoredStr.substr(m_CompStart, m_CompEnd - m_CompStart), m_acpEnd));
 			}
 		}
 
