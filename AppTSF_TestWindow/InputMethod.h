@@ -13,6 +13,7 @@ using namespace libtf;
 class InputMethod
 {
 public:
+	HWND m_hWnd;
 	TextBox* m_TextBox;
 	BOOL m_IsIMEEnabled = TRUE;
 	BOOL m_Initilized = FALSE;

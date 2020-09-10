@@ -16,6 +16,7 @@ InputMethod::~InputMethod()
 
 VOID InputMethod::Initialize(HWND hWnd)
 {
+	m_hWnd = hWnd;
 	//MS Pinyin cant open candidate window when using normal active with ITfContextOwnerCompositionSink
 	//m_App->m_pThreadMgrEx->ActivateEx(&(m_App->m_ClientId), TF_TMAE_UIELEMENTENABLEDONLY);
 #ifndef UILESS
@@ -97,8 +98,8 @@ VOID InputMethod::DisableIME()
 	if (m_IsIMEEnabled) {
 		m_IsIMEEnabled = FALSE;
 
-		m_TextStore->m_status.dwDynamicFlags = TF_SD_READONLY;
-		m_Ctx->m_pCtxOwnerServices->OnStatusChange(TF_SD_READONLY);
+		Document* doc = new Document(m_App.get(), m_hWnd);//Empty document
+		m_App->m_pThreadMgr->SetFocus(doc->m_pDocMgr);
 		m_Ctx->m_pCtxOwnerCompServices->TerminateComposition(NULL);//pass NULL to terminate all composition
 	}
 }
@@ -108,7 +109,6 @@ VOID InputMethod::EnableIME()
 	if (!m_IsIMEEnabled) {
 		m_IsIMEEnabled = TRUE;
 
-		m_TextStore->m_status.dwDynamicFlags = 0;
-		m_Ctx->m_pCtxOwnerServices->OnStatusChange(TF_SD_READONLY);
+		m_App->m_pThreadMgr->SetFocus(m_Doc->m_pDocMgr);
 	}
 }
