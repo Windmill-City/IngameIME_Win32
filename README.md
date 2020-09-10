@@ -98,6 +98,11 @@ m_Ctx->m_pCtxOwnerServices->OnStatusChange(TS_SD_READONLY);
 ```c++
 ITfThreadMgr->AssociateFocus(m_hWnd, NULL, &prevDocMgr);
 ```
+5. SetFocus to an Empty DocumentMgr
+```c++
+Document* doc = new Document(m_App, m_hWnd);//Empty document
+m_App->m_pThreadMgr->SetFocus(doc->m_pDocMgr);
+```
 ## C#
 Use Appwrapper
 ```c#
