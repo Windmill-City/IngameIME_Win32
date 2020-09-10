@@ -96,15 +96,9 @@ VOID InputMethod::DisableIME()
 {
 	if (m_IsIMEEnabled) {
 		m_IsIMEEnabled = FALSE;
-		/*
-		By default, the TSF manager will process keystrokesand pass them to the text services.
-		An application prevents this by calling this method.
-		Typically, this method is called when text service input is inappropriate, for example when a menu is displayed.
-		Calls to this method are cumulative, so every call to this method requires a subsequent call to ITfConfigureSystemKeystrokeFeed::EnableSystemKeystrokeFeed.
 
-		So we use a bool to prevent multiple disable here
-		*/
-		m_App->m_pCfgSysKeyFeed->DisableSystemKeystrokeFeed();
+		m_TextStore->m_status.dwDynamicFlags = TF_SD_READONLY;
+		m_Ctx->m_pCtxOwnerServices->OnStatusChange(TF_SD_READONLY);
 		m_Ctx->m_pCtxOwnerCompServices->TerminateComposition(NULL);//pass NULL to terminate all composition
 	}
 }
@@ -113,6 +107,8 @@ VOID InputMethod::EnableIME()
 {
 	if (!m_IsIMEEnabled) {
 		m_IsIMEEnabled = TRUE;
-		m_App->m_pCfgSysKeyFeed->EnableSystemKeystrokeFeed();
+
+		m_TextStore->m_status.dwDynamicFlags = 0;
+		m_Ctx->m_pCtxOwnerServices->OnStatusChange(TF_SD_READONLY);
 	}
 }
