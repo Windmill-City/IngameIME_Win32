@@ -100,8 +100,9 @@ VOID AppWrapper::DisableIME()
 {
 	if (m_IsIMEEnabled) {
 		m_IsIMEEnabled = false;
-		m_TextStore->m_status.dwDynamicFlags = TS_SD_READONLY;//Make textStore Readonly, prevent IME input
-		m_Ctx->m_pCtxOwnerServices->OnStatusChange(m_TextStore->m_status.dwDynamicFlags);
+
+		Document* doc = new Document(m_App, m_hWnd);//Empty document
+		m_App->m_pThreadMgr->SetFocus(doc->m_pDocMgr);
 		m_Ctx->m_pCtxOwnerCompServices->TerminateComposition(NULL);//pass NULL to terminate all composition
 	}
 }
@@ -110,7 +111,7 @@ VOID AppWrapper::EnableIME()
 {
 	if (!m_IsIMEEnabled) {
 		m_IsIMEEnabled = true;
-		m_TextStore->m_status.dwDynamicFlags = 0;//Set to 0, enable IME input
-		m_Ctx->m_pCtxOwnerServices->OnStatusChange(m_TextStore->m_status.dwDynamicFlags);
+
+		m_App->m_pThreadMgr->SetFocus(m_Doc->m_pDocMgr);
 	}
 }
