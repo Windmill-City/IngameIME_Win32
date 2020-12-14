@@ -43,6 +43,7 @@ VOID TextBox::Draw(HWND hwnd, HDC hdc, PAINTSTRUCT* ps)
 	for (size_t i = 0; i < Count; i++)
 	{
 		std::wstring str = Candidates[i];
+		int size = str.size();
 		origin.Y += yOffset;
 		graphics.DrawString(str.c_str(), str.size(), &fontText, origin, &format, &BrushFront);
 	}
@@ -56,6 +57,9 @@ VOID TextBox::GetCompExt(RECT* rect)
 
 VOID TextBox::onChar(WPARAM wParam, LPARAM lParam)
 {
+	char ch = wParam;
+	if(!iscntrl(ch))
+		m_Text += ch;
 }
 
 VOID TextBox::onKeyDown(WPARAM wParam, LPARAM lParam)
