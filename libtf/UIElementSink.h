@@ -1,5 +1,5 @@
 #pragma once
-#include <boost/signals2.hpp>
+#include <functional>
 #include "COMBase.h"
 #include "UIElementEventArgs.h"
 namespace libtf {
@@ -8,9 +8,9 @@ namespace libtf {
 		public ITfUIElementSink
 	{
 	public:
-		typedef boost::signals2::signal<VOID(UIElementEventArgs*)> signal_UIElement;
+		typedef std::function<VOID(UIElementEventArgs*)> signal_UIElement;
 
-		signal_UIElement			m_sigUIElement;
+		signal_UIElement			m_sigUIElement = [](UIElementEventArgs*) {};
 
 		Common* m_common;
 		DWORD							m_dwCookie = TF_INVALID_COOKIE;

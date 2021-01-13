@@ -1,6 +1,7 @@
 #pragma once
+#include <iostream>
+#include <functional>
 #include "UIElementSink.h"
-#include <boost/bind.hpp>
 
 namespace libtf {
 	struct TFAPI CandidateList
@@ -30,8 +31,7 @@ namespace libtf {
 	{
 	private:
 		Common* m_common;
-		typedef boost::signals2::signal<VOID(CandidateList* list)> signal_CandidateList;
-		boost::signals2::connection connectCandidateSink;
+		typedef std::function<VOID(CandidateList* list)> signal_CandidateList;
 	public:
 		CandidateList* m_list;
 		signal_CandidateList m_sigCandidateList;
@@ -40,11 +40,7 @@ namespace libtf {
 			m_common = common;
 			m_list = new CandidateList();
 
-			connectCandidateSink = sink->m_sigUIElement.connect(boost::bind(&CandidateListHandler::onUIEle, this, _1));
-		}
-
-		~CandidateListHandler() {
-			connectCandidateSink.disconnect();
+			sink->m_sigUIElement = std::bind(&CandidateListHandler::onUIEle, this, std::placeholders::_1);
 		}
 
 		VOID onUIEle(UIElementEventArgs* args) {
@@ -109,7 +105,7 @@ namespace libtf {
 						if (SUCCEEDED(candidateListUIEle->GetString(i, &candidate)))
 						{
 							LPWSTR text = candidate;
-							if (!text) {//some IME may return null str, wtf
+							if (!text) {//some IME may return null str
 								j--;
 								continue;
 							}

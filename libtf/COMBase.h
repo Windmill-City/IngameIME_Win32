@@ -1,5 +1,4 @@
 #pragma once
-
 #include <msctf.h>
 #include "tf_common.h"
 namespace libtf {

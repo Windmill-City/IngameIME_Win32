@@ -105,9 +105,4 @@
   <ItemGroup>
     <None Include="cpp.hint" />
   </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="libtf.rc">
-      <Filter>Resource</Filter>
-    </ResourceCompile>
-  </ItemGroup>
 </Project>

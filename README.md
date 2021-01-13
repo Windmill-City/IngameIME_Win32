@@ -1,19 +1,7 @@
 # libtf
 A library for text service framework
-
-**C# Wrapper Tutorial at the end of this page**
 # TSF Document
 [English Version](https://github.com/Windmill-City/libtf/blob/master/docs/Doc.md) 
-# Build
-Set Boost Root before build
-
-Path:`TextServiceFramework\libtf\PropertySheet.props`
-
-BoostVersion boost_1_74_0
-
-Download Boost: https://www.boost.org/
-
-Unzip, and copy the boost path to `PropertySheet.props`
 # How to use
 ## C++
 ```c++
@@ -102,32 +90,4 @@ ITfThreadMgr->AssociateFocus(m_hWnd, NULL, &prevDocMgr);
 ```c++
 Document* doc = new Document(m_App, m_hWnd);//Empty document
 m_App->m_pThreadMgr->SetFocus(doc->m_pDocMgr);
-```
-## C#
-Use Appwrapper
-```c#
-//Need to init in STA UIThread
-AppWrapper appWrapper = new AppWrapper();
-appWrapper.Initialize(form.Handle, ActivateMode.DEFAULT);
-
-//Composition
-compHandler = appWrapper.GetCompHandler();
-//IME need this to position the Candidate window
-compHandler.eventGetCompExt += CompHandler_eventGetCompExt;
-//Get Composition Text|Caret Pos|Commit Text
-compHandler.eventComposition += CompHandler_eventComposition;
-```
-### UILess
-```c#
-//Only activate the IME who supports UILess Mode
-appWrapper.Initialize(form.Handle, ActivateMode.UIELEMENTENABLEDONLY);
-//CandidateList
-candWrapper = appWrapper.GetCandWapper();
-//GetCandidateList Data from it
-candWrapper.eventCandidateList += CandWrapper_eventCandidateList;
-```
-### EnableIME/DisableIME
-```c#
-appWrapper.DisableIME();
-appWrapper.EnableIME();
 ```

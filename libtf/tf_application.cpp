@@ -14,7 +14,7 @@ namespace libtf {
 		HRESULT hr = Common::Initialize();
 		RETURNHR(hr);
 
-		hr = m_pThreadMgr.CoCreateInstance(CLSID_TF_ThreadMgr);
+		hr = m_pThreadMgr.CoCreateInstance(CLSID_TF_ThreadMgr, NULL, CLSCTX_INPROC_SERVER);
 		RETURNHR(hr);
 
 		m_pThreadMgrEx = m_pThreadMgr;

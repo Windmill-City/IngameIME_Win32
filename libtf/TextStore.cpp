@@ -298,7 +298,7 @@ namespace libtf {
 
 		BOOL    fDoText = cchPlainReq > 0;
 		BOOL    fDoRunInfo = cRunInfoReq > 0;
-		LONG    cchTotal;
+		size_t    cchTotal;
 		HRESULT hr = E_FAIL;
 
 		if (pcchPlainRet)

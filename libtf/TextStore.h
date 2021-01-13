@@ -3,7 +3,7 @@
 #include <xstring>
 
 #include <queue>
-#include <boost/signals2.hpp>
+#include <functional>
 
 #include "ContextOwnerCompositionSink.h"
 namespace libtf {
@@ -44,7 +44,7 @@ namespace libtf {
 		DWORD                   m_dwLockType;
 		std::queue<DWORD>		m_queuedLockReq;
 	public:
-		typedef boost::signals2::signal<VOID(TextStore*, RECT*)> signal_GetCompExt;
+		typedef std::function<VOID(TextStore*, RECT*)> signal_GetCompExt;
 
 		BOOL					m_fhasEdited;
 		BOOL					m_Commit;
@@ -59,7 +59,7 @@ namespace libtf {
 		BOOL                    m_fLayoutChanged;
 
 		//event
-		signal_GetCompExt		m_sigGetCompExt;
+		signal_GetCompExt		m_sigGetCompExt = [](TextStore*, RECT*) {};
 
 		TextStore(HWND hWnd);
 		HWND GetWnd();

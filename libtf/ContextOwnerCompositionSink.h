@@ -1,6 +1,5 @@
 #pragma once
-
-#include <boost/signals2.hpp>
+#include <functional>
 #include "COMBase.h"
 #include "CompositionEventArgs.h"
 namespace libtf {
@@ -9,8 +8,8 @@ namespace libtf {
 		public ITfContextOwnerCompositionSink
 	{
 	public:
-		typedef boost::signals2::signal <VOID(ITfContextOwnerCompositionSink*, CompositionEventArgs*)> signal_Comp;
-		signal_Comp				m_sigComposition;
+		typedef std::function<VOID(ITfContextOwnerCompositionSink*, CompositionEventArgs*)> signal_Comp;
+		signal_Comp				m_sigComposition = [](ITfContextOwnerCompositionSink*, CompositionEventArgs*) {};
 
 		// Í¨¹ý ITfContextOwnerCompositionSink ¼Ì³Ð
 		virtual HRESULT __stdcall OnStartComposition(ITfCompositionView* pComposition, BOOL* pfOk) override;
