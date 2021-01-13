@@ -19,9 +19,9 @@ m_Doc.reset(new Document(m_App.get(), hWnd));
 m_TextStore = new TextStore(hWnd);
 //reg events
 //IME need to get the Composition String's bounding box, for CandidateList Window drawing
-m_TextStore->m_sigGetCompExt.connect(boost::bind(&InputMethod::onGetCompsitionExt, this, _1, _2));
+m_TextStore->m_sigGetCompExt = std::bind(&InputMethod::onGetCompsitionExt, this, _1, _2);
 //Get Composition Text|Caret Pos|Commit Text
-m_TextStore->m_sigComposition.connect(boost::bind(&InputMethod::onComposition, this, _1, _2));
+m_TextStore->m_sigComposition = std::bind(&InputMethod::onComposition, this, _1, _2);
 ```
 #### Push Context
 ```c++
@@ -42,7 +42,7 @@ m_App->m_pThreadMgrEx->ActivateEx(&(m_App->m_ClientId), TF_TMAE_UIELEMENTENABLED
 m_UIEleSink = new UIElementSink(m_App.get());
 m_CandListHandler.reset(new CandidateListHandler(m_UIEleSink.p, m_App.get()));
 //Get CandidateList info from this event
-m_CandListHandler->m_sigCandidateList.connect(boost::bind(&InputMethod::onCandidateList, this, _1));
+m_CandListHandler->m_sigCandidateList = std::bind(&InputMethod::onCandidateList, this, _1);
 ```
 UIElementHandler reference： https://github.com/yangyuan/meow/blob/master/src/meow-uiless/meow_textapp.cpp
 ### DisableIME
