@@ -6,8 +6,8 @@ namespace libtf {
 	struct TFAPI CandidateList
 	{
 	public:
-		LONG			PageSize;
-		std::shared_ptr<std::wstring[]> Candidates;//PageSize indicates its array length
+		LONG								m_lPageSize;
+		std::shared_ptr<std::wstring[]>		m_pCandidates;//PageSize indicates its array length
 
 		CandidateList() {
 			Reset();
@@ -15,8 +15,8 @@ namespace libtf {
 
 		VOID Reset()
 		{
-			PageSize = 0;;
-			Candidates.reset();
+			m_lPageSize = 0;;
+			m_pCandidates.reset();
 		}
 	};
 
@@ -92,7 +92,7 @@ namespace libtf {
 					UINT start = startIndexs[cpage];
 					UINT end = start + pageSize;
 
-					m_pCandidateList->Candidates.reset(new std::wstring[pageSize]);
+					m_pCandidateList->m_pCandidates.reset(new std::wstring[pageSize]);
 					int j = 0;
 					for (UINT i = start; i < end; i++, j++)
 					{
@@ -104,10 +104,10 @@ namespace libtf {
 								j--;
 								continue;
 							}
-							m_pCandidateList->Candidates[j] = text;
+							m_pCandidateList->m_pCandidates[j] = text;
 						}
 					}
-					m_pCandidateList->PageSize = j;
+					m_pCandidateList->m_lPageSize = j;
 				}
 			}
 		}
