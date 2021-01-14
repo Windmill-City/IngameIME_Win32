@@ -70,7 +70,7 @@ namespace libtf {
 			{
 				CComVariant val;
 				RET_FAIL(m_pConversionMode->GetValue(&val));
-				m_sigAlphaMode(val.lVal & TF_CONVERSIONMODE_ALPHANUMERIC);
+				m_sigAlphaMode(val.lVal == TF_CONVERSIONMODE_ALPHANUMERIC);
 			}
 			return S_OK;
 		}
