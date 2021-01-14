@@ -35,7 +35,7 @@ namespace libtf {
 		/// <returns>
 		/// HRESULT of Initialize
 		/// </returns>
-		HRESULT TFAPI _stdcall Initialize() override {
+		HRESULT _stdcall TFAPI Initialize() override {
 			RET_FAIL(Common::Initialize());
 			RET_FAIL(m_pThreadMgr.CoCreateInstance(CLSID_TF_ThreadMgr, NULL, CLSCTX_INPROC_SERVER));
 
