@@ -77,9 +77,9 @@ namespace libtf {
 			AssertThread();
 			m_fKeyStrokeFeedState = state;
 			if (m_fKeyStrokeFeedState)
-				m_pThreadMgr2->ResumeKeystrokeHandling();
+				m_pThreadMgr->ResumeKeystrokeHandling();
 			else
-				m_pThreadMgr2->SuspendKeystrokeHandling();
+				m_pThreadMgr->SuspendKeystrokeHandling();
 		}
 
 		HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObject) override {

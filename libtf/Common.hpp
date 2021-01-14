@@ -11,8 +11,7 @@ namespace libtf {
 	{
 		std::thread::id						m_threadId;
 	public:
-		CComQIPtr<ITfThreadMgr>				m_pThreadMgr;
-		CComQIPtr<ITfThreadMgr2>			m_pThreadMgr2;
+		CComQIPtr<ITfThreadMgr2>			m_pThreadMgr;
 		CComQIPtr<ITfThreadMgrEx>			m_pThreadMgrEx;
 		CComQIPtr<ITfCompartmentMgr>		m_pCompartmentMgr;
 		CComQIPtr<ITfUIElementMgr>			m_pUIElementMgr;
@@ -22,6 +21,7 @@ namespace libtf {
 			if (m_ClientId != TF_CLIENTID_NULL)
 				m_pThreadMgr->Deactivate();
 			m_ClientId = TF_CLIENTID_NULL;
+			m_threadId = std::thread::id();
 		}
 
 		virtual HRESULT _stdcall Initialize() {

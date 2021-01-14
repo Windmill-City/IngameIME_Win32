@@ -12,7 +12,7 @@ namespace libtf {
 		typedef std::function <VOID(CompositionEventArgs*)>										sig_Composition;
 		typedef std::function <VOID(LONG acpStart, LONG acpEnd, RECT* prc, BOOL* pfClipped)>	sig_GetTextExt;
 
-		CComQIPtr<ITfThreadMgr>																	m_pThreadMgr;
+		CComQIPtr<ITfThreadMgr2>																	m_pThreadMgr;
 		TfClientId																				m_clientId;
 		DWORD																					m_dwCtxOwnerCookie;
 	public:
@@ -30,7 +30,7 @@ namespace libtf {
 		/// <param name="threadMgr">Get from Application</param>
 		/// <param name="clientId">Get from Application</param>
 		/// <param name="hWnd">The window's handle</param>
-		Document(CComPtrBase<ITfThreadMgr> threadMgr, TfClientId clientId , HWND hWnd) {
+		Document(CComPtrBase<ITfThreadMgr2> threadMgr, TfClientId clientId , HWND hWnd) {
 			m_hWnd = hWnd;
 			m_clientId = clientId;
 			m_pThreadMgr = threadMgr;
