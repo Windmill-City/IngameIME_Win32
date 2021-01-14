@@ -4,7 +4,7 @@
 #include "Common.hpp"
 #include "UIElementEventArgs.hpp"
 namespace libtf {
-	class TFAPI UIElementSink :
+	class UIElementSink :
 		public COMBase,
 		public ITfUIElementSink
 	{

@@ -2,22 +2,20 @@
 #include <iostream>
 #include "COMBase.hpp"
 #include "Common.hpp"
+#include "Document.hpp"
 #include "UIElementSink.hpp"
 #include "CandidateListHandler.hpp"
 namespace libtf {
-	class TFAPI Application :
+	class Application :
 		public Common,
 		public COMBase,
 		private ITfCompartmentEventSink
 	{
 		typedef std::function<VOID(BOOL)>					sig_AlphaMode;
 
-		DWORD												m_dwConversionModeCookie;
+		DWORD												m_dwConversionModeCookie = 0;
+		BOOL												m_fKeyStrokeFeedState = TRUE;
 	public:
-		CComQIPtr<ITfConfigureSystemKeystrokeFeed>			m_pCfgSysKeyFeed;
-		CComQIPtr<ITfKeystrokeMgr>							m_pKeyMgr;
-		CComQIPtr<ITfMessagePump>							m_pMsgPump;
-
 		std::shared_ptr<UIElementSink>						m_pUIEleSink;
 		std::shared_ptr<CandidateListHandler>				m_pCandidateListHandler;
 
@@ -37,16 +35,13 @@ namespace libtf {
 		/// <returns>
 		/// HRESULT of Initialize
 		/// </returns>
-		HRESULT _stdcall Initialize() override {
+		HRESULT TFAPI _stdcall Initialize() override {
 			RET_FAIL(Common::Initialize());
 			RET_FAIL(m_pThreadMgr.CoCreateInstance(CLSID_TF_ThreadMgr, NULL, CLSCTX_INPROC_SERVER));
 
 			m_pThreadMgrEx = m_pThreadMgr;
 			m_pCompartmentMgr = m_pThreadMgr;
 			m_pUIElementMgr = m_pThreadMgr;
-			m_pCfgSysKeyFeed = m_pThreadMgr;
-			m_pKeyMgr = m_pThreadMgr;
-			m_pMsgPump = m_pThreadMgr;
 
 			m_pThreadMgrEx->ActivateEx(&m_ClientId, TF_TMAE_UIELEMENTENABLEDONLY);
 
@@ -57,6 +52,33 @@ namespace libtf {
 			source = m_pConversionMode;
 			RET_FAIL(source->AdviseSink(IID_ITfCompartmentEventSink, (ITfCompartmentEventSink*)this, &m_dwConversionModeCookie));
 			return S_OK;
+		}
+
+		Document* TFAPI CreateDocument(HWND hWnd) {
+			AssertThread();
+			return new Document(m_pThreadMgr, m_ClientId, hWnd);
+		}
+
+		BOOL TFAPI isFocusing(Document* doc) {
+			AssertThread();
+			return doc->isFocusing();
+		}
+
+		VOID TFAPI Focus(Document* doc) {
+			AssertThread();
+			doc->Focus();
+		}
+
+		BOOL TFAPI KeyStrokeFeedState() {
+			return m_fKeyStrokeFeedState;
+		}
+
+		VOID TFAPI setKeyStrokeFeedState(BOOL state) {
+			m_fKeyStrokeFeedState = state;
+			if (m_fKeyStrokeFeedState)
+				m_pThreadMgr2->ResumeKeystrokeHandling();
+			else
+				m_pThreadMgr2->SuspendKeystrokeHandling();
 		}
 
 		HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObject) override {

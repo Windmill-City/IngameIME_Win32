@@ -1,15 +1,18 @@
 #pragma once
 #include <msctf.h>
 #include <atlbase.h>
+#include <thread>
 namespace libtf {
 #define TFAPI  __declspec(dllexport)
-#define THR_FAIL(hr, msg) if(FAILED(hr)) throw msg ## ":" + hr;
+#define THR_FAIL(hr, msg) if(FAILED(hr)) throw msg;
 #define RET_FAIL(hr) if(FAILED(hr)) return hr;
 #define RET_VOID(hr) if(FAILED(hr)) return;
-	class TFAPI Common
+	class Common
 	{
+		std::thread::id						m_threadId;
 	public:
 		CComQIPtr<ITfThreadMgr>				m_pThreadMgr;
+		CComQIPtr<ITfThreadMgr2>			m_pThreadMgr2;
 		CComQIPtr<ITfThreadMgrEx>			m_pThreadMgrEx;
 		CComQIPtr<ITfCompartmentMgr>		m_pCompartmentMgr;
 		CComQIPtr<ITfUIElementMgr>			m_pUIElementMgr;
@@ -19,12 +22,16 @@ namespace libtf {
 			if (m_ClientId != TF_CLIENTID_NULL)
 				m_pThreadMgr->Deactivate();
 			m_ClientId = TF_CLIENTID_NULL;
-			CoUninitialize();
 		}
 
 		virtual HRESULT _stdcall Initialize() {
-			HRESULT hr = CoInitialize(NULL);
-			return hr;
+			m_threadId = std::this_thread::get_id();
+			return S_OK;
+		}
+
+		VOID AssertThread() {
+			if (std::this_thread::get_id() != m_threadId)
+				throw "Call from invaild thread";
 		}
 	};
 }

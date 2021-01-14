@@ -20,7 +20,7 @@ namespace libtf {
 		}
 	};
 
-	class TFAPI CandidateListHandler
+	class CandidateListHandler
 	{
 		typedef std::function<VOID(CandidateList* list)>	signal_CandidateList;
 		CComPtr<ITfUIElementMgr>							m_pUIElementMgr;

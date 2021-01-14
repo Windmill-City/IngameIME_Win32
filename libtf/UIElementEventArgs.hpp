@@ -8,7 +8,7 @@ namespace libtf {
 		End
 	};
 
-	class TFAPI UIElementEventArgs
+	class UIElementEventArgs
 	{
 	public:
 		UIElementState				m_state;

@@ -36,6 +36,6 @@ ULONG __stdcall Release(void) override { return COMBase::Release(); };
 			return m_ulRef;
 		};
 	private:
-		ULONG m_ulRef;
+		ULONG m_ulRef = 0;
 	};
 }

@@ -4,7 +4,7 @@
 #include "Common.hpp"
 #include "CompositionEventArgs.hpp"
 namespace libtf {
-	class TFAPI Document:
+	class Document:
 		public COMBase,
 		public ITfContextOwner,
 		public ITfContextOwnerCompositionSink
@@ -19,7 +19,6 @@ namespace libtf {
 		HWND																					m_hWnd;
 		CComQIPtr<ITfDocumentMgr>																m_pDocMgr;
 		CComPtr<ITfContext>																		m_pCtx;
-		CComPtr<ITfCompartment>																	m_pKeyboardDisabled;
 		TfEditCookie																			m_ecTextStore;
 
 		sig_Composition																			m_sigComposition = [](CompositionEventArgs*) {};
@@ -31,7 +30,7 @@ namespace libtf {
 		/// <param name="threadMgr">Get from Application</param>
 		/// <param name="clientId">Get from Application</param>
 		/// <param name="hWnd">The window's handle</param>
-		Document(IN CComPtrBase<ITfThreadMgr> threadMgr, IN TfClientId clientId , IN HWND hWnd) {
+		Document(CComPtrBase<ITfThreadMgr> threadMgr, TfClientId clientId , HWND hWnd) {
 			m_hWnd = hWnd;
 			m_clientId = clientId;
 			m_pThreadMgr = threadMgr;
@@ -40,28 +39,9 @@ namespace libtf {
 			THR_FAIL(m_pDocMgr->CreateContext(clientId, 0, (ITfContextOwnerCompositionSink*)this, &m_pCtx, &m_ecTextStore), "Failed to Create Context");
 			THR_FAIL(m_pDocMgr->Push(m_pCtx), "Failed to push context");
 
-			CComPtr<ITfCompartmentMgr> ctxCompMgr;
-			ctxCompMgr = m_pCtx;
-			THR_FAIL(ctxCompMgr->GetCompartment(GUID_COMPARTMENT_KEYBOARD_DISABLED, &m_pKeyboardDisabled), "Failed to get KeyboardDisabled Compartment");
-
 			CComPtr<ITfSource> source;
 			source = m_pCtx;
 			THR_FAIL(source->AdviseSink(IID_ITfContextOwner, (ITfContextOwner*)this, &m_dwCtxOwnerCookie), "Failed to advise ITfContextOwner");
-		}
-
-		/// <summary>
-		/// Set if the Document allow IME
-		/// </summary>
-		/// <param name="state">TRUE to enable IME, otherwise disable</param>
-		VOID SetKeyboardState(BOOL state) {
-			CComVariant val = CComVariant((LONG)!state);
-			m_pKeyboardDisabled->SetValue(m_clientId, &val);
-		}
-
-		BOOL KeyboardState() {
-			CComVariant val;
-			m_pKeyboardDisabled->GetValue(&val);
-			return !val.lVal;
 		}
 
 		/// <summary>
@@ -78,6 +58,9 @@ namespace libtf {
 		}
 
 		~Document() {
+			CComPtr<ITfSource> source;
+			source = m_pCtx;
+			source->UnadviseSink(m_dwCtxOwnerCookie);
 			m_pDocMgr->Pop(TF_POPF_ALL);
 			if(isFocusing())
 				THR_FAIL(m_pThreadMgr->SetFocus(NULL), "Failed to SetFocus to NULL")
