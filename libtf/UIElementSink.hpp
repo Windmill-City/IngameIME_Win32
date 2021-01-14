@@ -24,7 +24,7 @@ namespace libtf {
 				THR_FAIL(m_source->UnadviseSink(m_dwCookie), "Failed to Unadvisesink");
 			}
 		}
-	private:
+
 		HRESULT __stdcall BeginUIElement(DWORD dwUIElementId, BOOL* pbShow) override
 		{
 			*pbShow = TRUE;//Show IME's candidate window by default

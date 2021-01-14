@@ -76,17 +76,19 @@ namespace libtf {
 			if(isFocusing())
 				THR_FAIL(m_pThreadMgr->SetFocus(NULL), "Failed to SetFocus to NULL")
 		}
-	private:
+
 		HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObject) override {
 			COM_ASUNK(ITfContextOwnerCompositionSink);
 			COM_RETURN
 		}
 		COM_REFS
+
 		HRESULT __stdcall OnStartComposition(ITfCompositionView* pComposition, BOOL* pfOk) override {
 			*pfOk = TRUE;
 			if (m_sigComposition) m_sigComposition(new CompositionEventArgs(CompositionState::StartComposition));
 			return S_OK;
 		}
+
 #define TEXT_BUF_SIZE 25
 		HRESULT __stdcall OnUpdateComposition(ITfCompositionView* pComposition, ITfRange* pRangeNew) override {
 			if (m_sigComposition) {
@@ -100,6 +102,7 @@ namespace libtf {
 			}
 			return S_OK;
 		}
+
 		HRESULT __stdcall OnEndComposition(ITfCompositionView* pComposition) override {
 			if (m_sigComposition) {
 				CComPtr<ITfRange> range;

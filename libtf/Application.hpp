@@ -55,7 +55,7 @@ namespace libtf {
 			RET_FAIL(source->AdviseSink(IID_ITfCompartmentEventSink, (ITfCompartmentEventSink*)this, &m_dwCMode));
 			return S_OK;
 		}
-	private:
+
 		HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObject) override {
 			COM_ASUNK(ITfCompartmentEventSink);
 			COM_RETURN
