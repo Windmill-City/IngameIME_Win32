@@ -74,6 +74,7 @@ namespace libtf {
 		}
 
 		TFAPI VOID setKeyStrokeFeedState(BOOL state) {
+			AssertThread();
 			m_fKeyStrokeFeedState = state;
 			if (m_fKeyStrokeFeedState)
 				m_pThreadMgr2->ResumeKeystrokeHandling();
