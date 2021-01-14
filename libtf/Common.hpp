@@ -11,6 +11,7 @@ namespace libtf {
 	public:
 		CComQIPtr<ITfThreadMgr>				m_pThreadMgr;
 		CComQIPtr<ITfThreadMgrEx>			m_pThreadMgrEx;
+		CComQIPtr<ITfCompartmentMgr>		m_pCompartmentMgr;
 		CComQIPtr<ITfUIElementMgr>			m_pUIElementMgr;
 		TfClientId							m_ClientId = TF_CLIENTID_NULL;
 
@@ -19,6 +20,7 @@ namespace libtf {
 				m_pThreadMgr->Deactivate();
 			m_pThreadMgr.Release();
 			m_pThreadMgrEx.Release();
+			m_pCompartmentMgr.Release();
 			m_pUIElementMgr.Release();
 			m_ClientId = TF_CLIENTID_NULL;
 			CoUninitialize();

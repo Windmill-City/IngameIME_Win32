@@ -5,6 +5,20 @@ VisualStudioVersion = 16.0.30320.27
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libtf", "libtf\libtf.vcxproj", "{6B9E60B4-51B6-40B0-884A-A5D07081302A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A8C3113B-71CD-4A63-BF6D-03D8000C0957}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{4C064B02-0C14-4ED4-9901-8342D44298C1}"
+	ProjectSection(SolutionItems) = preProject
+		docs\Doc.md = docs\Doc.md
+		docs\TSF-Context.png = docs\TSF-Context.png
+		docs\TSF-Context.uxf = docs\TSF-Context.uxf
+		docs\TSF-Sequence.png = docs\TSF-Sequence.png
+		docs\TSF-Sequence.uxf = docs\TSF-Sequence.uxf
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -24,6 +38,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4C064B02-0C14-4ED4-9901-8342D44298C1} = {A8C3113B-71CD-4A63-BF6D-03D8000C0957}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1E2E6AEA-7D20-45CF-B171-A81C174D184C}
