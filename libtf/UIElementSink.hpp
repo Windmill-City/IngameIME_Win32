@@ -5,7 +5,7 @@
 #include "UIElementEventArgs.hpp"
 namespace libtf {
 	class TFAPI UIElementSink :
-		public COMBase,
+		private COMBase,
 		public ITfUIElementSink
 	{
 		typedef std::function<VOID(UIElementEventArgs*)> signal_UIElement;
@@ -24,7 +24,7 @@ namespace libtf {
 				THR_FAIL(m_source->UnadviseSink(m_dwCookie), "Failed to Unadvisesink");
 			}
 		}
-
+	private:
 		HRESULT __stdcall BeginUIElement(DWORD dwUIElementId, BOOL* pbShow) override
 		{
 			*pbShow = TRUE;//Show IME's candidate window by default

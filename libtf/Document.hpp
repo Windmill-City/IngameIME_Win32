@@ -5,7 +5,7 @@
 #include "CompositionEventArgs.hpp"
 namespace libtf {
 	class TFAPI Document:
-		public COMBase,
+		private COMBase,
 		public ITfContextOwner,
 		public ITfContextOwnerCompositionSink
 	{
@@ -45,7 +45,7 @@ namespace libtf {
 			if(isFocusing())
 				THR_FAIL(m_pThreadMgr->SetFocus(NULL), "Failed to SetFocus to NULL")
 		}
-
+	private:
 		HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObject) override {
 			COM_ASUNK(ITfContextOwnerCompositionSink);
 			COM_RETURN
