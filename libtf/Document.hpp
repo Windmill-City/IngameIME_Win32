@@ -14,19 +14,48 @@ namespace libtf {
 		CComQIPtr<ITfThreadMgr>																	m_pThreadMgr;
 	public:
 		HWND																					m_hWnd;
+		TfClientId																				m_clientId;
 		CComQIPtr<ITfDocumentMgr>																m_pDocMgr;
 		CComPtr<ITfContext>																		m_pCtx;
 		TfEditCookie																			m_ecTextStore;
+		CComPtr<ITfCompartment>																	m_KeyboardDisabled;
 		sig_Composition																			m_sigComposition = [](CompositionEventArgs*) {};
 		sig_GetTextExt																			m_sigGetTextExt = [](LONG acpStart, LONG acpEnd, RECT* prc, BOOL* pfClipped) {};
 
+		/// <summary>
+		/// Create Document for the window
+		/// </summary>
+		/// <param name="threadMgr">Get from Application</param>
+		/// <param name="clientId">Get from Application</param>
+		/// <param name="hWnd">The window's handle</param>
 		Document(IN CComPtrBase<ITfThreadMgr> threadMgr, IN TfClientId clientId , IN HWND hWnd) {
 			m_hWnd = hWnd;
+			m_clientId = clientId;
 			m_pThreadMgr = threadMgr;
 
 			THR_FAIL(m_pThreadMgr->CreateDocumentMgr(&m_pDocMgr), "Failed to Create DocumentMgr");
 			THR_FAIL(m_pDocMgr->CreateContext(clientId, 0, (ITfContextOwnerCompositionSink*)this, &m_pCtx, &m_ecTextStore), "Failed to Create Context");
 			THR_FAIL(m_pDocMgr->Push(m_pCtx), "Failed to push context");
+
+			CComPtr<ITfCompartmentMgr> ctxCompMgr;
+			ctxCompMgr = m_pCtx;
+			THR_FAIL(ctxCompMgr->GetCompartment(GUID_COMPARTMENT_KEYBOARD_DISABLED, &m_KeyboardDisabled));
+		}
+
+		/// <summary>
+		/// Set if the Document allow IME
+		/// </summary>
+		/// <param name="state">TRUE to enable IME, otherwise disable</param>
+		VOID SetKeyboardState(BOOL state) {
+			CComVariant val = CComVariant(!state).ChangeType(VT_I4, NULL);
+			m_KeyboardDisabled->SetValue(m_clientId, &val);
+		}
+
+		BOOL KeyboardState() {
+			CComVariant val;
+			m_KeyboardDisabled->GetValue(&val);
+			val.ChangeType(VT_BOOL, NULL);
+			return !val.boolVal;
 		}
 
 		/// <summary>
