@@ -21,84 +21,36 @@
     <ClInclude Include="pch.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="tf_application.h">
+    <ClInclude Include="UIElementSink.hpp">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="tf_common.h">
+    <ClInclude Include="UIElementEventArgs.hpp">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Document.h">
+    <ClInclude Include="COMBase.hpp">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Context.h">
+    <ClInclude Include="Document.hpp">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="TextEditSink.h">
+    <ClInclude Include="ContextOwnerCompositionSink.hpp">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="ContextOwner.h">
+    <ClInclude Include="CompositionEventArgs.hpp">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="COMBase.h">
+    <ClInclude Include="Common.hpp">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="TextStore.h">
+    <ClInclude Include="Application.hpp">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="ContextOwnerCompositionSink.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="UIElementSink.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="CompositionEventArgs.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="UIElementEventArgs.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="CandidateListHandler.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="resource.h">
+    <ClInclude Include="CandidateListHandler.hpp">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="tf_application.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="tf_common.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Document.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Context.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="TextEditSink.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="ContextOwnerCompositionSink.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="ContextOwner.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="TextStore.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="UIElementSink.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="CompositionEventArgs.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="UIElementEventArgs.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

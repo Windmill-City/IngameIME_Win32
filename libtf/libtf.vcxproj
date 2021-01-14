@@ -214,41 +214,25 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="CandidateListHandler.h" />
-    <ClInclude Include="CompositionEventArgs.h" />
-    <ClInclude Include="Context.h" />
-    <ClInclude Include="ContextOwner.h" />
-    <ClInclude Include="ContextOwnerCompositionSink.h" />
-    <ClInclude Include="Document.h" />
-    <ClInclude Include="COMBase.h" />
+    <ClInclude Include="CandidateListHandler.hpp" />
+    <ClInclude Include="CompositionEventArgs.hpp" />
+    <ClInclude Include="ContextOwnerCompositionSink.hpp" />
+    <ClInclude Include="Document.hpp" />
+    <ClInclude Include="COMBase.hpp" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="TextEditSink.h" />
-    <ClInclude Include="TextStore.h" />
-    <ClInclude Include="tf_application.h" />
-    <ClInclude Include="tf_common.h" />
-    <ClInclude Include="UIElementEventArgs.h" />
-    <ClInclude Include="UIElementSink.h" />
+    <ClInclude Include="Application.hpp" />
+    <ClInclude Include="Common.hpp" />
+    <ClInclude Include="UIElementEventArgs.hpp" />
+    <ClInclude Include="UIElementSink.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CompositionEventArgs.cpp" />
-    <ClCompile Include="Context.cpp" />
-    <ClCompile Include="ContextOwner.cpp" />
-    <ClCompile Include="ContextOwnerCompositionSink.cpp" />
-    <ClCompile Include="Document.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="TextEditSink.cpp" />
-    <ClCompile Include="TextStore.cpp" />
-    <ClCompile Include="tf_application.cpp" />
-    <ClCompile Include="tf_common.cpp" />
-    <ClCompile Include="UIElementEventArgs.cpp" />
-    <ClCompile Include="UIElementSink.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
