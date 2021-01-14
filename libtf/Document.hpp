@@ -17,6 +17,7 @@ namespace libtf {
 		TfClientId																				m_clientId;
 		CComQIPtr<ITfDocumentMgr>																m_pDocMgr;
 		CComPtr<ITfContext>																		m_pCtx;
+		DWORD																					m_dwCtxOwner;
 		TfEditCookie																			m_ecTextStore;
 		CComPtr<ITfCompartment>																	m_KeyboardDisabled;
 		sig_Composition																			m_sigComposition = [](CompositionEventArgs*) {};
@@ -39,7 +40,11 @@ namespace libtf {
 
 			CComPtr<ITfCompartmentMgr> ctxCompMgr;
 			ctxCompMgr = m_pCtx;
-			THR_FAIL(ctxCompMgr->GetCompartment(GUID_COMPARTMENT_KEYBOARD_DISABLED, &m_KeyboardDisabled));
+			THR_FAIL(ctxCompMgr->GetCompartment(GUID_COMPARTMENT_KEYBOARD_DISABLED, &m_KeyboardDisabled), "Failed to get KeyboardDisabled Compartment");
+
+			CComPtr<ITfSource> source;
+			source = m_pCtx;
+			THR_FAIL(source->AdviseSink(IID_ITfContextOwner, (ITfContextOwner*)this, &m_dwCtxOwner), "Failed to advise ITfContextOwner");
 		}
 
 		/// <summary>
@@ -47,15 +52,14 @@ namespace libtf {
 		/// </summary>
 		/// <param name="state">TRUE to enable IME, otherwise disable</param>
 		VOID SetKeyboardState(BOOL state) {
-			CComVariant val = CComVariant(!state).ChangeType(VT_I4, NULL);
+			CComVariant val = CComVariant((LONG)!state);
 			m_KeyboardDisabled->SetValue(m_clientId, &val);
 		}
 
 		BOOL KeyboardState() {
 			CComVariant val;
 			m_KeyboardDisabled->GetValue(&val);
-			val.ChangeType(VT_BOOL, NULL);
-			return !val.boolVal;
+			return !val.lVal;
 		}
 
 		/// <summary>
@@ -79,6 +83,7 @@ namespace libtf {
 
 		HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObject) override {
 			COM_ASUNK(ITfContextOwnerCompositionSink);
+			COM_AS(ITfContextOwner);
 			COM_RETURN
 		}
 		COM_REFS
