@@ -28,6 +28,12 @@ namespace libtf {
 			THR_FAIL(source->UnadviseSink(m_dwCMode), "Failed to Unadvise AlphaMode sink");
 		}
 
+		/// <summary>
+		/// Initialize at UI-Thread
+		/// </summary>
+		/// <returns>
+		/// HRESULT of Initialize
+		/// </returns>
 		HRESULT _stdcall Initialize() override {
 			RET_FAIL(Common::Initialize());
 			RET_FAIL(m_pThreadMgr.CoCreateInstance(CLSID_TF_ThreadMgr, NULL, CLSCTX_INPROC_SERVER));
