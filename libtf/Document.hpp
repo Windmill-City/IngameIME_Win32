@@ -5,7 +5,7 @@
 #include "CompositionEventArgs.hpp"
 namespace libtf {
 	class TFAPI Document:
-		private COMBase,
+		public COMBase,
 		public ITfContextOwner,
 		public ITfContextOwnerCompositionSink
 	{

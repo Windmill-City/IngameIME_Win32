@@ -7,7 +7,7 @@
 namespace libtf {
 	class TFAPI Application :
 		public Common,
-		private COMBase,
+		public COMBase,
 		private ITfCompartmentEventSink
 	{
 		typedef std::function<VOID(BOOL)>					sig_AlphaMode;

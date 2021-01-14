@@ -5,7 +5,7 @@
 #include "UIElementEventArgs.hpp"
 namespace libtf {
 	class TFAPI UIElementSink :
-		private COMBase,
+		public COMBase,
 		public ITfUIElementSink
 	{
 		typedef std::function<VOID(UIElementEventArgs*)>		signal_UIElement;
