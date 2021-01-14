@@ -23,15 +23,9 @@ namespace libtf {
 		sig_AlphaMode										m_sigAlphaMode = [](BOOL) {};
 
 		~Application() {
-			m_pCfgSysKeyFeed.Release();
-			m_pKeyMgr.Release();
-			m_pMsgPump.Release();
-			m_pCandidateListHandler.reset();
-			m_pUIEleSink.reset();
-			CComQIPtr<ITfSource> source = m_pConversionMode.p;
-			source->UnadviseSink(m_dwCMode);
-			m_pConversionMode.Release();
-			Common::~Common();
+			CComPtr<ITfSource> source;
+			source = m_pConversionMode;
+			THR_FAIL(source->UnadviseSink(m_dwCMode), "Failed to Unadvise AlphaMode sink");
 		}
 
 		HRESULT _stdcall Initialize() override {
@@ -45,10 +39,13 @@ namespace libtf {
 			m_pKeyMgr = m_pThreadMgr;
 			m_pMsgPump = m_pThreadMgr;
 
+			m_pThreadMgrEx->ActivateEx(&m_ClientId, TF_TMAE_UIELEMENTENABLEDONLY);
+
 			m_pUIEleSink.reset(new UIElementSink(m_pUIElementMgr));
 			m_pCandidateListHandler.reset(new CandidateListHandler(m_pUIEleSink));
 			RET_FAIL(m_pCompartmentMgr->GetCompartment(GUID_COMPARTMENT_KEYBOARD_INPUTMODE_CONVERSION, &m_pConversionMode));
-			CComQIPtr<ITfSource> source = m_pConversionMode.p;
+			CComPtr<ITfSource> source;
+			source = m_pConversionMode;
 			RET_FAIL(source->AdviseSink(IID_ITfCompartmentEventSink, (ITfCompartmentEventSink*)this, &m_dwCMode));
 			return S_OK;
 		}

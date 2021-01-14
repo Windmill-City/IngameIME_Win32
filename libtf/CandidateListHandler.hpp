@@ -24,6 +24,7 @@ namespace libtf {
 	{
 		typedef std::function<VOID(CandidateList* list)>	signal_CandidateList;
 		CComPtr<ITfUIElementMgr>							m_uiElementMgr;
+		std::shared_ptr<UIElementSink>						m_sink;
 	public:
 		CandidateList*										m_list;
 		signal_CandidateList								m_sigCandidateList;
@@ -31,8 +32,12 @@ namespace libtf {
 
 		CandidateListHandler(std::shared_ptr<UIElementSink> sink) {
 			m_list = new CandidateList();
-
+			m_sink = sink;
 			sink->m_sigUIElement = std::bind(&CandidateListHandler::onUIEle, this, std::placeholders::_1);
+		}
+
+		~CandidateListHandler() {
+			m_sink->m_sigUIElement = [](UIElementEventArgs*) {};
 		}
 
 		VOID onUIEle(UIElementEventArgs* args) {
