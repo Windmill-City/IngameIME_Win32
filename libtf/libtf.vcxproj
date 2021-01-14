@@ -216,7 +216,6 @@
   <ItemGroup>
     <ClInclude Include="CandidateListHandler.hpp" />
     <ClInclude Include="CompositionEventArgs.hpp" />
-    <ClInclude Include="ContextOwnerCompositionSink.hpp" />
     <ClInclude Include="Document.hpp" />
     <ClInclude Include="COMBase.hpp" />
     <ClInclude Include="framework.h" />

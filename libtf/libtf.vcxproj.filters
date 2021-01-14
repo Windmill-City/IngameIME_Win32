@@ -33,9 +33,6 @@
     <ClInclude Include="Document.hpp">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="ContextOwnerCompositionSink.hpp">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="CompositionEventArgs.hpp">
       <Filter>Header</Filter>
     </ClInclude>
