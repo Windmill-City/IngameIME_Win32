@@ -42,7 +42,7 @@ namespace libtf {
 
 			CComPtr<ITfCompartmentMgr> ctxCompMgr;
 			ctxCompMgr = m_pCtx;
-			THR_FAIL(ctxCompMgr->GetCompartment(GUID_COMPARTMENT_KEYBOARD_DISABLED, &m_KeyboardDisabled), "Failed to get KeyboardDisabled Compartment");
+			THR_FAIL(ctxCompMgr->GetCompartment(GUID_COMPARTMENT_KEYBOARD_DISABLED, &m_pKeyboardDisabled), "Failed to get KeyboardDisabled Compartment");
 
 			CComPtr<ITfSource> source;
 			source = m_pCtx;
@@ -55,12 +55,12 @@ namespace libtf {
 		/// <param name="state">TRUE to enable IME, otherwise disable</param>
 		VOID SetKeyboardState(BOOL state) {
 			CComVariant val = CComVariant((LONG)!state);
-			m_KeyboardDisabled->SetValue(m_clientId, &val);
+			m_pKeyboardDisabled->SetValue(m_clientId, &val);
 		}
 
 		BOOL KeyboardState() {
 			CComVariant val;
-			m_KeyboardDisabled->GetValue(&val);
+			m_pKeyboardDisabled->GetValue(&val);
 			return !val.lVal;
 		}
 
