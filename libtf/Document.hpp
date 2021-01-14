@@ -30,7 +30,7 @@ namespace libtf {
 		}
 
 		/// <summary>
-		/// Focus when corespond window gets input focus
+		/// Focus when correspond window gets input focus
 		/// </summary>
 		VOID Focus() {
 			m_pThreadMgr->SetFocus(m_pDocMgr.p);
