@@ -8,11 +8,11 @@ namespace libtf {
 		private COMBase,
 		public ITfUIElementSink
 	{
-		typedef std::function<VOID(UIElementEventArgs*)> signal_UIElement;
-		CComQIPtr<ITfSource>		m_source;
-		DWORD						m_dwCookie = TF_INVALID_COOKIE;
+		typedef std::function<VOID(UIElementEventArgs*)>		signal_UIElement;
+		CComQIPtr<ITfSource>									m_source;
+		DWORD													m_dwCookie = TF_INVALID_COOKIE;
 	public:
-		signal_UIElement			m_sigUIElement = [](UIElementEventArgs*) {};
+		signal_UIElement										m_sigUIElement = [](UIElementEventArgs*) {};
 
 		UIElementSink(IN CComPtrBase<ITfUIElementMgr> uiElementMgr) {
 			m_source = uiElementMgr;

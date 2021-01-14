@@ -9,16 +9,17 @@ namespace libtf {
 		public ITfContextOwner,
 		public ITfContextOwnerCompositionSink
 	{
-		typedef std::function <VOID(CompositionEventArgs*)>	sig_Composition;
-		typedef std::function <VOID(LONG acpStart, LONG acpEnd, RECT* prc, BOOL* pfClipped)> sig_GetTextExt;
-		CComQIPtr<ITfThreadMgr>									m_pThreadMgr;
+		typedef std::function <VOID(CompositionEventArgs*)>										sig_Composition;
+		typedef std::function <VOID(LONG acpStart, LONG acpEnd, RECT* prc, BOOL* pfClipped)>	sig_GetTextExt;
+		CComQIPtr<ITfThreadMgr>																	m_pThreadMgr;
 	public:
-		HWND													m_hWnd;
-		CComQIPtr<ITfDocumentMgr>								m_pDocMgr;
-		CComPtr<ITfContext>										m_pCtx;
-		TfEditCookie											m_ecTextStore;
-		sig_Composition											m_sigComposition = [](CompositionEventArgs*) {};
-		sig_GetTextExt											m_sigGetTextExt = [](LONG acpStart, LONG acpEnd, RECT* prc, BOOL* pfClipped) {};
+		HWND																					m_hWnd;
+		CComQIPtr<ITfDocumentMgr>																m_pDocMgr;
+		CComPtr<ITfContext>																		m_pCtx;
+		TfEditCookie																			m_ecTextStore;
+		sig_Composition																			m_sigComposition = [](CompositionEventArgs*) {};
+		sig_GetTextExt																			m_sigGetTextExt = [](LONG acpStart, LONG acpEnd, RECT* prc, BOOL* pfClipped) {};
+
 		Document(IN CComPtrBase<ITfThreadMgr> threadMgr, IN TfClientId clientId , IN HWND hWnd) {
 			m_hWnd = hWnd;
 			m_pThreadMgr = threadMgr;
