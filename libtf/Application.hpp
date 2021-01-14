@@ -11,13 +11,16 @@ namespace libtf {
 		private ITfCompartmentEventSink
 	{
 		typedef std::function<VOID(BOOL)>					sig_AlphaMode;
-		DWORD												m_dwCMode;
+
+		DWORD												m_dwConversionModeCookie;
 	public:
 		CComQIPtr<ITfConfigureSystemKeystrokeFeed>			m_pCfgSysKeyFeed;
 		CComQIPtr<ITfKeystrokeMgr>							m_pKeyMgr;
 		CComQIPtr<ITfMessagePump>							m_pMsgPump;
+
 		std::shared_ptr<UIElementSink>						m_pUIEleSink;
 		std::shared_ptr<CandidateListHandler>				m_pCandidateListHandler;
+
 		CComPtr<ITfCompartment>								m_pConversionMode;
 
 		sig_AlphaMode										m_sigAlphaMode = [](BOOL) {};
@@ -25,7 +28,7 @@ namespace libtf {
 		~Application() {
 			CComPtr<ITfSource> source;
 			source = m_pConversionMode;
-			THR_FAIL(source->UnadviseSink(m_dwCMode), "Failed to Unadvise AlphaMode sink");
+			THR_FAIL(source->UnadviseSink(m_dwConversionModeCookie), "Failed to Unadvise AlphaMode sink");
 		}
 
 		/// <summary>
@@ -52,7 +55,7 @@ namespace libtf {
 			RET_FAIL(m_pCompartmentMgr->GetCompartment(GUID_COMPARTMENT_KEYBOARD_INPUTMODE_CONVERSION, &m_pConversionMode));
 			CComPtr<ITfSource> source;
 			source = m_pConversionMode;
-			RET_FAIL(source->AdviseSink(IID_ITfCompartmentEventSink, (ITfCompartmentEventSink*)this, &m_dwCMode));
+			RET_FAIL(source->AdviseSink(IID_ITfCompartmentEventSink, (ITfCompartmentEventSink*)this, &m_dwConversionModeCookie));
 			return S_OK;
 		}
 

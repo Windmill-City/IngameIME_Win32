@@ -23,32 +23,32 @@ namespace libtf {
 	class TFAPI CandidateListHandler
 	{
 		typedef std::function<VOID(CandidateList* list)>	signal_CandidateList;
-		CComPtr<ITfUIElementMgr>							m_uiElementMgr;
-		std::shared_ptr<UIElementSink>						m_sink;
+		CComPtr<ITfUIElementMgr>							m_pUIElementMgr;
+		std::shared_ptr<UIElementSink>						m_pUIElementSink;
+		std::unique_ptr<CandidateList>						m_pCandidateList;
 	public:
-		CandidateList*										m_list;
 		signal_CandidateList								m_sigCandidateList = [](CandidateList* list) {};
-		BOOL												m_handleCandidate = FALSE;
+		BOOL												m_fhandleCandidate = FALSE;
 
 		CandidateListHandler(CComPtr<ITfUIElementMgr> uiElementMgr, std::shared_ptr<UIElementSink> sink) {
-			m_list = new CandidateList();
-			m_sink = sink;
-			m_uiElementMgr = uiElementMgr;
+			m_pCandidateList.reset(new CandidateList());
+			m_pUIElementSink = sink;
+			m_pUIElementMgr = uiElementMgr;
 			sink->m_sigUIElement = std::bind(&CandidateListHandler::onUIEle, this, std::placeholders::_1);
 		}
 
 		~CandidateListHandler() {
-			m_sink->m_sigUIElement = [](UIElementEventArgs*) {};
+			m_pUIElementSink->m_sigUIElement = [](UIElementEventArgs*) {};
 		}
 
 		VOID onUIEle(UIElementEventArgs* args) {
-			if (!m_handleCandidate) return;
+			if (!m_fhandleCandidate) return;
 			switch (args->m_state)
 			{
 			case UIElementState::Begin:
 				*(args->m_pfShow) = FALSE;
 			case UIElementState::End:
-				m_list->Reset();
+				m_pCandidateList->Reset();
 				break;
 			case UIElementState::Update:
 				fetchCandidateList(args);
@@ -56,12 +56,12 @@ namespace libtf {
 			default:
 				break;
 			}
-			m_sigCandidateList(m_list);
+			m_sigCandidateList(m_pCandidateList.get());
 		}
 
 		VOID fetchCandidateList(UIElementEventArgs* args) {
 			CComPtr<ITfUIElement> uiElement;
-			if (SUCCEEDED(m_uiElementMgr->GetUIElement(args->m_dwUIElementId, &uiElement)))
+			if (SUCCEEDED(m_pUIElementMgr->GetUIElement(args->m_dwUIElementId, &uiElement)))
 			{
 				CComPtr<ITfCandidateListUIElement> candidateListUIEle;
 				if (SUCCEEDED(uiElement->QueryInterface(IID_ITfCandidateListUIElement, (LPVOID*)&candidateListUIEle)))
@@ -92,7 +92,7 @@ namespace libtf {
 					UINT start = startIndexs[cpage];
 					UINT end = start + pageSize;
 
-					m_list->Candidates.reset(new std::wstring[pageSize]);
+					m_pCandidateList->Candidates.reset(new std::wstring[pageSize]);
 					int j = 0;
 					for (UINT i = start; i < end; i++, j++)
 					{
@@ -104,10 +104,10 @@ namespace libtf {
 								j--;
 								continue;
 							}
-							m_list->Candidates[j] = text;
+							m_pCandidateList->Candidates[j] = text;
 						}
 					}
-					m_list->PageSize = j;
+					m_pCandidateList->PageSize = j;
 				}
 			}
 		}

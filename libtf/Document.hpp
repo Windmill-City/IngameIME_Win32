@@ -11,15 +11,17 @@ namespace libtf {
 	{
 		typedef std::function <VOID(CompositionEventArgs*)>										sig_Composition;
 		typedef std::function <VOID(LONG acpStart, LONG acpEnd, RECT* prc, BOOL* pfClipped)>	sig_GetTextExt;
+
 		CComQIPtr<ITfThreadMgr>																	m_pThreadMgr;
+		TfClientId																				m_clientId;
+		DWORD																					m_dwCtxOwnerCookie;
 	public:
 		HWND																					m_hWnd;
-		TfClientId																				m_clientId;
 		CComQIPtr<ITfDocumentMgr>																m_pDocMgr;
 		CComPtr<ITfContext>																		m_pCtx;
-		DWORD																					m_dwCtxOwner;
+		CComPtr<ITfCompartment>																	m_pKeyboardDisabled;
 		TfEditCookie																			m_ecTextStore;
-		CComPtr<ITfCompartment>																	m_KeyboardDisabled;
+
 		sig_Composition																			m_sigComposition = [](CompositionEventArgs*) {};
 		sig_GetTextExt																			m_sigGetTextExt = [](LONG acpStart, LONG acpEnd, RECT* prc, BOOL* pfClipped) {};
 
@@ -44,7 +46,7 @@ namespace libtf {
 
 			CComPtr<ITfSource> source;
 			source = m_pCtx;
-			THR_FAIL(source->AdviseSink(IID_ITfContextOwner, (ITfContextOwner*)this, &m_dwCtxOwner), "Failed to advise ITfContextOwner");
+			THR_FAIL(source->AdviseSink(IID_ITfContextOwner, (ITfContextOwner*)this, &m_dwCtxOwnerCookie), "Failed to advise ITfContextOwner");
 		}
 
 		/// <summary>

@@ -9,19 +9,19 @@ namespace libtf {
 		public ITfUIElementSink
 	{
 		typedef std::function<VOID(UIElementEventArgs*)>		signal_UIElement;
-		CComQIPtr<ITfSource>									m_source;
+		CComQIPtr<ITfSource>									m_pSource;
 		DWORD													m_dwCookie = TF_INVALID_COOKIE;
 	public:
 		signal_UIElement										m_sigUIElement = [](UIElementEventArgs*) {};
 
 		UIElementSink(IN CComPtrBase<ITfUIElementMgr> uiElementMgr) {
-			m_source = uiElementMgr;
-			THR_FAIL(m_source->AdviseSink(IID_ITfUIElementSink, (ITfUIElementSink*)this, &m_dwCookie), "Failed to Advisesink");
+			m_pSource = uiElementMgr;
+			THR_FAIL(m_pSource->AdviseSink(IID_ITfUIElementSink, (ITfUIElementSink*)this, &m_dwCookie), "Failed to Advisesink");
 		}
 
 		~UIElementSink() {
 			if (m_dwCookie != TF_INVALID_COOKIE) {
-				THR_FAIL(m_source->UnadviseSink(m_dwCookie), "Failed to Unadvisesink");
+				THR_FAIL(m_pSource->UnadviseSink(m_dwCookie), "Failed to Unadvisesink");
 			}
 		}
 

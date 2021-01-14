@@ -14,14 +14,14 @@ namespace libtf {
 	{
 	public:
 		CompositionState                m_state;
-		LONG                            m_caretPos = 0;
+		LONG                            m_lCaretPos = 0;
 		std::wstring					m_strComposition = L"";
 		std::wstring					m_strCommit = L"";
 
 		CompositionEventArgs(std::wstring strComposition, int caretPos) {
 			m_state = CompositionState::Composing;
 			m_strComposition = strComposition;
-			m_caretPos = caretPos;
+			m_lCaretPos = caretPos;
 		}
 
 		CompositionEventArgs(std::wstring commitStr) {
