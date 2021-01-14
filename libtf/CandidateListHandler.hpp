@@ -27,7 +27,7 @@ namespace libtf {
 		std::shared_ptr<UIElementSink>						m_sink;
 	public:
 		CandidateList*										m_list;
-		signal_CandidateList								m_sigCandidateList;
+		signal_CandidateList								m_sigCandidateList = [](CandidateList* list) {};
 		BOOL												m_handleCandidate = FALSE;
 
 		CandidateListHandler(std::shared_ptr<UIElementSink> sink) {
