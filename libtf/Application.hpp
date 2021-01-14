@@ -48,7 +48,7 @@ namespace libtf {
 			m_pThreadMgrEx->ActivateEx(&m_ClientId, TF_TMAE_UIELEMENTENABLEDONLY);
 
 			m_pUIEleSink.reset(new UIElementSink(m_pUIElementMgr));
-			m_pCandidateListHandler.reset(new CandidateListHandler(m_pUIEleSink));
+			m_pCandidateListHandler.reset(new CandidateListHandler(m_pUIElementMgr, m_pUIEleSink));
 			RET_FAIL(m_pCompartmentMgr->GetCompartment(GUID_COMPARTMENT_KEYBOARD_INPUTMODE_CONVERSION, &m_pConversionMode));
 			CComPtr<ITfSource> source;
 			source = m_pConversionMode;

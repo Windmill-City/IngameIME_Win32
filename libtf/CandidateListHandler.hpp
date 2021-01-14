@@ -30,9 +30,10 @@ namespace libtf {
 		signal_CandidateList								m_sigCandidateList = [](CandidateList* list) {};
 		BOOL												m_handleCandidate = FALSE;
 
-		CandidateListHandler(std::shared_ptr<UIElementSink> sink) {
+		CandidateListHandler(CComPtr<ITfUIElementMgr> uiElementMgr, std::shared_ptr<UIElementSink> sink) {
 			m_list = new CandidateList();
 			m_sink = sink;
+			m_uiElementMgr = uiElementMgr;
 			sink->m_sigUIElement = std::bind(&CandidateListHandler::onUIEle, this, std::placeholders::_1);
 		}
 
