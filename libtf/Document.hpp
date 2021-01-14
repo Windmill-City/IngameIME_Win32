@@ -114,6 +114,7 @@ namespace libtf {
 
 		HRESULT __stdcall GetTextExt(LONG acpStart, LONG acpEnd, RECT* prc, BOOL* pfClipped) override {
 			if (m_sigGetTextExt) m_sigGetTextExt(acpStart, acpEnd, prc, pfClipped);
+			MapWindowPoints(m_hWnd, NULL, (LPPOINT)prc, 2);
 			return S_OK;
 		}
 
