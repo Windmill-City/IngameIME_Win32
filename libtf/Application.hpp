@@ -35,7 +35,7 @@ namespace libtf {
 		/// <returns>
 		/// HRESULT of Initialize
 		/// </returns>
-		HRESULT _stdcall TFAPI Initialize() override {
+		TFAPI HRESULT _stdcall Initialize() override {
 			RET_FAIL(Common::Initialize());
 			RET_FAIL(m_pThreadMgr.CoCreateInstance(CLSID_TF_ThreadMgr, NULL, CLSCTX_INPROC_SERVER));
 
@@ -54,26 +54,26 @@ namespace libtf {
 			return S_OK;
 		}
 
-		Document* TFAPI CreateDocument(HWND hWnd) {
+		TFAPI Document* CreateDocument(HWND hWnd) {
 			AssertThread();
 			return new Document(m_pThreadMgr, m_ClientId, hWnd);
 		}
 
-		BOOL TFAPI isFocusing(Document* doc) {
+		TFAPI BOOL isFocusing(Document* doc) {
 			AssertThread();
 			return doc->isFocusing();
 		}
 
-		VOID TFAPI Focus(Document* doc) {
+		TFAPI VOID Focus(Document* doc) {
 			AssertThread();
 			doc->Focus();
 		}
 
-		BOOL TFAPI KeyStrokeFeedState() {
+		TFAPI BOOL KeyStrokeFeedState() {
 			return m_fKeyStrokeFeedState;
 		}
 
-		VOID TFAPI setKeyStrokeFeedState(BOOL state) {
+		TFAPI VOID setKeyStrokeFeedState(BOOL state) {
 			m_fKeyStrokeFeedState = state;
 			if (m_fKeyStrokeFeedState)
 				m_pThreadMgr2->ResumeKeystrokeHandling();
