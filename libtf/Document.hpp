@@ -6,16 +6,17 @@
 namespace libtf {
 	class TFAPI Document:
 		public COMBase,
+		public ITfContextOwner,
 		public ITfContextOwnerCompositionSink
 	{
-		typedef std::function < VOID(CompositionEventArgs*)> sig_composition;
+		typedef std::function < VOID(CompositionEventArgs*)> sig_Composition;
 		CComQIPtr<ITfThreadMgr>			m_pThreadMgr;
 	public:
 		HWND							m_hWnd;
 		CComQIPtr<ITfDocumentMgr>		m_pDocMgr;
 		CComPtr<ITfContext>				m_pCtx;
 		TfEditCookie					m_ecTextStore;
-		sig_composition					m_sigComposition;
+		sig_Composition					m_sigComposition;
 
 		Document(IN CComPtrBase<ITfThreadMgr> threadMgr, IN TfClientId clientId , IN HWND hWnd) {
 			m_hWnd = hWnd;
@@ -40,6 +41,7 @@ namespace libtf {
 		}
 
 		~Document() {
+			m_pDocMgr->Pop(TF_POPF_ALL);
 			if(isFocusing())
 				THR_FAIL(m_pThreadMgr->SetFocus(NULL), "Failed to SetFocus to NULL")
 		}
@@ -79,6 +81,34 @@ namespace libtf {
 					m_sigComposition(new CompositionEventArgs(buf));
 				m_sigComposition(new CompositionEventArgs(CompositionState::EndComposition));
 			}
+			return S_OK;
+		}
+
+		HRESULT __stdcall GetACPFromPoint(const POINT* ptScreen, DWORD dwFlags, LONG* pacp) override {
+			return S_OK;
+		}
+
+		HRESULT __stdcall GetTextExt(LONG acpStart, LONG acpEnd, RECT* prc, BOOL* pfClipped) override {
+			return S_OK;
+		}
+
+		HRESULT __stdcall GetScreenExt(RECT* prc) override {
+			GetWindowRect(m_hWnd, prc);
+			return S_OK;
+		}
+
+		HRESULT __stdcall GetStatus(TF_STATUS* pdcs) override {
+			pdcs->dwDynamicFlags = 0;
+			pdcs->dwStaticFlags = 0;
+			return S_OK;
+		}
+
+		HRESULT __stdcall GetWnd(HWND* phwnd) override {
+			phwnd = &m_hWnd;
+			return S_OK;
+		}
+
+		HRESULT __stdcall GetAttribute(REFGUID rguidAttribute, VARIANT* pvarValue) override {
 			return S_OK;
 		}
 	};
