@@ -4,7 +4,7 @@
 #include "Common.hpp"
 #include "CompositionEventArgs.hpp"
 namespace libtf {
-	class Document :
+	class TF_API Document :
 		private COMBase,
 		private ITfContextOwner,
 		private ITfContextOwnerCompositionSink,
@@ -19,10 +19,12 @@ namespace libtf {
 		DWORD																					m_dwCtxOwnerCookie;
 		DWORD																					m_dwTextEditSinkCookie;
 		BOOL																					m_fClean = FALSE;
+		CComPtr<ITfCompartment>																	m_KeyboardDisabled;
 	public:
 		HWND																					m_hWnd;
 		CComPtr<ITfDocumentMgr>																	m_pDocMgr;
 		CComPtr<ITfContext>																		m_pCtx;
+		CComPtr<ITfContextOwnerCompositionServices>												m_pCtxServices;
 		TfEditCookie																			m_ecTextStore;
 
 		sig_Composition																			m_sigComposition = [](CompositionEventArgs*) {};
@@ -42,6 +44,11 @@ namespace libtf {
 			THR_FAIL(m_pThreadMgr->CreateDocumentMgr(&m_pDocMgr), "Failed to Create DocumentMgr");
 			THR_FAIL(m_pDocMgr->CreateContext(clientId, 0, (ITfContextOwnerCompositionSink*)this, &m_pCtx, &m_ecTextStore), "Failed to Create Context");
 			THR_FAIL(m_pDocMgr->Push(m_pCtx), "Failed to push context");
+			m_pCtxServices = m_pCtx;
+
+			CComPtr<ITfCompartmentMgr> ctxCompMgr;
+			ctxCompMgr = m_pCtx;
+			THR_FAIL(ctxCompMgr->GetCompartment(GUID_COMPARTMENT_KEYBOARD_DISABLED, &m_KeyboardDisabled));
 
 			CComPtr<ITfSource> source;
 			source = m_pCtx;
@@ -49,13 +56,31 @@ namespace libtf {
 			THR_FAIL(source->AdviseSink(IID_ITfTextEditSink, (ITfTextEditSink*)this, &m_dwTextEditSinkCookie), "Failed to advise ITfTextEditSink");
 		}
 
+		VOID SetKeyboardState(BOOL state) {
+			CComVariant val = CComVariant((LONG)!state);
+			m_KeyboardDisabled->SetValue(m_clientId, &val);
+		}
+
+		BOOL KeyboardState() {
+			CComVariant val;
+			m_KeyboardDisabled->GetValue(&val);
+			return !val.lVal;
+		}
+
+		VOID TerminateComposition() {
+			m_pCtxServices->TerminateComposition(NULL);//Pass NULL to terminate all the composition
+		}
+
 		/// <summary>
-		/// Focus when correspond window gets input focus
+		/// Set current thread's focusing document
 		/// </summary>
 		VOID Focus() {
 			m_pThreadMgr->SetFocus(m_pDocMgr.p);
 		}
 
+		/// <summary>
+		/// Get if current thread focusing on this document
+		/// </summary>
 		BOOL isFocusing() {
 			CComPtr<ITfDocumentMgr> curDocMgr;
 			m_pThreadMgr->GetFocus(&curDocMgr);
