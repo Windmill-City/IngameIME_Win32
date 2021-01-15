@@ -8,7 +8,7 @@
 namespace libtf {
 	class Application :
 		private Common,
-		public COMBase,
+		private COMBase,
 		private ITfCompartmentEventSink
 	{
 		typedef std::function<VOID(BOOL)>					sig_AlphaMode;
