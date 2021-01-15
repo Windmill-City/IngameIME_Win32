@@ -3,7 +3,7 @@
 #include <functional>
 #include "UIElementSink.hpp"
 namespace libtf {
-	struct TFAPI CandidateList
+	struct TF_API CandidateList
 	{
 	public:
 		LONG								m_lPageSize;

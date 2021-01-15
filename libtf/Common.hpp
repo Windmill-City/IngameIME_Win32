@@ -3,7 +3,7 @@
 #include <atlbase.h>
 #include <thread>
 namespace libtf {
-#define TFAPI  __declspec(dllexport)
+#define TF_API  __declspec(dllexport)
 #define THR_FAIL(hr, msg) if(FAILED(hr)) throw msg;
 #define RET_FAIL(hr) if(FAILED(hr)) return hr;
 #define RET_VOID(hr) if(FAILED(hr)) return;

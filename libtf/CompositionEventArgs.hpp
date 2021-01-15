@@ -2,7 +2,7 @@
 #include <xstring>
 #include "Common.hpp"
 namespace libtf {
-	enum class TFAPI CompositionState
+	enum class TF_API CompositionState
 	{
 		StartComposition,
 		Composing,
@@ -10,7 +10,7 @@ namespace libtf {
 		EndComposition
 	};
 
-	struct TFAPI CompositionEventArgs
+	struct TF_API CompositionEventArgs
 	{
 	public:
 		CompositionState                m_state;
