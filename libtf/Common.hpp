@@ -1,4 +1,5 @@
 #pragma once
+#pragma warning(disable: 4251)
 #include <msctf.h>
 #include <atlbase.h>
 #include <thread>
