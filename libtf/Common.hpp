@@ -26,6 +26,7 @@ namespace libtf {
 		}
 
 		virtual HRESULT _stdcall Initialize() {
+			if (m_threadId == std::thread::id()) return S_FALSE;//Prevent Initialize twice
 			m_threadId = std::this_thread::get_id();
 			return S_OK;
 		}
