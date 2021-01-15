@@ -30,7 +30,7 @@ namespace libtf {
 		}
 
 		/// <summary>
-		/// Initialize at UI-Thread
+		/// Initialize on STA Thread
 		/// </summary>
 		HRESULT _stdcall Initialize() override {
 			RET_FAIL(Common::Initialize());
@@ -40,8 +40,6 @@ namespace libtf {
 			m_pCompartmentMgr = m_pThreadMgr;
 			m_pUIElementMgr = m_pThreadMgr;
 
-			m_pThreadMgrEx->ActivateEx(&m_ClientId, TF_TMAE_UIELEMENTENABLEDONLY);
-
 			m_pUIEleSink.reset(new UIElementSink(m_pUIElementMgr));
 			m_pCandidateListHandler.reset(new CandidateListHandler(m_pUIElementMgr, m_pUIEleSink));
 			RET_FAIL(m_pCompartmentMgr->GetCompartment(GUID_COMPARTMENT_KEYBOARD_INPUTMODE_CONVERSION, &m_pConversionMode));
@@ -49,6 +47,17 @@ namespace libtf {
 			source = m_pConversionMode;
 			RET_FAIL(source->AdviseSink(IID_ITfCompartmentEventSink, (ITfCompartmentEventSink*)this, &m_dwConversionModeCookie));
 			return S_OK;
+		}
+
+		/// <summary>
+		/// Activate on UI Thread
+		/// </summary>
+		HRESULT Activate(TfClientId* clientId) {
+			return m_pThreadMgrEx->ActivateEx(clientId, TF_TMAE_UIELEMENTENABLEDONLY);
+		}
+
+		HRESULT Deactivate() {
+			return m_pThreadMgrEx->Deactivate();
 		}
 
 		BOOL KeyStrokeFeedState() {
@@ -61,12 +70,19 @@ namespace libtf {
 		/// </summary>
 		/// <param name="state"></param>
 		VOID setKeyStrokeFeedState(BOOL state) {
-			AssertThread();
 			m_fKeyStrokeFeedState = state;
 			if (m_fKeyStrokeFeedState)
 				m_pThreadMgr->ResumeKeystrokeHandling();
 			else
 				m_pThreadMgr->SuspendKeystrokeHandling();
+		}
+
+		VOID setHandleCandidate(BOOL handle) {
+			m_pCandidateListHandler->m_fhandleCandidate = handle;
+		}
+
+		BOOL HandlingCandidate() {
+			return m_pCandidateListHandler->m_fhandleCandidate;
 		}
 
 		HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObject) override {
