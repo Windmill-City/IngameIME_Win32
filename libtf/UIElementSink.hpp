@@ -5,8 +5,8 @@
 #include "UIElementEventArgs.hpp"
 namespace libtf {
 	class UIElementSink :
-		public COMBase,
-		public ITfUIElementSink
+		private COMBase,
+		private ITfUIElementSink
 	{
 		typedef std::function<VOID(UIElementEventArgs*)>		signal_UIElement;
 		CComQIPtr<ITfSource>									m_pSource;
@@ -21,7 +21,7 @@ namespace libtf {
 
 		~UIElementSink() {
 			if (m_dwCookie != TF_INVALID_COOKIE) {
-				THR_FAIL(m_pSource->UnadviseSink(m_dwCookie), "Failed to Unadvisesink");
+				m_pSource->UnadviseSink(m_dwCookie);
 			}
 		}
 

@@ -1,5 +1,4 @@
 #pragma once
-#include "Common.hpp"
 namespace libtf {
 #define COM_AS(Interface) \
 if (IsEqualIID(IID_##Interface, riid)) {	\
@@ -22,9 +21,9 @@ return E_NOINTERFACE;
 ULONG __stdcall AddRef(void) override { return COMBase::AddRef(); };	\
 ULONG __stdcall Release(void) override { return COMBase::Release(); };
 
-	class COMBase : public IUnknown
+	class COMBase : protected IUnknown
 	{
-	public:
+	protected:
 		ULONG __stdcall IUnknown::AddRef(void) override {
 			return ++m_ulRef;
 		};

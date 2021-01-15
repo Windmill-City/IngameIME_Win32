@@ -40,7 +40,7 @@ namespace libtf {
 		~CandidateListHandler() {
 			m_pUIElementSink->m_sigUIElement = [](UIElementEventArgs*) {};
 		}
-
+	private:
 		VOID onUIEle(UIElementEventArgs* args) {
 			if (!m_fhandleCandidate) return;
 			switch (args->m_state)

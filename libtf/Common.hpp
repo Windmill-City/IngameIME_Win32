@@ -10,7 +10,7 @@ namespace libtf {
 	class Common
 	{
 		std::thread::id						m_threadId;
-	public:
+	protected:
 		CComQIPtr<ITfThreadMgr2>			m_pThreadMgr;
 		CComQIPtr<ITfThreadMgrEx>			m_pThreadMgrEx;
 		CComQIPtr<ITfCompartmentMgr>		m_pCompartmentMgr;

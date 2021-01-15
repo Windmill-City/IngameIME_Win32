@@ -5,11 +5,11 @@
 #include "CompositionEventArgs.hpp"
 namespace libtf {
 	class Document :
-		public COMBase,
-		public ITfContextOwner,
-		public ITfContextOwnerCompositionSink,
-		public ITfEditSession,
-		public ITfTextEditSink
+		private COMBase,
+		private ITfContextOwner,
+		private ITfContextOwnerCompositionSink,
+		private ITfEditSession,
+		private ITfTextEditSink
 	{
 		typedef std::function <VOID(CompositionEventArgs*)>										sig_Composition;
 		typedef std::function <VOID(LONG acpStart, LONG acpEnd, RECT* prc, BOOL* pfClipped)>	sig_GetTextExt;
@@ -69,7 +69,7 @@ namespace libtf {
 			source->UnadviseSink(m_dwTextEditSinkCookie);
 			m_pDocMgr->Pop(TF_POPF_ALL);
 			if (isFocusing())
-				THR_FAIL(m_pThreadMgr->SetFocus(NULL), "Failed to SetFocus to NULL")
+				m_pThreadMgr->SetFocus(NULL);
 		}
 
 		HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObject) override {
@@ -185,8 +185,8 @@ namespace libtf {
 					RET_FAIL(rangeACP->GetExtent(&startACP, &len));
 					m_sigComposition(new CompositionEventArgs(buf, startACP));
 				}
-				return S_OK;
 			}
+			return S_OK;
 		}
 	};
 }

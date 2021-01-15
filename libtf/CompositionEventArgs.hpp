@@ -15,8 +15,8 @@ namespace libtf {
 	public:
 		CompositionState                m_state;
 		LONG                            m_lCaretPos = 0;
-		std::wstring					m_strComposition = L"";
-		std::wstring					m_strCommit = L"";
+		std::wstring					m_strComposition;
+		std::wstring					m_strCommit;
 
 		CompositionEventArgs(std::wstring strComposition, int caretPos) {
 			m_state = CompositionState::Composing;

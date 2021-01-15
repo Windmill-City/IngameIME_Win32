@@ -7,7 +7,7 @@
 #include "CandidateListHandler.hpp"
 namespace libtf {
 	class Application :
-		public Common,
+		private Common,
 		public COMBase,
 		private ITfCompartmentEventSink
 	{
@@ -26,7 +26,7 @@ namespace libtf {
 		~Application() {
 			CComPtr<ITfSource> source;
 			source = m_pConversionMode;
-			THR_FAIL(source->UnadviseSink(m_dwConversionModeCookie), "Failed to Unadvise AlphaMode sink");
+			source->UnadviseSink(m_dwConversionModeCookie);
 		}
 
 		/// <summary>
