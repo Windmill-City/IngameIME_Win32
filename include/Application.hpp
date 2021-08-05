@@ -5,25 +5,27 @@
 #include "Document.hpp"
 #include "UIElementSink.hpp"
 #include "CandidateListHandler.hpp"
-namespace libtf {
-	class TF_API Application :
-		public Common,
-		private COMBase,
-		private ITfCompartmentEventSink
+namespace libtf
+{
+	class TF_API Application : public Common,
+							   private COMBase,
+							   private ITfCompartmentEventSink
 	{
-		typedef std::function<VOID(BOOL)>					sig_AlphaMode;
+		typedef std::function<VOID(BOOL)> sig_AlphaMode;
 
-		DWORD												m_dwConversionModeCookie = 0;
-		BOOL												m_fKeyStrokeFeedState = TRUE;
+		DWORD m_dwConversionModeCookie = 0;
+		BOOL m_fKeyStrokeFeedState = TRUE;
+
 	public:
-		std::shared_ptr<UIElementSink>						m_pUIEleSink;
-		std::shared_ptr<CandidateListHandler>				m_pCandidateListHandler;
+		std::shared_ptr<UIElementSink> m_pUIEleSink;
+		std::shared_ptr<CandidateListHandler> m_pCandidateListHandler;
 
-		CComPtr<ITfCompartment>								m_pConversionMode;
+		CComPtr<ITfCompartment> m_pConversionMode;
 
-		sig_AlphaMode										m_sigAlphaMode = [](BOOL) {};
+		sig_AlphaMode m_sigAlphaMode = [](BOOL) {};
 
-		~Application() {
+		~Application()
+		{
 			CComPtr<ITfSource> source;
 			source = m_pConversionMode;
 			source->UnadviseSink(m_dwConversionModeCookie);
@@ -32,7 +34,8 @@ namespace libtf {
 		/// <summary>
 		/// Initialize on STA Thread
 		/// </summary>
-		HRESULT _stdcall Initialize() override {
+		HRESULT _stdcall Initialize() override
+		{
 			RET_FAIL(Common::Initialize());
 			RET_FAIL(m_pThreadMgr.CoCreateInstance(CLSID_TF_ThreadMgr, NULL, CLSCTX_INPROC_SERVER));
 
@@ -45,31 +48,35 @@ namespace libtf {
 			RET_FAIL(m_pCompartmentMgr->GetCompartment(GUID_COMPARTMENT_KEYBOARD_INPUTMODE_CONVERSION, &m_pConversionMode));
 			CComPtr<ITfSource> source;
 			source = m_pConversionMode;
-			RET_FAIL(source->AdviseSink(IID_ITfCompartmentEventSink, (ITfCompartmentEventSink*)this, &m_dwConversionModeCookie));
+			RET_FAIL(source->AdviseSink(IID_ITfCompartmentEventSink, (ITfCompartmentEventSink *)this, &m_dwConversionModeCookie));
 			return S_OK;
 		}
 
 		/// <summary>
 		/// Activate on UI Thread
 		/// </summary>
-		HRESULT Activate(TfClientId* clientId) {
+		HRESULT Activate(TfClientId *clientId)
+		{
 			return m_pThreadMgrEx->ActivateEx(clientId, TF_TMAE_UIELEMENTENABLEDONLY);
 		}
 
-		HRESULT Deactivate() {
+		HRESULT Deactivate()
+		{
 			return m_pThreadMgrEx->Deactivate();
 		}
 
-		BOOL KeyStrokeFeedState() {
+		BOOL KeyStrokeFeedState()
+		{
 			return m_fKeyStrokeFeedState;
 		}
-		
+
 		/// <summary>
 		/// Set current thread's key handleing status
 		/// if suspended, IME wont process keys
 		/// </summary>
 		/// <param name="state"></param>
-		VOID setKeyStrokeFeedState(BOOL state) {
+		VOID setKeyStrokeFeedState(BOOL state)
+		{
 			m_fKeyStrokeFeedState = state;
 			if (m_fKeyStrokeFeedState)
 				m_pThreadMgr->ResumeKeystrokeHandling();
@@ -77,21 +84,25 @@ namespace libtf {
 				m_pThreadMgr->SuspendKeystrokeHandling();
 		}
 
-		VOID setHandleCandidate(BOOL handle) {
+		VOID setHandleCandidate(BOOL handle)
+		{
 			m_pCandidateListHandler->m_fhandleCandidate = handle;
 		}
 
-		BOOL HandlingCandidate() {
+		BOOL HandlingCandidate()
+		{
 			return m_pCandidateListHandler->m_fhandleCandidate;
 		}
 
-		HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObject) override {
+		HRESULT __stdcall QueryInterface(REFIID riid, void **ppvObject) override
+		{
 			COM_ASUNK(ITfCompartmentEventSink);
 			COM_RETURN
 		}
 		COM_REFS;
 
-		HRESULT __stdcall OnChange(REFGUID rguid) override {
+		HRESULT __stdcall OnChange(REFGUID rguid) override
+		{
 			if (IsEqualGUID(rguid, GUID_COMPARTMENT_KEYBOARD_INPUTMODE_CONVERSION))
 			{
 				CComVariant val;
