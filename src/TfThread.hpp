@@ -63,7 +63,7 @@ namespace libtf
 
                     while (GetMessage(&msg, NULL, 0, 0))
                     {
-                        //Not translating message
+                        TranslateMessage(&msg);
                         DispatchMessage(&msg);
 
                         std::function<void()> task;
