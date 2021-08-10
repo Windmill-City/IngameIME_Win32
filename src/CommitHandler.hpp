@@ -103,5 +103,5 @@ namespace libtf
         }
     };
 
-    typedef CComObject<CommitHandler> CCommitHandler;
+    typedef CComObjectNoLock<CommitHandler> CCommitHandler;
 }

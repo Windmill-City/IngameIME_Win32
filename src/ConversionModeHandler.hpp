@@ -103,5 +103,5 @@ namespace libtf
         }
     };
 
-    typedef CComObject<ConversionModeHandler> CConversionModeHandler;
+    typedef CComObjectNoLock<ConversionModeHandler> CConversionModeHandler;
 }

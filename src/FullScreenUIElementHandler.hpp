@@ -75,5 +75,5 @@ namespace libtf
         }
     };
 
-    typedef CComObject<FullScreenUIElementHandler> CFullScreenUIElementHandler;
+    typedef CComObjectNoLock<FullScreenUIElementHandler> CFullScreenUIElementHandler;
 }

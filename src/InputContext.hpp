@@ -297,5 +297,5 @@ namespace libtf
 #pragma endregion
     };
 
-    typedef CComObject<InputContext> CInputContext;
+    typedef CComObjectNoLock<InputContext> CInputContext;
 } // namespace libtf

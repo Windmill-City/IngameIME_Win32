@@ -103,5 +103,5 @@ namespace libtf
         }
     };
 
-    typedef CComObject<SentenceModeHandler> CSentenceModeHandler;
+    typedef CComObjectNoLock<SentenceModeHandler> CSentenceModeHandler;
 }

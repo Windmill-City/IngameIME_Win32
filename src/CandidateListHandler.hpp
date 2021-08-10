@@ -332,5 +332,5 @@ namespace libtf
         }
     };
 
-    typedef CComObject<CandidateListHandler> CCandidateListHandler;
+    typedef CComObjectNoLock<CandidateListHandler> CCandidateListHandler;
 } // namespace libtf

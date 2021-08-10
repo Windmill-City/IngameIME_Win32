@@ -176,5 +176,5 @@ namespace libtf
 #pragma endregion
     };
 
-    typedef CComObject<CompositionHandler> CCompositionHandler;
+    typedef CComObjectNoLock<CompositionHandler> CCompositionHandler;
 }
