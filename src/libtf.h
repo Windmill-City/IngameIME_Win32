@@ -1,7 +1,7 @@
 #pragma once
-#include "libtfdef.h"
 #include "InputContext.hpp"
 #include "TfThread.hpp"
+#include "libtfdef.h"
 
 typedef struct InputContext
 {
@@ -9,10 +9,12 @@ typedef struct InputContext
      * @brief Current Window of the context
      */
     HWND hWnd;
+#ifdef USE_TfThread
     /**
      * @brief STA Apartment Thread
      */
     libtf::TfThread *tfThread;
+#endif
     CComPtr<libtf::CInputContext> ctx;
 } InputContext_t, *libtf_pInputContext;
 
