@@ -171,6 +171,7 @@ namespace libtf
             CComPtr<ITfContext> context;
             CHECK_HR(documentMgr->GetTop(&context));
             CComQIPtr<ITfContextOwner> contextOwner = context;
+            if (!contextOwner) return E_FAIL;
             CHECK_HR(contextOwner->GetWnd(&hWnd));
             return S_OK;
         }
