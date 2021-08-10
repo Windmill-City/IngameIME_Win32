@@ -31,7 +31,9 @@ HRESULT libtf_dispose_ctx(libtf_pInputContext ctx)
         {
             return ctx->ctx->dispose();
         });
-    return future.get();
+    HRESULT hr = future.get();
+    delete ctx;
+    return hr;
 }
 
 /**
