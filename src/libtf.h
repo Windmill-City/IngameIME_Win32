@@ -1,7 +1,7 @@
 #pragma once
+#include "libtfdef.h"
 #include "InputContext.hpp"
 #include "TfThread.hpp"
-#include "libtfdef.h"
 
 typedef struct InputContext
 {
@@ -14,29 +14,29 @@ typedef struct InputContext
      */
     libtf::TfThread *tfThread;
     CComPtr<libtf::CInputContext> ctx;
-} InputContext_t, *pInputContext;
+} InputContext_t, *libtf_pInputContext;
 
 extern "C"
 {
     /**
      * @brief Create input context on calling thread
      */
-    HRESULT create(pInputContext);
+    HRESULT libtf_create_ctx(libtf_pInputContext *);
 
     /**
      * @brief Dispose input context
      */
-    HRESULT dispose(pInputContext);
+    HRESULT libtf_dispose_ctx(libtf_pInputContext);
 
     /**
      * @brief Terminate all the compositions in the context
      */
-    HRESULT terminateComposition(pInputContext);
+    HRESULT libtf_terminate_composition(libtf_pInputContext);
 
     /**
      * @brief Set input method state
      */
-    HRESULT setIMState(pInputContext, bool);
+    HRESULT libtf_set_im_state(libtf_pInputContext, bool);
 
     /**
      * @brief Get input method state
@@ -44,7 +44,7 @@ extern "C"
      * @return true IM has enabled
      * @return false IM has disabled
      */
-    HRESULT getIMState(pInputContext, bool *);
+    HRESULT libtf_get_im_state(libtf_pInputContext, bool *);
 
     /**
      * @brief Set current focused window
@@ -52,65 +52,65 @@ extern "C"
      * @param hWnd window who receive WM_SETFOCUS on its message queue
      *             this parameter can be NULL if the context does not have the corresponding handle to the window.
      */
-    HRESULT setFocus(pInputContext, HWND);
+    HRESULT libtf_set_focus_wnd(libtf_pInputContext, HWND);
 
     /**
      * @brief Get current focused window
      */
-    HRESULT getFocus(pInputContext, HWND *);
+    HRESULT libtf_get_focus_wnd(libtf_pInputContext, HWND *);
 
     /**
      * @brief Set Conversion Mode
      * 
      * @return HRESULT 
      */
-    HRESULT setConversionMode(pInputContext, ConversionMode);
+    HRESULT libtf_set_conversion_mode(libtf_pInputContext, ConversionMode);
 
     /**
      * @brief Set Sentence Mode
      * 
      * @return HRESULT 
      */
-    HRESULT setSentenceMode(pInputContext, SentenceMode);
+    HRESULT libtf_set_sentence_mode(libtf_pInputContext, SentenceMode);
 
     /**
      * @brief Set if in Full Screen mode
      * 
      * @return HRESULT 
      */
-    HRESULT setFullScreen(pInputContext, bool);
+    HRESULT libtf_set_full_screen(libtf_pInputContext, bool);
 
     /**
      * @brief Set if input method should show its Candidate Window
      * 
      * @return HRESULT 
      */
-    HRESULT setShowCandidateWnd(pInputContext, bool);
+    HRESULT libtf_set_show_candidate_list_wnd(libtf_pInputContext, bool);
 
 #pragma region setCallback
     /**
      * @brief Set Composition Callback
      */
-    HRESULT setCompositionCallback(pInputContext, CallbackComposition);
+    HRESULT libtf_set_composition_callback(libtf_pInputContext, CallbackComposition);
 
     /**
      * @brief Set PreEdit Bounding Box Callback
      */
-    HRESULT setBoundingBoxCallback(pInputContext, CallbackBoundingBox);
+    HRESULT libtf_set_bounding_box_callback(libtf_pInputContext, CallbackBoundingBox);
 
     /**
      * @brief Set Candidate List Callback
      */
-    HRESULT setCandidateListCallback(pInputContext, CallbackCandidateList);
+    HRESULT libtf_set_candidate_list_callback(libtf_pInputContext, CallbackCandidateList);
 
     /**
      * @brief Set Conversion mode Callback
      */
-    HRESULT setConversionModeCallback(pInputContext, CallbackConversionMode);
+    HRESULT libtf_set_conversion_mode_callback(libtf_pInputContext, CallbackConversionMode);
 
     /**
      * @brief Set Sentence mode Callback
      */
-    HRESULT setSentenceModeCallback(pInputContext, CallbackSentenceMode);
+    HRESULT libtf_set_sentence_mode_callback(libtf_pInputContext, CallbackSentenceMode);
 #pragma endregion
 }

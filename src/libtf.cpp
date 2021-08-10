@@ -4,18 +4,18 @@ using namespace libtf;
 /**
  * @brief Create input context on calling thread
  */
-HRESULT create(pInputContext ctx)
+HRESULT libtf_create_ctx(libtf_pInputContext *ctx)
 {
     InputContext_t context;
-    ctx = &context;
+    *ctx = &context;
 
-    ctx->ctx = new CInputContext();
-    ctx->tfThread = new TfThread();
-    AttachThreadInput(ctx->tfThread->getId(), GetCurrentThreadId(), true);
-    auto future = ctx->tfThread->enqueue(
-        [ctx]()
+    context.ctx = new CInputContext();
+    context.tfThread = new TfThread();
+    AttachThreadInput(context.tfThread->getId(), GetCurrentThreadId(), true);
+    auto future = context.tfThread->enqueue(
+        [context]()
         {
-            return ctx->ctx->initialize();
+            return context.ctx->initialize();
         });
     return future.get();
 }
@@ -23,7 +23,7 @@ HRESULT create(pInputContext ctx)
 /**
  * @brief Dispose input context
  */
-HRESULT dispose(pInputContext ctx)
+HRESULT libtf_dispose_ctx(libtf_pInputContext ctx)
 {
     AttachThreadInput(ctx->tfThread->getId(), GetCurrentThreadId(), false);
     auto future = ctx->tfThread->enqueue(
@@ -37,7 +37,7 @@ HRESULT dispose(pInputContext ctx)
 /**
  * @brief Terminate all the compositions in the context
  */
-HRESULT terminateComposition(pInputContext ctx)
+HRESULT libtf_terminate_composition(libtf_pInputContext ctx)
 {
     auto future = ctx->tfThread->enqueue(
         [ctx]()
@@ -50,7 +50,7 @@ HRESULT terminateComposition(pInputContext ctx)
 /**
  * @brief Set input method state
  */
-HRESULT setIMState(pInputContext ctx, bool enable)
+HRESULT libtf_set_im_state(libtf_pInputContext ctx, bool enable)
 {
     auto future = ctx->tfThread->enqueue(
         [ctx](bool enable)
@@ -67,7 +67,7 @@ HRESULT setIMState(pInputContext ctx, bool enable)
  * @return true IM has enabled
  * @return false IM has disabled
  */
-HRESULT getIMState(pInputContext ctx, bool *imState)
+HRESULT libtf_get_im_state(libtf_pInputContext ctx, bool *imState)
 {
     auto future = ctx->tfThread->enqueue(
         [ctx](bool *imState)
@@ -84,7 +84,7 @@ HRESULT getIMState(pInputContext ctx, bool *imState)
  * @param hWnd window who receive WM_SETFOCUS on its message queue
  *             this parameter can be NULL if the context does not have the corresponding handle to the window.
  */
-HRESULT setFocus(pInputContext ctx, HWND hWnd)
+HRESULT libtf_set_focus_wnd(libtf_pInputContext ctx, HWND hWnd)
 {
     auto future = ctx->tfThread->enqueue(
         [ctx](HWND hWnd)
@@ -99,7 +99,7 @@ HRESULT setFocus(pInputContext ctx, HWND hWnd)
 /**
  * @brief Get current focused window
  */
-HRESULT getFocus(pInputContext ctx, HWND *hWnd)
+HRESULT libtf_get_focus_wnd(libtf_pInputContext ctx, HWND *hWnd)
 {
     auto future = ctx->tfThread->enqueue(
         [ctx](HWND *hWnd)
@@ -116,7 +116,7 @@ HRESULT getFocus(pInputContext ctx, HWND *hWnd)
  * 
  * @return HRESULT 
  */
-HRESULT setConversionMode(pInputContext ctx, ConversionMode mode)
+HRESULT libtf_set_conversion_mode(libtf_pInputContext ctx, ConversionMode mode)
 {
     auto future = ctx->tfThread->enqueue(
         [ctx](ConversionMode mode)
@@ -132,7 +132,7 @@ HRESULT setConversionMode(pInputContext ctx, ConversionMode mode)
  * 
  * @return HRESULT 
  */
-HRESULT setSentenceMode(pInputContext ctx, SentenceMode mode)
+HRESULT libtf_set_sentence_mode(libtf_pInputContext ctx, SentenceMode mode)
 {
     auto future = ctx->tfThread->enqueue(
         [ctx](SentenceMode mode)
@@ -148,7 +148,7 @@ HRESULT setSentenceMode(pInputContext ctx, SentenceMode mode)
  * 
  * @return HRESULT 
  */
-HRESULT setFullScreen(pInputContext ctx, bool isFullScreen)
+HRESULT libtf_set_full_screen(libtf_pInputContext ctx, bool isFullScreen)
 {
     auto future = ctx->tfThread->enqueue(
         [ctx](bool isFullScreen)
@@ -165,7 +165,7 @@ HRESULT setFullScreen(pInputContext ctx, bool isFullScreen)
  * 
  * @return HRESULT 
  */
-HRESULT setShowCandidateWnd(pInputContext ctx, bool show)
+HRESULT libtf_set_show_candidate_list_wnd(libtf_pInputContext ctx, bool show)
 {
     auto future = ctx->tfThread->enqueue(
         [ctx](bool show)
@@ -181,7 +181,7 @@ HRESULT setShowCandidateWnd(pInputContext ctx, bool show)
 /**
  * @brief Set Composition Callback
  */
-HRESULT setCompositionCallback(pInputContext ctx, CallbackComposition callback)
+HRESULT libtf_set_composition_callback(libtf_pInputContext ctx, CallbackComposition callback)
 {
     auto future = ctx->tfThread->enqueue(
         [ctx](CallbackComposition callback)
@@ -196,7 +196,7 @@ HRESULT setCompositionCallback(pInputContext ctx, CallbackComposition callback)
 /**
  * @brief Set PreEdit Bounding Box Callback
  */
-HRESULT setBoundingBoxCallback(pInputContext ctx, CallbackBoundingBox callback)
+HRESULT libtf_set_bounding_box_callback(libtf_pInputContext ctx, CallbackBoundingBox callback)
 {
     auto future = ctx->tfThread->enqueue(
         [ctx](CallbackBoundingBox callback)
@@ -211,7 +211,7 @@ HRESULT setBoundingBoxCallback(pInputContext ctx, CallbackBoundingBox callback)
 /**
  * @brief Set Candidate List Callback
  */
-HRESULT setCandidateListCallback(pInputContext ctx, CallbackCandidateList callback)
+HRESULT libtf_set_candidate_list_callback(libtf_pInputContext ctx, CallbackCandidateList callback)
 {
     auto future = ctx->tfThread->enqueue(
         [ctx](CallbackCandidateList callback)
@@ -226,7 +226,7 @@ HRESULT setCandidateListCallback(pInputContext ctx, CallbackCandidateList callba
 /**
  * @brief Set Conversion mode Callback
  */
-HRESULT setConversionModeCallback(pInputContext ctx, CallbackConversionMode callback)
+HRESULT libtf_set_conversion_mode_callback(libtf_pInputContext ctx, CallbackConversionMode callback)
 {
     auto future = ctx->tfThread->enqueue(
         [ctx](CallbackConversionMode callback)
@@ -241,7 +241,7 @@ HRESULT setConversionModeCallback(pInputContext ctx, CallbackConversionMode call
 /**
  * @brief Set Sentence mode Callback
  */
-HRESULT setSentenceModeCallback(pInputContext ctx, CallbackSentenceMode callback)
+HRESULT libtf_set_sentence_mode_callback(libtf_pInputContext ctx, CallbackSentenceMode callback)
 {
     auto future = ctx->tfThread->enqueue(
         [ctx](CallbackSentenceMode callback)
