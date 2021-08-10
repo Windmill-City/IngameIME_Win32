@@ -40,40 +40,32 @@ namespace libtf
         {
             CHECK_HR(m_threadMgr.CoCreateInstance(CLSID_TF_ThreadMgr, NULL, CLSCTX_INPROC_SERVER));
 
-            //Activate
             CComQIPtr<ITfThreadMgrEx> threadMgrEx = m_threadMgr;
             CHECK_HR(threadMgrEx->ActivateEx(&m_clientId, TF_TMAE_UIELEMENTENABLEDONLY));
 
-            //Set initial state
             CHECK_HR(setIMState(false));
 
-            //Create DocumentMgr
             CHECK_HR(m_threadMgr->CreateDocumentMgr(&m_documentMgr));
 
-            //Create Context
             TfEditCookie ec;
             CHECK_HR(m_documentMgr->CreateContext(m_clientId, 0, m_compHandler, &m_context, &ec));
-            //Push Context
             CHECK_HR(m_documentMgr->Push(m_context));
 
             HRESULT hr;
             CComQIPtr<ITfUIElementMgr> uiElementMgr = m_threadMgr;
             CComQIPtr<ITfCompartmentMgr> compartmentMgr = m_threadMgr;
-            //Advise ITfContextOwner
+
             CComQIPtr<ITfSource> evtCtx = m_context;
             if (FAILED(hr = evtCtx->AdviseSink(IID_ITfContextOwner, this, &m_contextOwnerCookie))) goto Cleanup;
-            //Composition Handler
+
             if (FAILED(hr = m_compHandler->initialize(m_clientId, m_context, ec))) goto Cleanup;
 
-            //Candidate List Handler
             if (FAILED(hr = m_candHandler->initialize(uiElementMgr))) goto Cleanup;
-            //Full screen Handler
             if (FAILED(hr = m_fullScHandler->initialize(uiElementMgr))) goto Cleanup;
 
-            //Conversion Mode
             if (FAILED(hr = m_conversionHander->initialize(m_clientId, compartmentMgr))) goto Cleanup;
-            //Sentence Mode
             if (FAILED(hr = m_sentenceHander->initialize(m_clientId, compartmentMgr))) goto Cleanup;
+
             return S_OK;
         Cleanup:
             dispose();
@@ -90,11 +82,9 @@ namespace libtf
             //Prevent creation of new Composition
             CHECK_HR(setIMState(false));
 
-            //Close all the Compositions
             CHECK_HR(terminateComposition());
-            //Pop all the Context
             CHECK_HR(m_documentMgr->Pop(TF_POPF_ALL));
-            //Un-advise ITfContextOwner
+
             CComQIPtr<ITfSource> evtContext = m_context;
             CHECK_HR(evtContext->UnadviseSink(m_contextOwnerCookie));
 
@@ -105,7 +95,6 @@ namespace libtf
             CHECK_HR(m_conversionHander->dispose());
             CHECK_HR(m_sentenceHander->dispose());
 
-            //De-activate
             CHECK_HR(m_threadMgr->Deactivate());
 
             return S_OK;
