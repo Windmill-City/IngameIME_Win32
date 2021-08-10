@@ -49,13 +49,18 @@ namespace libtf
     public:
         TfThread()
         {
+            std::promise<bool> messageQueueReady;
+            auto future = messageQueueReady.get_future();
             m_tfThread = std::thread(
-                [this]()
+                [this](std::promise<bool> messageQueueReady)
                 {
                     m_tfThreadId = GetCurrentThreadId();
                     CoInitialize(NULL);
 
                     MSG msg;
+                    PeekMessage(&msg, NULL, WM_USER, WM_USER, PM_NOREMOVE);
+                    messageQueueReady.set_value(true);
+
                     while (GetMessage(&msg, NULL, 0, 0))
                     {
                         //Not translating message
@@ -72,8 +77,9 @@ namespace libtf
                     }
 
                     CoUninitialize();
-                });
+                }, std::move(messageQueueReady));
             m_tfThread.detach();
+            future.get();
         }
 
         /**
