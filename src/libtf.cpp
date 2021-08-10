@@ -6,16 +6,16 @@ using namespace libtf;
  */
 HRESULT libtf_create_ctx(libtf_pInputContext *ctx)
 {
-    InputContext_t context;
-    *ctx = &context;
+    auto context = new InputContext_t();
+    *ctx = context;
 
-    context.ctx = new CInputContext();
-    context.tfThread = new TfThread();
-    AttachThreadInput(context.tfThread->getId(), GetCurrentThreadId(), true);
-    auto future = context.tfThread->enqueue(
+    context->ctx = new CInputContext();
+    context->tfThread = new TfThread();
+    AttachThreadInput(context->tfThread->getId(), GetCurrentThreadId(), true);
+    auto future = context->tfThread->enqueue(
         [context]()
         {
-            return context.ctx->initialize();
+            return context->ctx->initialize();
         });
     return future.get();
 }
