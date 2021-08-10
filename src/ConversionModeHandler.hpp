@@ -58,7 +58,8 @@ namespace libtf
             m_clientId = clientId;
             m_compartmentMgr = compartmentMgr;
             CHECK_HR(m_compartmentMgr->GetCompartment(GUID_COMPARTMENT_KEYBOARD_INPUTMODE_CONVERSION, &m_conversionMode));
-            CHECK_HR(m_conversionMode.Advise(this, IID_ITfCompartmentEventSink, &m_conversionModeCookie))
+            CComQIPtr<ITfSource> evt = m_conversionMode;
+            CHECK_HR(evt->AdviseSink(IID_ITfCompartmentEventSink, this, &m_conversionModeCookie))
             return S_OK;
         }
 

@@ -58,7 +58,8 @@ namespace libtf
             m_clientId = clientId;
             m_compartmentMgr = compartmentMgr;
             CHECK_HR(m_compartmentMgr->GetCompartment(GUID_COMPARTMENT_KEYBOARD_INPUTMODE_SENTENCE, &m_sentenceMode));
-            CHECK_HR(m_sentenceMode.Advise(this, IID_ITfCompartmentEventSink, &m_sentenceModeCookie))
+            CComQIPtr<ITfSource> evt = m_sentenceMode;
+            CHECK_HR(evt->AdviseSink(IID_ITfCompartmentEventSink, this, &m_sentenceModeCookie))
             return S_OK;
         }
 

@@ -33,7 +33,8 @@ namespace libtf
         HRESULT initialize(CComPtr<ITfUIElementMgr> uiElementMgr)
         {
             m_uiElementMgr = uiElementMgr;
-            return m_uiElementMgr.Advise(this, IID_ITfUIElementSink, &m_uiSinkCookie);
+            CComQIPtr<ITfSource> evt = m_uiElementMgr;
+            return evt->AdviseSink(IID_ITfUIElementSink, this, &m_uiSinkCookie);
         }
 
         /**

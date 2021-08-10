@@ -60,7 +60,8 @@ namespace libtf
             CComQIPtr<ITfUIElementMgr> uiElementMgr = m_threadMgr;
             CComQIPtr<ITfCompartmentMgr> compartmentMgr = m_threadMgr;
             //Advise ITfContextOwner
-            if (FAILED(hr = m_context.Advise(this, IID_ITfContextOwner, &m_contextOwnerCookie))) goto Cleanup;
+            CComQIPtr<ITfSource> evtCtx = m_context;
+            if (FAILED(hr = evtCtx->AdviseSink(IID_ITfContextOwner, this, &m_contextOwnerCookie))) goto Cleanup;
             //Composition Handler
             if (FAILED(hr = m_compHandler->initialize(m_clientId, m_context, ec))) goto Cleanup;
 
