@@ -1,6 +1,8 @@
 #pragma once
 #include "InputContext.hpp"
+#ifdef USE_TfThread
 #include "TfThread.hpp"
+#endif
 #include "libtfdef.h"
 
 typedef struct InputContext
