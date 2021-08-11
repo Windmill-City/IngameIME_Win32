@@ -44,6 +44,9 @@ include_directories(${HEADERS})
 link_directories(${SDK_LIB_DIR})
 source_group(${SOURCES})
 
+add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
+add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+
 add_library(libtf src/libtf.cpp)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

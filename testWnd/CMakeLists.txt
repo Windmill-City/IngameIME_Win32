@@ -9,7 +9,8 @@ add_subdirectory(glfw ./glfw)
 
 include_directories(../src/ ./glfw/include)
 
-target_link_libraries(glfw)
+add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
+add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
 add_executable(testWnd main.cpp)
 target_link_libraries(testWnd glfw ${GLFW_LIBRARIES})
