@@ -83,10 +83,8 @@ namespace libtf
             CHECK_HR(setIMState(false));
 
             CHECK_HR(terminateComposition());
+            //Context will un-advise all sink when pop
             CHECK_HR(m_documentMgr->Pop(TF_POPF_ALL));
-
-            CComQIPtr<ITfSource> evtContext = m_context;
-            CHECK_HR(evtContext->UnadviseSink(m_contextOwnerCookie));
 
             //Cleanup
             CHECK_HR(m_compositionHandler->dispose());
