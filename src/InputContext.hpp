@@ -1,12 +1,15 @@
 #pragma once
 #include "libtfdef.h"
 
+#include "TfThread.hpp"
+
 #include "CandidateListHandler.hpp"
 #include "CompositionHandler.hpp"
 #include "ConversionModeHandler.hpp"
 #include "FullScreenUIElementHandler.hpp"
 #include "SentenceModeHandler.hpp"
 
+#include <memory>
 #include <msctf.h>
 
 namespace libtf
@@ -14,6 +17,10 @@ namespace libtf
     class InputContext : public CComObjectRoot, protected ITfContextOwner
     {
     protected:
+        /**
+         * @brief STA Apartment Thread, where we CoCreate ITfThreadMgr
+         */
+        std::unique_ptr<TfThread> m_tfThread = std::make_unique<TfThread>();
         CComPtr<ITfThreadMgr> m_threadMgr;
         TfClientId m_clientId;
         CComPtr<ITfDocumentMgr> m_documentMgr;
@@ -39,8 +46,27 @@ namespace libtf
          * @return HRESULT 
          */
         HRESULT initialize()
-        {   
-            CHECK_HR(m_threadMgr.CoCreateInstance(CLSID_TF_ThreadMgr, NULL, CLSCTX_INPROC_SERVER));
+        {
+            IStream *streamThreadMgr;
+            IStream *streamUIElementMgr;
+            CHECK_HR(m_tfThread->enqueue(
+                                   [&streamThreadMgr, &streamUIElementMgr]()
+                                   {
+                                       CComPtr<ITfThreadMgr> threadMgr;
+                                       CHECK_HR(threadMgr.CoCreateInstance(CLSID_TF_ThreadMgr, NULL, CLSCTX_INPROC_SERVER));
+                                       CHECK_HR(CoMarshalInterThreadInterfaceInStream(IID_ITfThreadMgr, (IUnknown *)threadMgr.p, &streamThreadMgr));
+
+                                       CComQIPtr<ITfUIElementMgr> uiElementMgr = threadMgr;
+                                       CHECK_HR(CoMarshalInterThreadInterfaceInStream(IID_ITfUIElementMgr, (IUnknown *)uiElementMgr.p, &streamUIElementMgr));
+
+                                       return S_OK;
+                                   })
+                         .get());
+
+            CHECK_HR(CoGetInterfaceAndReleaseStream(streamThreadMgr, IID_ITfThreadMgr, (void **)&m_threadMgr));
+
+            CComPtr<ITfUIElementMgr> uiElementMgr;
+            CHECK_HR(CoGetInterfaceAndReleaseStream(streamUIElementMgr, IID_ITfUIElementMgr, (void **)&uiElementMgr));
 
             CComQIPtr<ITfThreadMgrEx> threadMgrEx = m_threadMgr;
             CHECK_HR(threadMgrEx->ActivateEx(&m_clientId, TF_TMAE_UIELEMENTENABLEDONLY));
@@ -54,7 +80,6 @@ namespace libtf
             CHECK_HR(m_documentMgr->Push(m_context));
 
             HRESULT hr;
-            CComQIPtr<ITfUIElementMgr> uiElementMgr = m_threadMgr;
             CComQIPtr<ITfCompartmentMgr> compartmentMgr = m_threadMgr;
 
             CComQIPtr<ITfSource> evtCtx = m_context;
