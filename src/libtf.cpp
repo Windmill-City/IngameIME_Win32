@@ -250,6 +250,15 @@ HRESULT libtf_set_composition_callback(libtf_pInputContext ctx, libtf_CallbackCo
 }
 
 /**
+ * @brief Set Commit Callback
+ */
+HRESULT libtf_set_commit_callback(libtf_pInputContext ctx, libtf_CallbackCommit callback)
+{
+    ctx->ctx->m_compositionHandler->m_commitHandler->m_sigCommit = callback;
+    return S_OK;
+}
+
+/**
  * @brief Set PreEdit Bounding Box Callback
  */
 HRESULT libtf_set_bounding_box_callback(libtf_pInputContext ctx, libtf_CallbackBoundingBox callback)

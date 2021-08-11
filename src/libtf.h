@@ -98,6 +98,11 @@ extern "C"
     HRESULT libtf_set_composition_callback(libtf_pInputContext, libtf_CallbackComposition);
 
     /**
+     * @brief Set Commit Callback
+     */
+    HRESULT libtf_set_commit_callback(libtf_pInputContext, libtf_CallbackCommit);
+
+    /**
      * @brief Set PreEdit Bounding Box Callback
      */
     HRESULT libtf_set_bounding_box_callback(libtf_pInputContext, libtf_CallbackBoundingBox);
