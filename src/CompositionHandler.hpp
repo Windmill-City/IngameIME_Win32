@@ -34,12 +34,12 @@ extern "C"
 
 namespace libtf
 {
-    class CompositionHandler : public CComObjectRoot, public ITfContextOwnerCompositionSink
+    class CompositionHandler : public CComObjectRoot, public ITfContextOwnerCompositionSink, public ITfEditSession
     {
     protected:
         TfClientId m_clientId;
         CComPtr<ITfContext> m_context;
-        TfEditCookie m_ecTextStore;
+        CComPtr<ITfCompositionView> m_compositionView;
 
     public:
         /**
@@ -62,6 +62,7 @@ namespace libtf
 
         BEGIN_COM_MAP(CompositionHandler)
         COM_INTERFACE_ENTRY(ITfContextOwnerCompositionSink)
+        COM_INTERFACE_ENTRY(ITfEditSession)
         END_COM_MAP()
 
         /**
@@ -69,14 +70,12 @@ namespace libtf
          * 
          * @param clientId ClientId to request edit session
          * @param context ITfContext to request edit session
-         * @param ec Read Only EditCookie to get PreEdit str
          * @return HRESULT 
          */
-        HRESULT initialize(TfClientId clientId, CComPtr<ITfContext> context, TfEditCookie ec)
+        HRESULT initialize(TfClientId clientId, CComPtr<ITfContext> context)
         {
             m_clientId = clientId;
             m_context = context;
-            m_ecTextStore = ec;
             CHECK_HR(m_commitHandler->initialize(m_context));
             return S_OK;
         }
@@ -110,35 +109,18 @@ namespace libtf
         }
 
         /**
-         * @brief Get Composition data and call callback with it
+         * @brief Request EditSession to get Composition data
          * 
          * @return HRESULT 
          */
         HRESULT OnUpdateComposition(ITfCompositionView *pComposition, ITfRange *pRangeNew) override
         {
-            CComPtr<ITfRange> preEditRange;
-            CHECK_HR(pComposition->GetRange(&preEditRange));
+            m_compositionView = pComposition;
 
-            ULONG charCount;
-            WCHAR *buf = new WCHAR[65];
-            CHECK_OOM(buf);
-            ZeroMemory(buf, sizeof(buf));
+            HRESULT hr;
+            CHECK_HR(m_context->RequestEditSession(m_clientId, this, TF_ES_ASYNC | TF_ES_READ, &hr));
 
-            CHECK_HR(preEditRange->GetText(m_ecTextStore, 0, buf, 64, &charCount));
-            BSTR bstr = SysAllocString(buf);
-
-            CComQIPtr<ITfRangeACP> preEditRangeAcp = preEditRange;
-            LONG acpStart, len;
-            CHECK_HR(preEditRangeAcp->GetExtent(&acpStart, &len));
-
-            Composition_t composition = {CompositionUpdate, bstr, {acpStart, acpStart + len}};
-            m_sigComposition(composition);
-
-            //Cleanup
-            SysReleaseString(bstr);
-            delete[] buf;
-
-            return S_OK;
+            return hr;
         }
 
         /**
@@ -153,6 +135,46 @@ namespace libtf
             HRESULT hr;
             CHECK_HR(m_context->RequestEditSession(m_clientId, m_commitHandler, TF_ES_ASYNC | TF_ES_READWRITE, &hr));
             return hr;
+        }
+#pragma endregion
+#pragma region ITfEditSession
+        /**
+         * @brief Get PreEdit test and its selection
+         * 
+         * @param ec edit cookie
+         * @return HRESULT 
+         */
+        HRESULT DoEditSession(TfEditCookie ec) override
+        {
+            CComPtr<ITfRange> preEditRange;
+            CHECK_HR(m_compositionView->GetRange(&preEditRange));
+
+            ULONG charCount;
+            WCHAR *buf = new WCHAR[65];
+            CHECK_OOM(buf);
+            ZeroMemory(buf, sizeof(buf));
+
+            CHECK_HR(preEditRange->GetText(ec, 0, buf, 64, &charCount));
+            BSTR bstr = SysAllocString(buf);
+
+            TF_SELECTION sel[1];
+            ULONG fetched;
+            CComPtr<ITfRange> selRange;
+            CHECK_HR(m_context->GetSelection(ec, TF_DEFAULT_SELECTION, 1, sel, &fetched));
+            selRange.Attach(sel[0].range);
+            CComQIPtr<ITfRangeACP> selRangeAcp = selRange;
+            LONG acpStart, len;
+            CHECK_HR(selRangeAcp->GetExtent(&acpStart, &len));
+
+            Composition_t composition = {CompositionUpdate, bstr, {acpStart, acpStart + len}};
+            m_sigComposition(composition);
+
+            //Cleanup
+            SysReleaseString(bstr);
+            delete[] buf;
+            m_compositionView.Release();
+
+            return S_OK;
         }
 #pragma endregion
     };

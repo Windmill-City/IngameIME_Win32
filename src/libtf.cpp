@@ -20,7 +20,6 @@ HRESULT libtf_create_ctx(libtf_pInputContext *ctx)
         });
     return future.get();
 #else
-    CoInitialize(NULL);
     return context->ctx->initialize();
 #endif
 }
@@ -239,13 +238,13 @@ HRESULT libtf_set_composition_callback(libtf_pInputContext ctx, CallbackComposit
     auto future = ctx->tfThread->enqueue(
         [ctx](CallbackComposition callback)
         {
-            ctx->ctx->m_compHandler->m_sigComposition = callback;
+            ctx->ctx->m_compositionHandler->m_sigComposition = callback;
             return S_OK;
         },
         callback);
     return future.get();
 #else
-    ctx->ctx->m_compHandler->m_sigComposition = callback;
+    ctx->ctx->m_compositionHandler->m_sigComposition = callback;
     return S_OK;
 #endif
 }
@@ -259,13 +258,13 @@ HRESULT libtf_set_bounding_box_callback(libtf_pInputContext ctx, CallbackBoundin
     auto future = ctx->tfThread->enqueue(
         [ctx](CallbackBoundingBox callback)
         {
-            ctx->ctx->m_compHandler->m_sigBoundingBox = callback;
+            ctx->ctx->m_compositionHandler->m_sigBoundingBox = callback;
             return S_OK;
         },
         callback);
     return future.get();
 #else
-    ctx->ctx->m_compHandler->m_sigBoundingBox = callback;
+    ctx->ctx->m_compositionHandler->m_sigBoundingBox = callback;
     return S_OK;
 #endif
 }

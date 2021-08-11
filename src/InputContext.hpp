@@ -23,7 +23,7 @@ namespace libtf
     public:
         CComPtr<CCandidateListHandler> m_candHandler = new CCandidateListHandler();
         CComPtr<CFullScreenUIElementHandler> m_fullScHandler = new CFullScreenUIElementHandler();
-        CComPtr<CCompositionHandler> m_compHandler = new CCompositionHandler();
+        CComPtr<CCompositionHandler> m_compositionHandler = new CCompositionHandler();
         CComPtr<CConversionModeHandler> m_conversionHander = new CConversionModeHandler();
         CComPtr<CSentenceModeHandler> m_sentenceHander = new CSentenceModeHandler();
 
@@ -48,7 +48,7 @@ namespace libtf
             CHECK_HR(m_threadMgr->CreateDocumentMgr(&m_documentMgr));
 
             TfEditCookie ec;
-            CHECK_HR(m_documentMgr->CreateContext(m_clientId, 0, m_compHandler, &m_context, &ec));
+            CHECK_HR(m_documentMgr->CreateContext(m_clientId, 0, (ITfContextOwnerCompositionSink *)m_compositionHandler, &m_context, &ec));
             CHECK_HR(m_documentMgr->Push(m_context));
 
             HRESULT hr;
@@ -58,7 +58,7 @@ namespace libtf
             CComQIPtr<ITfSource> evtCtx = m_context;
             if (FAILED(hr = evtCtx->AdviseSink(IID_ITfContextOwner, this, &m_contextOwnerCookie))) goto Cleanup;
 
-            if (FAILED(hr = m_compHandler->initialize(m_clientId, m_context, ec))) goto Cleanup;
+            if (FAILED(hr = m_compositionHandler->initialize(m_clientId, m_context))) goto Cleanup;
 
             if (FAILED(hr = m_candHandler->initialize(uiElementMgr))) goto Cleanup;
             if (FAILED(hr = m_fullScHandler->initialize(uiElementMgr))) goto Cleanup;
@@ -89,7 +89,7 @@ namespace libtf
             CHECK_HR(evtContext->UnadviseSink(m_contextOwnerCookie));
 
             //Cleanup
-            CHECK_HR(m_compHandler->dispose());
+            CHECK_HR(m_compositionHandler->dispose());
             CHECK_HR(m_candHandler->dispose());
             CHECK_HR(m_fullScHandler->dispose());
             CHECK_HR(m_conversionHander->dispose());
@@ -214,7 +214,7 @@ namespace libtf
         HRESULT GetTextExt(LONG acpStart, LONG acpEnd, RECT *prc, BOOL *pfClipped) override
         {
             //Always return the bounding box of pre edit text, for positioning the Candidate List window
-            m_compHandler->m_sigBoundingBox(prc);
+            m_compositionHandler->m_sigBoundingBox(prc);
             return S_OK;
         }
 
