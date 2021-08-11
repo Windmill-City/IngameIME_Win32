@@ -40,7 +40,7 @@ extern "C"
          */
         Candidate *candidates;
     } CandidateList_t, *pCandidateList;
-    typedef void (*CallbackCandidateList)(HWND, CandidateListState_t, CandidateList_t);
+    typedef void (*CallbackCandidateList)(CandidateListState_t, CandidateList_t);
 }
 
 namespace libtf
@@ -157,25 +157,6 @@ namespace libtf
             return candidateList;
         }
 
-        /**
-         * @brief Get which window specific Candidate List associate to
-         * 
-         * @param candEle candidate list ui element
-         * @param hWnd receive hWnd
-         * @return HRESULT 
-         */
-        HRESULT getWnd(CComPtr<ITfCandidateListUIElement> candEle, HWND &hWnd)
-        {
-            CComPtr<ITfDocumentMgr> documentMgr;
-            CHECK_HR(candEle->GetDocumentMgr(&documentMgr));
-            CComPtr<ITfContext> context;
-            CHECK_HR(documentMgr->GetTop(&context));
-            CComQIPtr<ITfContextOwner> contextOwner = context;
-            if (!contextOwner) return E_FAIL;
-            CHECK_HR(contextOwner->GetWnd(&hWnd));
-            return S_OK;
-        }
-
     public:
         /**
          * @brief Set if input method should(IM) show its candidate list window
@@ -187,8 +168,8 @@ namespace libtf
         /**
          * @brief Callback when Candidate List updates
          */
-        typedef std::function<void(HWND, CandidateListState_t, CandidateList_t)> signalCandidateList;
-        signalCandidateList m_sigCandidateList = [](HWND, CandidateListState_t, CandidateList_t) {};
+        typedef std::function<void(CandidateListState_t, CandidateList_t)> signalCandidateList;
+        signalCandidateList m_sigCandidateList = [](CandidateListState_t, CandidateList_t) {};
 
         /**
          * @brief Specific provider for different input method
@@ -277,12 +258,9 @@ namespace libtf
 
                 *pbShow = m_showIMCandidateListWindow;
 
-                HWND hWnd;
-                CHECK_HR(getWnd(m_curCandEle, hWnd));
-
                 //Empty list
                 CandidateList_t list = {0};
-                m_sigCandidateList(hWnd, CandidateListState::CandidateListBegin, list);
+                m_sigCandidateList(CandidateListState::CandidateListBegin, list);
             }
             return S_OK;
         }
@@ -295,13 +273,10 @@ namespace libtf
         {
             if (m_curCandEle == getCandidateListUIElement(dwUIElementId))
             {
-                HWND hWnd;
-                CHECK_HR(getWnd(m_curCandEle, hWnd));
-
                 CandidateList_t list;
                 CHECK_HR(provider->getCandidateList(m_curCandEle, &list));
 
-                m_sigCandidateList(hWnd, CandidateListState::CandidateListUpdate, list);
+                m_sigCandidateList(CandidateListState::CandidateListUpdate, list);
 
                 //Cleanup
                 for (size_t i = 0; i < list.totalCount; i++)
@@ -320,15 +295,12 @@ namespace libtf
         {
             if (m_curCandEle == getCandidateListUIElement(dwUIElementId))
             {
-                HWND hWnd;
-                HRESULT hr = getWnd(m_curCandEle, hWnd);
                 //Always Release CandUIEle
                 m_curCandEle.Release();
-                CHECK_HR(hr);
 
                 //Empty list
                 CandidateList_t list = {0};
-                m_sigCandidateList(hWnd, CandidateListState::CandidateListEnd, list);
+                m_sigCandidateList(CandidateListState::CandidateListEnd, list);
             }
             return S_OK;
         }

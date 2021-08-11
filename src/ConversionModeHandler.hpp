@@ -8,7 +8,7 @@
 extern "C"
 {
     typedef unsigned long ConversionMode;
-    typedef void (*CallbackConversionMode)(HWND, ConversionMode);
+    typedef void (*CallbackConversionMode)(ConversionMode);
 }
 
 namespace libtf
@@ -21,28 +21,9 @@ namespace libtf
         DWORD m_conversionModeCookie;
         TfClientId m_clientId;
 
-        /**
-         * @brief Get which window is active window on current thread
-         * 
-         * @param hWnd receive hWnd
-         * @return HRESULT 
-         */
-        HRESULT getWnd(HWND &hWnd)
-        {
-            CComQIPtr<ITfThreadMgr> threadMgr = m_compartmentMgr;
-            CComPtr<ITfDocumentMgr> documentMgr;
-            CHECK_HR(threadMgr->GetFocus(&documentMgr));
-            CComPtr<ITfContext> context;
-            CHECK_HR(documentMgr->GetTop(&context));
-            CComQIPtr<ITfContextOwner> contextOwner = context;
-            if (!contextOwner) return E_FAIL;
-            CHECK_HR(contextOwner->GetWnd(&hWnd));
-            return S_OK;
-        }
-
     public:
-        typedef std::function<void(HWND, ConversionMode)> signalConversionMode;
-        signalConversionMode sigConversionMode = [](HWND, ConversionMode) {};
+        typedef std::function<void(ConversionMode)> signalConversionMode;
+        signalConversionMode sigConversionMode = [](ConversionMode) {};
 
         BEGIN_COM_MAP(ConversionModeHandler)
         COM_INTERFACE_ENTRY(ITfCompartmentEventSink)
@@ -97,9 +78,7 @@ namespace libtf
             {
                 CComVariant val;
                 CHECK_HR(m_conversionMode->GetValue(&val));
-                HWND hWnd;
-                CHECK_HR(getWnd(hWnd));
-                sigConversionMode(hWnd, val.ulVal);
+                sigConversionMode(val.ulVal);
             }
             return S_OK;
         }

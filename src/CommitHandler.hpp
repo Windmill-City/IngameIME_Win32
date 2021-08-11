@@ -8,7 +8,7 @@
 extern "C"
 {
     typedef BSTR Commit;
-    typedef void (*CallbackCommit)(HWND, Commit);
+    typedef void (*CallbackCommit)(Commit);
 }
 
 namespace libtf
@@ -18,24 +18,12 @@ namespace libtf
     protected:
         CComPtr<ITfContext> m_context;
 
-        /**
-         * @brief Get the current window of the context
-         * 
-         * @param hWnd receive window handle
-         * @return HRESULT 
-         */
-        HRESULT getWnd(HWND &hWnd)
-        {
-            CComQIPtr<ITfContextOwner> contextOwner = m_context;
-            return contextOwner->GetWnd(&hWnd);
-        }
-
     public:
         /**
          * @brief Callback when input method Commit
          */
-        typedef std::function<void(HWND, Commit)> signalCommit;
-        signalCommit m_sigCommit = [](HWND, Commit) {};
+        typedef std::function<void(Commit)> signalCommit;
+        signalCommit m_sigCommit = [](Commit) {};
 
         BEGIN_COM_MAP(CommitHandler)
         COM_INTERFACE_ENTRY(ITfEditSession)
@@ -78,19 +66,19 @@ namespace libtf
             CHECK_HR(m_context->GetEnd(ec, &rangeAtEnd));
             CHECK_HR(fullRange->ShiftEndToRange(ec, rangeAtEnd, TF_ANCHOR_END));
 
+            BOOL isEmpty;
+            CHECK_HR(fullRange->IsEmpty(ec, &isEmpty));
+            if (isEmpty) return S_OK;
+
             ULONG charCount;
             WCHAR *buf = new WCHAR[65];
             CHECK_OOM(buf);
             ZeroMemory(buf, sizeof(buf));
 
             CHECK_HR(fullRange->GetText(ec, 0, buf, 64, &charCount));
-
             BSTR bstr = SysAllocString(buf);
 
-            HWND hWnd;
-            getWnd(hWnd);
-
-            m_sigCommit(hWnd, bstr);
+            m_sigCommit(bstr);
 
             //Cleanup
             SysReleaseString(bstr);

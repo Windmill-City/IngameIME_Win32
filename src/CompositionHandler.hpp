@@ -16,8 +16,20 @@ extern "C"
     } CompositionState_t;
     typedef RECT BoundingBox_t;
     typedef BSTR PreEdit;
-    typedef void (*CallbackComposition)(HWND, CompositionState_t, PreEdit);
-    typedef HRESULT (*CallbackBoundingBox)(HWND, BoundingBox_t *);
+    typedef struct Composition
+    {
+        CompositionState_t state;
+        /**
+         * @brief Only Available at CompositionUpdate
+         */
+        PreEdit preEdit;
+        /**
+         * @brief Only Available at CompositionUpdate
+         */
+        uint32_t selection[2];
+    } Composition_t, *pComposition;
+    typedef void (*CallbackComposition)(Composition_t);
+    typedef HRESULT (*CallbackBoundingBox)(BoundingBox_t *);
 }
 
 namespace libtf
@@ -29,31 +41,19 @@ namespace libtf
         CComPtr<ITfContext> m_context;
         TfEditCookie m_ecTextStore;
 
-        /**
-         * @brief Get the current window of the context
-         * 
-         * @param hWnd receive window handle
-         * @return HRESULT 
-         */
-        HRESULT getWnd(HWND &hWnd)
-        {
-            CComQIPtr<ITfContextOwner> contextOwner = m_context;
-            return contextOwner->GetWnd(&hWnd);
-        }
-
     public:
         /**
          * @brief Callback when PreEdit updates
          */
-        typedef std::function<void(HWND, CompositionState_t, PreEdit)> signalComposition;
-        signalComposition m_sigComposition = [](HWND, CompositionState_t, PreEdit) {};
+        typedef std::function<void(Composition_t)> signalComposition;
+        signalComposition m_sigComposition = [](Composition_t) {};
 
         /**
          * @brief Callback to get PreEdit's BoundingBox
          * for positioning Candidate List window
          */
-        typedef std::function<void(HWND, BoundingBox_t *)> signalBoundingBox;
-        signalBoundingBox m_sigBoundingBox = [](HWND, BoundingBox_t *) {};
+        typedef std::function<void(BoundingBox_t *)> signalBoundingBox;
+        signalBoundingBox m_sigBoundingBox = [](BoundingBox_t *) {};
 
         /**
          * @brief Handle input method commit str
@@ -95,7 +95,6 @@ namespace libtf
 #pragma region ITfContextOwnerCompositionSink
         /**
          * @brief Always allow Composition start
-         * Call callback with empty PreEdit
          * 
          * @param pfOk allow Composition start?
          * @return HRESULT 
@@ -105,43 +104,35 @@ namespace libtf
             //Always allow Composition start
             *pfOk = TRUE;
 
-            //Empty PreEdit
-            BSTR bstr = SysAllocString(L"");
-
-            HWND hWnd;
-            getWnd(hWnd);
-
-            m_sigComposition(hWnd, CompositionState::CompositionBegin, bstr);
-
-            //Cleanup
-            SysReleaseString(bstr);
+            m_sigComposition({CompositionBegin});
 
             return S_OK;
         }
 
         /**
-         * @brief Get PreEdit str and call callback with it
+         * @brief Get Composition data and call callback with it
          * 
          * @return HRESULT 
          */
         HRESULT OnUpdateComposition(ITfCompositionView *pComposition, ITfRange *pRangeNew) override
         {
-            CComPtr<ITfRange> range;
-            CHECK_HR(pComposition->GetRange(&range));
+            CComPtr<ITfRange> preEditRange;
+            CHECK_HR(pComposition->GetRange(&preEditRange));
 
             ULONG charCount;
             WCHAR *buf = new WCHAR[65];
             CHECK_OOM(buf);
             ZeroMemory(buf, sizeof(buf));
 
-            CHECK_HR(range->GetText(m_ecTextStore, 0, buf, 64, &charCount));
-
+            CHECK_HR(preEditRange->GetText(m_ecTextStore, 0, buf, 64, &charCount));
             BSTR bstr = SysAllocString(buf);
 
-            HWND hWnd;
-            getWnd(hWnd);
+            CComQIPtr<ITfRangeACP> preEditRangeAcp = preEditRange;
+            LONG acpStart, len;
+            CHECK_HR(preEditRangeAcp->GetExtent(&acpStart, &len));
 
-            m_sigComposition(hWnd, CompositionState::CompositionUpdate, bstr);
+            Composition_t composition = {CompositionUpdate, bstr, {acpStart, acpStart + len}};
+            m_sigComposition(composition);
 
             //Cleanup
             SysReleaseString(bstr);
@@ -151,26 +142,16 @@ namespace libtf
         }
 
         /**
-         * @brief Call callback with empty PreEdit
+         * @brief Handle Composition End
          * 
          * @return HRESULT 
          */
         HRESULT OnEndComposition(ITfCompositionView *pComposition) override
         {
-            //Empty PreEdit
-            BSTR bstr = SysAllocString(L"");
-
-            HWND hWnd;
-            getWnd(hWnd);
-
-            m_sigComposition(hWnd, CompositionState::CompositionEnd, bstr);
-
-            //Cleanup
-            SysReleaseString(bstr);
+            m_sigComposition({CompositionEnd});
 
             HRESULT hr;
             CHECK_HR(m_context->RequestEditSession(m_clientId, m_commitHandler, TF_ES_ASYNC | TF_ES_READWRITE, &hr));
-
             return hr;
         }
 #pragma endregion

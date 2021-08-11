@@ -8,7 +8,7 @@
 extern "C"
 {
     typedef unsigned long SentenceMode;
-    typedef void (*CallbackSentenceMode)(HWND, SentenceMode);
+    typedef void (*CallbackSentenceMode)(SentenceMode);
 }
 
 namespace libtf
@@ -21,28 +21,9 @@ namespace libtf
         DWORD m_sentenceModeCookie;
         TfClientId m_clientId;
 
-        /**
-         * @brief Get which window is active window on current thread
-         * 
-         * @param hWnd receive hWnd
-         * @return HRESULT 
-         */
-        HRESULT getWnd(HWND &hWnd)
-        {
-            CComQIPtr<ITfThreadMgr> threadMgr = m_compartmentMgr;
-            CComPtr<ITfDocumentMgr> documentMgr;
-            CHECK_HR(threadMgr->GetFocus(&documentMgr));
-            CComPtr<ITfContext> context;
-            CHECK_HR(documentMgr->GetTop(&context));
-            CComQIPtr<ITfContextOwner> contextOwner = context;
-            if (!contextOwner) return E_FAIL;
-            CHECK_HR(contextOwner->GetWnd(&hWnd));
-            return S_OK;
-        }
-
     public:
-        typedef std::function<void(HWND, SentenceMode)> signalSentenceMode;
-        signalSentenceMode sigSentenceMode = [](HWND, SentenceMode) {};
+        typedef std::function<void(SentenceMode)> signalSentenceMode;
+        signalSentenceMode sigSentenceMode = [](SentenceMode) {};
 
         BEGIN_COM_MAP(SentenceModeHandler)
         COM_INTERFACE_ENTRY(ITfCompartmentEventSink)
@@ -97,9 +78,7 @@ namespace libtf
             {
                 CComVariant val;
                 CHECK_HR(m_sentenceMode->GetValue(&val));
-                HWND hWnd;
-                CHECK_HR(getWnd(hWnd));
-                sigSentenceMode(hWnd, val.ulVal);
+                sigSentenceMode(val.ulVal);
             }
             return S_OK;
         }
