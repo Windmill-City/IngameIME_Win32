@@ -4,6 +4,7 @@
 #include <atlcom.h>
 #include <functional>
 #include <msctf.h>
+#include <memory>
 
 extern "C"
 {
@@ -52,7 +53,7 @@ namespace libtf
     /**
      * @brief Default way to get CandidateList from ITfCandidateListUIElement
      */
-    class CandidateListProvider
+    typedef class CandidateListProvider
     {
         typedef CComPtr<ITfCandidateListUIElement> CandUIEle;
 
@@ -87,6 +88,8 @@ namespace libtf
             start = pageStarts[curPage];
             end = isLastPage ? totalCount - 1 : pageStarts[curPage + 1] - 1;
             delete[] pageStarts;
+
+            return S_OK;
         }
 
         /**
@@ -131,7 +134,7 @@ namespace libtf
             }
             return S_OK;
         }
-    };
+    } CandidateListProvider_t, *pCandidateListProvider;
 
     /**
      * @brief Get data from input method's CandidateList UIElement
@@ -178,7 +181,7 @@ namespace libtf
         /**
          * @brief Specific provider for different input method
          */
-        CandidateListProvider *provider;
+        std::unique_ptr<CandidateListProvider> provider = std::make_unique<CandidateListProvider_t>();
 
         BEGIN_COM_MAP(CandidateListHandler)
         COM_INTERFACE_ENTRY(ITfUIElementSink)
