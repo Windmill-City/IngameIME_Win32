@@ -139,10 +139,7 @@ namespace libtf
 #pragma endregion
 #pragma region ITfEditSession
         /**
-         * @brief Get PreEdit test and its selection
-         * 
-         * @param ec edit cookie
-         * @return HRESULT 
+         * @brief Get PreEdit text and its selection
          */
         HRESULT DoEditSession(TfEditCookie ec) override
         {

@@ -99,7 +99,7 @@ namespace libtf
         }
 
         /**
-         * @brief Terminate all the compositions in the context
+         * @brief Terminate all the compositions
          * 
          * @return HRESULT 
          */

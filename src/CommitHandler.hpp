@@ -53,9 +53,6 @@ namespace libtf
 
         /**
          * @brief Get all the text in the context, which is Commit
-         * 
-         * @param ec edit cookie
-         * @return HRESULT 
          */
         HRESULT DoEditSession(TfEditCookie ec) override
         {
