@@ -26,7 +26,7 @@ extern "C"
         /**
          * @brief Only Available at CompositionUpdate
          */
-        uint32_t selection[2];
+        long selection[2];
     } Composition_t, *pComposition;
     typedef void (*CallbackComposition)(Composition_t);
     typedef HRESULT (*CallbackBoundingBox)(BoundingBox_t *);
