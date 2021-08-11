@@ -1,10 +1,12 @@
 #pragma once
+#include "libtfdef.h"
+
 #include "CandidateListHandler.hpp"
 #include "CompositionHandler.hpp"
 #include "ConversionModeHandler.hpp"
 #include "FullScreenUIElementHandler.hpp"
 #include "SentenceModeHandler.hpp"
-#include "libtfdef.h"
+
 #include <msctf.h>
 
 namespace libtf
@@ -37,7 +39,7 @@ namespace libtf
          * @return HRESULT 
          */
         HRESULT initialize()
-        {
+        {   
             CHECK_HR(m_threadMgr.CoCreateInstance(CLSID_TF_ThreadMgr, NULL, CLSCTX_INPROC_SERVER));
 
             CComQIPtr<ITfThreadMgrEx> threadMgrEx = m_threadMgr;
