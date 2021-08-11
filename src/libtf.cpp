@@ -10,18 +10,7 @@ HRESULT libtf_create_ctx(libtf_pInputContext *ctx)
     *ctx = context;
 
     context->ctx = new CInputContext();
-#ifdef USE_TfThread
-    context->tfThread = new TfThread();
-    AttachThreadInput(GetCurrentThreadId(), context->tfThread->getId(), true);
-    auto future = context->tfThread->enqueue(
-        [context]()
-        {
-            return context->ctx->initialize();
-        });
-    return future.get();
-#else
     return context->ctx->initialize();
-#endif
 }
 
 /**
@@ -29,21 +18,9 @@ HRESULT libtf_create_ctx(libtf_pInputContext *ctx)
  */
 HRESULT libtf_dispose_ctx(libtf_pInputContext ctx)
 {
-#ifdef USE_TfThread
-    AttachThreadInput(GetCurrentThreadId(), ctx->tfThread->getId(), false);
-    auto future = ctx->tfThread->enqueue(
-        [ctx]()
-        {
-            return ctx->ctx->dispose();
-        });
-    HRESULT hr = future.get();
-    delete ctx;
-    return hr;
-#else
     HRESULT hr = ctx->ctx->dispose();
     delete ctx;
     return hr;
-#endif
 }
 
 /**
@@ -51,16 +28,7 @@ HRESULT libtf_dispose_ctx(libtf_pInputContext ctx)
  */
 HRESULT libtf_terminate_composition(libtf_pInputContext ctx)
 {
-#ifdef USE_TfThread
-    auto future = ctx->tfThread->enqueue(
-        [ctx]()
-        {
-            return ctx->ctx->terminateComposition();
-        });
-    return future.get();
-#else
     return ctx->ctx->terminateComposition();
-#endif
 }
 
 /**
@@ -68,17 +36,7 @@ HRESULT libtf_terminate_composition(libtf_pInputContext ctx)
  */
 HRESULT libtf_set_im_state(libtf_pInputContext ctx, bool enable)
 {
-#ifdef USE_TfThread
-    auto future = ctx->tfThread->enqueue(
-        [ctx](bool enable)
-        {
-            return ctx->ctx->setIMState(enable);
-        },
-        enable);
-    return future.get();
-#else
     return ctx->ctx->setIMState(enable);
-#endif
 }
 
 /**
@@ -89,17 +47,7 @@ HRESULT libtf_set_im_state(libtf_pInputContext ctx, bool enable)
  */
 HRESULT libtf_get_im_state(libtf_pInputContext ctx, bool *imState)
 {
-#ifdef USE_TfThread
-    auto future = ctx->tfThread->enqueue(
-        [ctx](bool *imState)
-        {
-            return ctx->ctx->getIMState(imState);
-        },
-        imState);
-    return future.get();
-#else
     return ctx->ctx->getIMState(imState);
-#endif
 }
 
 /**
@@ -110,18 +58,7 @@ HRESULT libtf_get_im_state(libtf_pInputContext ctx, bool *imState)
  */
 HRESULT libtf_set_focus_wnd(libtf_pInputContext ctx, HWND hWnd)
 {
-#ifdef USE_TfThread
-    auto future = ctx->tfThread->enqueue(
-        [ctx](HWND hWnd)
-        {
-            ctx->hWnd = hWnd;
-            return ctx->ctx->setFocus(hWnd);
-        },
-        hWnd);
-    return future.get();
-#else
     return ctx->ctx->setFocus(hWnd);
-#endif
 }
 
 /**
@@ -129,19 +66,8 @@ HRESULT libtf_set_focus_wnd(libtf_pInputContext ctx, HWND hWnd)
  */
 HRESULT libtf_get_focus_wnd(libtf_pInputContext ctx, HWND *hWnd)
 {
-#ifdef USE_TfThread
-    auto future = ctx->tfThread->enqueue(
-        [ctx](HWND *hWnd)
-        {
-            *hWnd = ctx->hWnd;
-            return S_OK;
-        },
-        hWnd);
-    return future.get();
-#else
     *hWnd = ctx->hWnd;
     return S_OK;
-#endif
 }
 
 /**
@@ -151,17 +77,7 @@ HRESULT libtf_get_focus_wnd(libtf_pInputContext ctx, HWND *hWnd)
  */
 HRESULT libtf_set_conversion_mode(libtf_pInputContext ctx, libtf_ConversionMode mode)
 {
-#ifdef USE_TfThread
-    auto future = ctx->tfThread->enqueue(
-        [ctx](ConversionMode mode)
-        {
-            return ctx->ctx->m_conversionHander->setConversionMode(mode);
-        },
-        mode);
-    return future.get();
-#else
     return ctx->ctx->m_conversionHander->setConversionMode(mode);
-#endif
 }
 
 /**
@@ -171,17 +87,7 @@ HRESULT libtf_set_conversion_mode(libtf_pInputContext ctx, libtf_ConversionMode 
  */
 HRESULT libtf_set_sentence_mode(libtf_pInputContext ctx, libtf_SentenceMode mode)
 {
-#ifdef USE_TfThread
-    auto future = ctx->tfThread->enqueue(
-        [ctx](SentenceMode mode)
-        {
-            return ctx->ctx->m_sentenceHander->setSentenceMode(mode);
-        },
-        mode);
-    return future.get();
-#else
     return ctx->ctx->m_sentenceHander->setSentenceMode(mode);
-#endif
 }
 
 /**
@@ -191,19 +97,8 @@ HRESULT libtf_set_sentence_mode(libtf_pInputContext ctx, libtf_SentenceMode mode
  */
 HRESULT libtf_set_full_screen(libtf_pInputContext ctx, bool isFullScreen)
 {
-#ifdef USE_TfThread
-    auto future = ctx->tfThread->enqueue(
-        [ctx](bool isFullScreen)
-        {
-            ctx->ctx->m_fullScHandler->m_isFullScreen = isFullScreen;
-            return S_OK;
-        },
-        isFullScreen);
-    return future.get();
-#else
     ctx->ctx->m_fullScHandler->m_isFullScreen = isFullScreen;
     return S_OK;
-#endif
 }
 
 /**
@@ -213,19 +108,8 @@ HRESULT libtf_set_full_screen(libtf_pInputContext ctx, bool isFullScreen)
  */
 HRESULT libtf_set_show_candidate_list_wnd(libtf_pInputContext ctx, bool show)
 {
-#ifdef USE_TfThread
-    auto future = ctx->tfThread->enqueue(
-        [ctx](bool show)
-        {
-            ctx->ctx->m_candHandler->m_showIMCandidateListWindow = show;
-            return S_OK;
-        },
-        show);
-    return future.get();
-#else
     ctx->ctx->m_candHandler->m_showIMCandidateListWindow = show;
     return S_OK;
-#endif
 }
 
 #pragma region setCallback
@@ -234,19 +118,8 @@ HRESULT libtf_set_show_candidate_list_wnd(libtf_pInputContext ctx, bool show)
  */
 HRESULT libtf_set_composition_callback(libtf_pInputContext ctx, libtf_CallbackComposition callback)
 {
-#ifdef USE_TfThread
-    auto future = ctx->tfThread->enqueue(
-        [ctx](CallbackComposition callback)
-        {
-            ctx->ctx->m_compositionHandler->m_sigComposition = callback;
-            return S_OK;
-        },
-        callback);
-    return future.get();
-#else
     ctx->ctx->m_compositionHandler->m_sigComposition = callback;
     return S_OK;
-#endif
 }
 
 /**
@@ -263,19 +136,8 @@ HRESULT libtf_set_commit_callback(libtf_pInputContext ctx, libtf_CallbackCommit 
  */
 HRESULT libtf_set_bounding_box_callback(libtf_pInputContext ctx, libtf_CallbackBoundingBox callback)
 {
-#ifdef USE_TfThread
-    auto future = ctx->tfThread->enqueue(
-        [ctx](CallbackBoundingBox callback)
-        {
-            ctx->ctx->m_compositionHandler->m_sigBoundingBox = callback;
-            return S_OK;
-        },
-        callback);
-    return future.get();
-#else
     ctx->ctx->m_compositionHandler->m_sigBoundingBox = callback;
     return S_OK;
-#endif
 }
 
 /**
@@ -283,19 +145,8 @@ HRESULT libtf_set_bounding_box_callback(libtf_pInputContext ctx, libtf_CallbackB
  */
 HRESULT libtf_set_candidate_list_callback(libtf_pInputContext ctx, libtf_CallbackCandidateList callback)
 {
-#ifdef USE_TfThread
-    auto future = ctx->tfThread->enqueue(
-        [ctx](libtf_CallbackCandidateList callback)
-        {
-            ctx->ctx->m_candHandler->m_sigCandidateList = callback;
-            return S_OK;
-        },
-        callback);
-    return future.get();
-#else
     ctx->ctx->m_candHandler->m_sigCandidateList = callback;
     return S_OK;
-#endif
 }
 
 /**
@@ -303,19 +154,8 @@ HRESULT libtf_set_candidate_list_callback(libtf_pInputContext ctx, libtf_Callbac
  */
 HRESULT libtf_set_conversion_mode_callback(libtf_pInputContext ctx, libtf_CallbackConversionMode callback)
 {
-#ifdef USE_TfThread
-    auto future = ctx->tfThread->enqueue(
-        [ctx](CallbackConversionMode callback)
-        {
-            ctx->ctx->m_conversionHander->sigConversionMode = callback;
-            return S_OK;
-        },
-        callback);
-    return future.get();
-#else
     ctx->ctx->m_conversionHander->sigConversionMode = callback;
     return S_OK;
-#endif
 }
 
 /**
@@ -323,18 +163,7 @@ HRESULT libtf_set_conversion_mode_callback(libtf_pInputContext ctx, libtf_Callba
  */
 HRESULT libtf_set_sentence_mode_callback(libtf_pInputContext ctx, libtf_CallbackSentenceMode callback)
 {
-#ifdef USE_TfThread
-    auto future = ctx->tfThread->enqueue(
-        [ctx](CallbackSentenceMode callback)
-        {
-            ctx->ctx->m_sentenceHander->sigSentenceMode = callback;
-            return S_OK;
-        },
-        callback);
-    return future.get();
-#else
     ctx->ctx->m_sentenceHander->sigSentenceMode = callback;
     return S_OK;
-#endif
 }
 #pragma endregion
