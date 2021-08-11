@@ -20,6 +20,10 @@ extern "C"
     typedef struct libtf_CandidateList
     {
         /**
+         * @brief The property below only available at CandidateListUpdate
+         */
+        libtf_CandidateListState_t state;
+        /**
          * @brief Total count of the Candidates
          */
         uint32_t totalCount;
@@ -40,7 +44,7 @@ extern "C"
          */
         libtf_Candidate *candidates;
     } libtf_CandidateList_t, *libtf_pCandidateList;
-    typedef void (*libtf_CallbackCandidateList)(libtf_CandidateListState_t, libtf_CandidateList_t);
+    typedef void (*libtf_CallbackCandidateList)(libtf_CandidateList_t);
 }
 
 namespace libtf
@@ -168,8 +172,8 @@ namespace libtf
         /**
          * @brief Callback when Candidate List updates
          */
-        typedef std::function<void(libtf_CandidateListState_t, libtf_CandidateList_t)> signalCandidateList;
-        signalCandidateList m_sigCandidateList = [](libtf_CandidateListState_t, libtf_CandidateList_t) {};
+        typedef std::function<void(libtf_CandidateList_t)> signalCandidateList;
+        signalCandidateList m_sigCandidateList = [](libtf_CandidateList_t) {};
 
         /**
          * @brief Specific provider for different input method
@@ -243,7 +247,6 @@ namespace libtf
 
         /**
          * @brief Decide if input method should show its candidate window
-         * Call callback with empty CandidateList
          * 
          * @param pbShow should show?
          */
@@ -258,25 +261,22 @@ namespace libtf
 
                 *pbShow = m_showIMCandidateListWindow;
 
-                //Empty list
-                libtf_CandidateList_t list = {0};
-                m_sigCandidateList(libtf_CandidateListState::libtf_CandidateListBegin, list);
+                m_sigCandidateList({libtf_CandidateListBegin});
             }
             return S_OK;
         }
 
         /**
          * @brief Get Candidates from input method
-         * Call callback with CandidateList
          */
         HRESULT UpdateUIElement(DWORD dwUIElementId) override
         {
             if (m_curCandEle == getCandidateListUIElement(dwUIElementId))
             {
-                libtf_CandidateList_t list;
+                libtf_CandidateList_t list = {libtf_CandidateListUpdate};
                 CHECK_HR(provider->getCandidateList(m_curCandEle, &list));
 
-                m_sigCandidateList(libtf_CandidateListState::libtf_CandidateListUpdate, list);
+                m_sigCandidateList(list);
 
                 //Cleanup
                 for (size_t i = 0; i < list.totalCount; i++)
@@ -289,7 +289,7 @@ namespace libtf
         }
 
         /**
-         * @brief Call callback with empty CandidateList
+         * @brief Candidate list End
          */
         HRESULT EndUIElement(DWORD dwUIElementId) override
         {
@@ -298,9 +298,7 @@ namespace libtf
                 //Always Release CandUIEle
                 m_curCandEle.Release();
 
-                //Empty list
-                libtf_CandidateList_t list = {0};
-                m_sigCandidateList(libtf_CandidateListState::libtf_CandidateListEnd, list);
+                m_sigCandidateList({libtf_CandidateListEnd});
             }
             return S_OK;
         }
