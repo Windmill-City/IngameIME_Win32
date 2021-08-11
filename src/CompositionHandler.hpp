@@ -163,6 +163,8 @@ namespace libtf
 
             CHECK_HR(preEditRange->GetText(ec, 0, buf, 64, &charCount));
             BSTR bstr = SysAllocString(buf);
+            delete[] buf;
+            CHECK_OOM(bstr);
 
             TF_SELECTION sel[1];
             ULONG fetched;
@@ -178,7 +180,6 @@ namespace libtf
 
             //Cleanup
             SysFreeString(bstr);
-            delete[] buf;
 
             return S_OK;
         }

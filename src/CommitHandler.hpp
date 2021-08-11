@@ -74,12 +74,13 @@ namespace libtf
 
             CHECK_HR(fullRange->GetText(ec, 0, buf, 64, &charCount));
             BSTR bstr = SysAllocString(buf);
+            delete[] buf;
+            CHECK_OOM(bstr);
 
             m_sigCommit(bstr);
 
             //Cleanup
             SysFreeString(bstr);
-            delete[] buf;
 
             //Clean the handled Commit str
             CHECK_HR(fullRange->SetText(ec, 0, NULL, 0));
