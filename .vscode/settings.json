@@ -76,6 +76,9 @@
         "xtree": "cpp",
         "xutility": "cpp",
         "queue": "cpp",
-        "future": "cpp"
+        "future": "cpp",
+        "condition_variable": "cpp",
+        "deque": "cpp",
+        "mutex": "cpp"
     }
 }
