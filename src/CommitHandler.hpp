@@ -70,10 +70,9 @@ namespace libtf
             ULONG charCount;
             WCHAR *buf = new WCHAR[65];
             CHECK_OOM(buf);
-            ZeroMemory(buf, sizeof(buf));
 
             CHECK_HR(fullRange->GetText(ec, 0, buf, 64, &charCount));
-            BSTR bstr = SysAllocString(buf);
+            BSTR bstr = SysAllocStringLen(buf, charCount);
             delete[] buf;
             CHECK_OOM(bstr);
 
