@@ -144,7 +144,7 @@ namespace libtf
             return hr;
         }
 #pragma endregion
-#pragma ITfTextEditSink
+#pragma region ITfTextEditSink
         /**
          * @brief Get PreEdit text and its selection
          */
