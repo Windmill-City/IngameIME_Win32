@@ -149,7 +149,7 @@ HRESULT libtf_get_focus_wnd(libtf_pInputContext ctx, HWND *hWnd)
  * 
  * @return HRESULT 
  */
-HRESULT libtf_set_conversion_mode(libtf_pInputContext ctx, ConversionMode mode)
+HRESULT libtf_set_conversion_mode(libtf_pInputContext ctx, libtf_ConversionMode mode)
 {
 #ifdef USE_TfThread
     auto future = ctx->tfThread->enqueue(
@@ -169,7 +169,7 @@ HRESULT libtf_set_conversion_mode(libtf_pInputContext ctx, ConversionMode mode)
  * 
  * @return HRESULT 
  */
-HRESULT libtf_set_sentence_mode(libtf_pInputContext ctx, SentenceMode mode)
+HRESULT libtf_set_sentence_mode(libtf_pInputContext ctx, libtf_SentenceMode mode)
 {
 #ifdef USE_TfThread
     auto future = ctx->tfThread->enqueue(
@@ -232,7 +232,7 @@ HRESULT libtf_set_show_candidate_list_wnd(libtf_pInputContext ctx, bool show)
 /**
  * @brief Set Composition Callback
  */
-HRESULT libtf_set_composition_callback(libtf_pInputContext ctx, CallbackComposition callback)
+HRESULT libtf_set_composition_callback(libtf_pInputContext ctx, libtf_CallbackComposition callback)
 {
 #ifdef USE_TfThread
     auto future = ctx->tfThread->enqueue(
@@ -252,7 +252,7 @@ HRESULT libtf_set_composition_callback(libtf_pInputContext ctx, CallbackComposit
 /**
  * @brief Set PreEdit Bounding Box Callback
  */
-HRESULT libtf_set_bounding_box_callback(libtf_pInputContext ctx, CallbackBoundingBox callback)
+HRESULT libtf_set_bounding_box_callback(libtf_pInputContext ctx, libtf_CallbackBoundingBox callback)
 {
 #ifdef USE_TfThread
     auto future = ctx->tfThread->enqueue(
@@ -272,11 +272,11 @@ HRESULT libtf_set_bounding_box_callback(libtf_pInputContext ctx, CallbackBoundin
 /**
  * @brief Set Candidate List Callback
  */
-HRESULT libtf_set_candidate_list_callback(libtf_pInputContext ctx, CallbackCandidateList callback)
+HRESULT libtf_set_candidate_list_callback(libtf_pInputContext ctx, libtf_CallbackCandidateList callback)
 {
 #ifdef USE_TfThread
     auto future = ctx->tfThread->enqueue(
-        [ctx](CallbackCandidateList callback)
+        [ctx](libtf_CallbackCandidateList callback)
         {
             ctx->ctx->m_candHandler->m_sigCandidateList = callback;
             return S_OK;
@@ -292,7 +292,7 @@ HRESULT libtf_set_candidate_list_callback(libtf_pInputContext ctx, CallbackCandi
 /**
  * @brief Set Conversion mode Callback
  */
-HRESULT libtf_set_conversion_mode_callback(libtf_pInputContext ctx, CallbackConversionMode callback)
+HRESULT libtf_set_conversion_mode_callback(libtf_pInputContext ctx, libtf_CallbackConversionMode callback)
 {
 #ifdef USE_TfThread
     auto future = ctx->tfThread->enqueue(
@@ -312,7 +312,7 @@ HRESULT libtf_set_conversion_mode_callback(libtf_pInputContext ctx, CallbackConv
 /**
  * @brief Set Sentence mode Callback
  */
-HRESULT libtf_set_sentence_mode_callback(libtf_pInputContext ctx, CallbackSentenceMode callback)
+HRESULT libtf_set_sentence_mode_callback(libtf_pInputContext ctx, libtf_CallbackSentenceMode callback)
 {
 #ifdef USE_TfThread
     auto future = ctx->tfThread->enqueue(

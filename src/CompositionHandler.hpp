@@ -8,28 +8,28 @@
 
 extern "C"
 {
-    typedef enum CompositionState
+    typedef enum libtf_CompositionState
     {
-        CompositionBegin,
-        CompositionUpdate,
-        CompositionEnd
-    } CompositionState_t;
-    typedef RECT BoundingBox_t;
-    typedef BSTR PreEdit;
-    typedef struct Composition
+        libtf_CompositionBegin,
+        libtf_CompositionUpdate,
+        libtf_CompositionEnd
+    } libtf_CompositionState_t;
+    typedef RECT libtf_BoundingBox_t;
+    typedef BSTR libtf_PreEdit;
+    typedef struct libtf_Composition
     {
-        CompositionState_t state;
+        libtf_CompositionState_t state;
         /**
          * @brief Only Available at CompositionUpdate
          */
-        PreEdit preEdit;
+        libtf_PreEdit preEdit;
         /**
          * @brief Only Available at CompositionUpdate
          */
         long selection[2];
-    } Composition_t, *pComposition;
-    typedef void (*CallbackComposition)(Composition_t);
-    typedef HRESULT (*CallbackBoundingBox)(BoundingBox_t *);
+    } libtf_Composition_t, *libtf_pComposition;
+    typedef void (*libtf_CallbackComposition)(libtf_Composition_t);
+    typedef HRESULT (*libtf_CallbackBoundingBox)(libtf_BoundingBox_t *);
 }
 
 namespace libtf
@@ -45,15 +45,15 @@ namespace libtf
         /**
          * @brief Callback when PreEdit updates
          */
-        typedef std::function<void(Composition_t)> signalComposition;
-        signalComposition m_sigComposition = [](Composition_t) {};
+        typedef std::function<void(libtf_Composition_t)> signalComposition;
+        signalComposition m_sigComposition = [](libtf_Composition_t) {};
 
         /**
          * @brief Callback to get PreEdit's BoundingBox
          * for positioning Candidate List window
          */
-        typedef std::function<void(BoundingBox_t *)> signalBoundingBox;
-        signalBoundingBox m_sigBoundingBox = [](BoundingBox_t *) {};
+        typedef std::function<void(libtf_BoundingBox_t *)> signalBoundingBox;
+        signalBoundingBox m_sigBoundingBox = [](libtf_BoundingBox_t *) {};
 
         /**
          * @brief Handle input method commit str
@@ -103,7 +103,7 @@ namespace libtf
             //Always allow Composition start
             *pfOk = TRUE;
 
-            m_sigComposition({CompositionBegin});
+            m_sigComposition({libtf_CompositionBegin});
 
             return S_OK;
         }
@@ -130,7 +130,7 @@ namespace libtf
          */
         HRESULT OnEndComposition(ITfCompositionView *pComposition) override
         {
-            m_sigComposition({CompositionEnd});
+            m_sigComposition({libtf_CompositionEnd});
 
             HRESULT hr;
             CHECK_HR(m_context->RequestEditSession(m_clientId, m_commitHandler, TF_ES_ASYNC | TF_ES_READWRITE, &hr));
@@ -163,7 +163,7 @@ namespace libtf
             LONG acpStart, len;
             CHECK_HR(selRangeAcp->GetExtent(&acpStart, &len));
 
-            Composition_t composition = {CompositionUpdate, bstr, {acpStart, acpStart + len}};
+            libtf_Composition_t composition = {libtf_CompositionUpdate, bstr, {acpStart, acpStart + len}};
             m_sigComposition(composition);
 
             //Cleanup

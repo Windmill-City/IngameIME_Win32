@@ -7,8 +7,8 @@
 
 extern "C"
 {
-    typedef unsigned long SentenceMode;
-    typedef void (*CallbackSentenceMode)(SentenceMode);
+    typedef unsigned long libtf_SentenceMode;
+    typedef void (*libtf_CallbackSentenceMode)(libtf_SentenceMode);
 }
 
 namespace libtf
@@ -22,8 +22,8 @@ namespace libtf
         TfClientId m_clientId;
 
     public:
-        typedef std::function<void(SentenceMode)> signalSentenceMode;
-        signalSentenceMode sigSentenceMode = [](SentenceMode) {};
+        typedef std::function<void(libtf_SentenceMode)> signalSentenceMode;
+        signalSentenceMode sigSentenceMode = [](libtf_SentenceMode) {};
 
         BEGIN_COM_MAP(SentenceModeHandler)
         COM_INTERFACE_ENTRY(ITfCompartmentEventSink)
@@ -62,7 +62,7 @@ namespace libtf
          * @param mode mode
          * @return HRESULT 
          */
-        HRESULT setSentenceMode(SentenceMode mode)
+        HRESULT setSentenceMode(libtf_SentenceMode mode)
         {
             CComVariant val;
             val.ulVal = mode;

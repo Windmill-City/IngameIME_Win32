@@ -7,8 +7,8 @@
 
 extern "C"
 {
-    typedef BSTR Commit;
-    typedef void (*CallbackCommit)(Commit);
+    typedef BSTR libtf_Commit;
+    typedef void (*libtf_CallbackCommit)(libtf_Commit);
 }
 
 namespace libtf
@@ -22,8 +22,8 @@ namespace libtf
         /**
          * @brief Callback when input method Commit
          */
-        typedef std::function<void(Commit)> signalCommit;
-        signalCommit m_sigCommit = [](Commit) {};
+        typedef std::function<void(libtf_Commit)> signalCommit;
+        signalCommit m_sigCommit = [](libtf_Commit) {};
 
         BEGIN_COM_MAP(CommitHandler)
         COM_INTERFACE_ENTRY(ITfEditSession)

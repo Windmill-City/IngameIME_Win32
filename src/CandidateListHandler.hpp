@@ -7,17 +7,17 @@
 
 extern "C"
 {
-    typedef enum CandidateListState
+    typedef enum libtf_CandidateListState
     {
-        CandidateListBegin,
-        CandidateListUpdate,
-        CandidateListEnd
-    } CandidateListState_t;
+        libtf_CandidateListBegin,
+        libtf_CandidateListUpdate,
+        libtf_CandidateListEnd
+    } libtf_CandidateListState_t;
     /**
      * @brief Candidate String format is Binary String
      */
-    typedef BSTR Candidate;
-    typedef struct CandidateList
+    typedef BSTR libtf_Candidate;
+    typedef struct libtf_CandidateList
     {
         /**
          * @brief Total count of the Candidates
@@ -38,9 +38,9 @@ extern "C"
         /**
          * @brief Array of Candidates
          */
-        Candidate *candidates;
-    } CandidateList_t, *pCandidateList;
-    typedef void (*CallbackCandidateList)(CandidateListState_t, CandidateList_t);
+        libtf_Candidate *candidates;
+    } libtf_CandidateList_t, *libtf_pCandidateList;
+    typedef void (*libtf_CallbackCandidateList)(libtf_CandidateListState_t, libtf_CandidateList_t);
 }
 
 namespace libtf
@@ -96,19 +96,19 @@ namespace libtf
         /**
          * @brief Get Candidate by its index
          */
-        virtual HRESULT getCandidate(CandUIEle candEle, size_t index, Candidate *cand)
+        virtual HRESULT getCandidate(CandUIEle candEle, size_t index, libtf_Candidate *cand)
         {
             CHECK_HR(candEle->GetString((UINT)index, cand));
             return S_OK;
         }
 
-        virtual HRESULT getCandidateList(CandUIEle candEle, pCandidateList list)
+        virtual HRESULT getCandidateList(CandUIEle candEle, libtf_pCandidateList list)
         {
             CHECK_HR(getTotalCount(candEle, list->totalCount));
             CHECK_HR(getPageStartAndEnd(candEle, list->pageStart, list->pageEnd));
             CHECK_HR(getCurSelection(candEle, list->curSelection));
 
-            list->candidates = new Candidate[list->totalCount];
+            list->candidates = new libtf_Candidate[list->totalCount];
             CHECK_OOM(list->candidates);
 
             HRESULT hr;
@@ -168,8 +168,8 @@ namespace libtf
         /**
          * @brief Callback when Candidate List updates
          */
-        typedef std::function<void(CandidateListState_t, CandidateList_t)> signalCandidateList;
-        signalCandidateList m_sigCandidateList = [](CandidateListState_t, CandidateList_t) {};
+        typedef std::function<void(libtf_CandidateListState_t, libtf_CandidateList_t)> signalCandidateList;
+        signalCandidateList m_sigCandidateList = [](libtf_CandidateListState_t, libtf_CandidateList_t) {};
 
         /**
          * @brief Specific provider for different input method
@@ -259,8 +259,8 @@ namespace libtf
                 *pbShow = m_showIMCandidateListWindow;
 
                 //Empty list
-                CandidateList_t list = {0};
-                m_sigCandidateList(CandidateListState::CandidateListBegin, list);
+                libtf_CandidateList_t list = {0};
+                m_sigCandidateList(libtf_CandidateListState::libtf_CandidateListBegin, list);
             }
             return S_OK;
         }
@@ -273,10 +273,10 @@ namespace libtf
         {
             if (m_curCandEle == getCandidateListUIElement(dwUIElementId))
             {
-                CandidateList_t list;
+                libtf_CandidateList_t list;
                 CHECK_HR(provider->getCandidateList(m_curCandEle, &list));
 
-                m_sigCandidateList(CandidateListState::CandidateListUpdate, list);
+                m_sigCandidateList(libtf_CandidateListState::libtf_CandidateListUpdate, list);
 
                 //Cleanup
                 for (size_t i = 0; i < list.totalCount; i++)
@@ -299,8 +299,8 @@ namespace libtf
                 m_curCandEle.Release();
 
                 //Empty list
-                CandidateList_t list = {0};
-                m_sigCandidateList(CandidateListState::CandidateListEnd, list);
+                libtf_CandidateList_t list = {0};
+                m_sigCandidateList(libtf_CandidateListState::libtf_CandidateListEnd, list);
             }
             return S_OK;
         }

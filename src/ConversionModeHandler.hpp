@@ -7,8 +7,8 @@
 
 extern "C"
 {
-    typedef unsigned long ConversionMode;
-    typedef void (*CallbackConversionMode)(ConversionMode);
+    typedef unsigned long libtf_ConversionMode;
+    typedef void (*libtf_CallbackConversionMode)(libtf_ConversionMode);
 }
 
 namespace libtf
@@ -22,8 +22,8 @@ namespace libtf
         TfClientId m_clientId;
 
     public:
-        typedef std::function<void(ConversionMode)> signalConversionMode;
-        signalConversionMode sigConversionMode = [](ConversionMode) {};
+        typedef std::function<void(libtf_ConversionMode)> signalConversionMode;
+        signalConversionMode sigConversionMode = [](libtf_ConversionMode) {};
 
         BEGIN_COM_MAP(ConversionModeHandler)
         COM_INTERFACE_ENTRY(ITfCompartmentEventSink)
@@ -62,7 +62,7 @@ namespace libtf
          * @param mode mode
          * @return HRESULT 
          */
-        HRESULT setConversionMode(ConversionMode mode)
+        HRESULT setConversionMode(libtf_ConversionMode mode)
         {
             CComVariant val;
             val.ulVal = mode;

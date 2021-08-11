@@ -68,14 +68,14 @@ extern "C"
      * 
      * @return HRESULT 
      */
-    HRESULT libtf_set_conversion_mode(libtf_pInputContext, ConversionMode);
+    HRESULT libtf_set_conversion_mode(libtf_pInputContext, libtf_ConversionMode);
 
     /**
      * @brief Set Sentence Mode
      * 
      * @return HRESULT 
      */
-    HRESULT libtf_set_sentence_mode(libtf_pInputContext, SentenceMode);
+    HRESULT libtf_set_sentence_mode(libtf_pInputContext, libtf_SentenceMode);
 
     /**
      * @brief Set if in Full Screen mode
@@ -95,26 +95,26 @@ extern "C"
     /**
      * @brief Set Composition Callback
      */
-    HRESULT libtf_set_composition_callback(libtf_pInputContext, CallbackComposition);
+    HRESULT libtf_set_composition_callback(libtf_pInputContext, libtf_CallbackComposition);
 
     /**
      * @brief Set PreEdit Bounding Box Callback
      */
-    HRESULT libtf_set_bounding_box_callback(libtf_pInputContext, CallbackBoundingBox);
+    HRESULT libtf_set_bounding_box_callback(libtf_pInputContext, libtf_CallbackBoundingBox);
 
     /**
      * @brief Set Candidate List Callback
      */
-    HRESULT libtf_set_candidate_list_callback(libtf_pInputContext, CallbackCandidateList);
+    HRESULT libtf_set_candidate_list_callback(libtf_pInputContext, libtf_CallbackCandidateList);
 
     /**
      * @brief Set Conversion mode Callback
      */
-    HRESULT libtf_set_conversion_mode_callback(libtf_pInputContext, CallbackConversionMode);
+    HRESULT libtf_set_conversion_mode_callback(libtf_pInputContext, libtf_CallbackConversionMode);
 
     /**
      * @brief Set Sentence mode Callback
      */
-    HRESULT libtf_set_sentence_mode_callback(libtf_pInputContext, CallbackSentenceMode);
+    HRESULT libtf_set_sentence_mode_callback(libtf_pInputContext, libtf_CallbackSentenceMode);
 #pragma endregion
 }
