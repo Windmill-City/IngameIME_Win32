@@ -29,7 +29,7 @@ extern "C"
         long selection[2];
     } libtf_Composition_t, *libtf_pComposition;
     typedef void (*libtf_CallbackComposition)(libtf_Composition_t);
-    typedef HRESULT (*libtf_CallbackBoundingBox)(libtf_BoundingBox_t *);
+    typedef void (*libtf_CallbackBoundingBox)(libtf_BoundingBox_t *);
 }
 
 namespace libtf
