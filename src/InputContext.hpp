@@ -228,7 +228,8 @@ namespace libtf
          */
         HRESULT GetScreenExt(RECT *prc) override
         {
-            GetWindowRect(m_hWnd, prc);
+            if (m_hWnd)
+                GetWindowRect(m_hWnd, prc);
             return S_OK;
         }
 
