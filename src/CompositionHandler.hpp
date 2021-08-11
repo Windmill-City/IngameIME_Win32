@@ -177,7 +177,7 @@ namespace libtf
             m_sigComposition(composition);
 
             //Cleanup
-            SysReleaseString(bstr);
+            SysFreeString(bstr);
             delete[] buf;
 
             return S_OK;

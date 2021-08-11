@@ -78,7 +78,7 @@ namespace libtf
             m_sigCommit(bstr);
 
             //Cleanup
-            SysReleaseString(bstr);
+            SysFreeString(bstr);
             delete[] buf;
 
             //Clean the handled Commit str

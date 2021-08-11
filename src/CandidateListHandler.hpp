@@ -126,7 +126,7 @@ namespace libtf
                     //Cleanup
                     for (size_t k = 0; k < i; k++)
                     {
-                        SysReleaseString(list->candidates[k]);
+                        SysFreeString(list->candidates[k]);
                     }
                     delete[] list->candidates;
                     return hr;
@@ -284,7 +284,7 @@ namespace libtf
                 //Cleanup
                 for (size_t i = 0; i < list.totalCount; i++)
                 {
-                    SysReleaseString(list.candidates[i]);
+                    SysFreeString(list.candidates[i]);
                 }
                 delete[] list.candidates;
             }
