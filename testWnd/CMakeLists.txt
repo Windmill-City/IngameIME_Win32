@@ -4,10 +4,16 @@ project(testWnd VERSION 0.1.0)
 include(CTest)
 enable_testing()
 
-link_libraries(glfw)
-link_libraries(libtf)
+add_subdirectory(../ ./libtf)
+add_subdirectory(glfw ./glfw)
+
+include_directories(../src/ ./glfw/include)
+
+target_link_libraries(glfw)
 
 add_executable(testWnd main.cpp)
+target_link_libraries(testWnd glfw ${GLFW_LIBRARIES})
+target_link_libraries(testWnd libtf)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
