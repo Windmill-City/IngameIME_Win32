@@ -34,11 +34,12 @@ extern "C"
 
 namespace libtf
 {
-    class CompositionHandler : public CComObjectRoot, public ITfContextOwnerCompositionSink, public ITfEditSession
+    class CompositionHandler : public CComObjectRoot, public ITfContextOwnerCompositionSink, public ITfTextEditSink
     {
     protected:
         TfClientId m_clientId;
         CComPtr<ITfContext> m_context;
+        DWORD m_textEditSinkCookie;
         CComPtr<ITfCompositionView> m_compositionView;
 
     public:
@@ -62,7 +63,7 @@ namespace libtf
 
         BEGIN_COM_MAP(CompositionHandler)
         COM_INTERFACE_ENTRY(ITfContextOwnerCompositionSink)
-        COM_INTERFACE_ENTRY(ITfEditSession)
+        COM_INTERFACE_ENTRY(ITfTextEditSink)
         END_COM_MAP()
 
         /**
@@ -77,6 +78,10 @@ namespace libtf
             m_clientId = clientId;
             m_context = context;
             CHECK_HR(m_commitHandler->initialize(m_context));
+
+            CComQIPtr<ITfSource> evtCtx = m_context;
+            CHECK_HR(evtCtx->AdviseSink(IID_ITfTextEditSink, (ITfTextEditSink *)this, &m_textEditSinkCookie));
+
             return S_OK;
         }
 
@@ -88,6 +93,10 @@ namespace libtf
         HRESULT dispose()
         {
             CHECK_HR(m_commitHandler->dispose());
+
+            CComQIPtr<ITfSource> evtCtx = m_context;
+            CHECK_HR(evtCtx->UnadviseSink(m_textEditSinkCookie));
+
             return S_OK;
         }
 
@@ -109,18 +118,14 @@ namespace libtf
         }
 
         /**
-         * @brief Request EditSession to get Composition data
+         * @brief Handle Composition Update at ITfTextEditSink
          * 
          * @return HRESULT 
          */
         HRESULT OnUpdateComposition(ITfCompositionView *pComposition, ITfRange *pRangeNew) override
         {
             m_compositionView = pComposition;
-
-            HRESULT hr;
-            CHECK_HR(m_context->RequestEditSession(m_clientId, this, TF_ES_ASYNC | TF_ES_READ, &hr));
-
-            return hr;
+            return S_OK;
         }
 
         /**
@@ -132,17 +137,22 @@ namespace libtf
         {
             m_sigComposition({libtf_CompositionEnd});
 
+            m_compositionView.Release();
+
             HRESULT hr;
             CHECK_HR(m_context->RequestEditSession(m_clientId, m_commitHandler, TF_ES_ASYNC | TF_ES_READWRITE, &hr));
             return hr;
         }
 #pragma endregion
-#pragma region ITfEditSession
+#pragma ITfTextEditSink
         /**
          * @brief Get PreEdit text and its selection
          */
-        HRESULT DoEditSession(TfEditCookie ec) override
+        HRESULT OnEndEdit(ITfContext *pic, TfEditCookie ec, ITfEditRecord *pEditRecord) override
         {
+            //No active composition
+            if (!m_compositionView) return S_OK;
+
             CComPtr<ITfRange> preEditRange;
             CHECK_HR(m_compositionView->GetRange(&preEditRange));
 
@@ -169,7 +179,6 @@ namespace libtf
             //Cleanup
             SysReleaseString(bstr);
             delete[] buf;
-            m_compositionView.Release();
 
             return S_OK;
         }

@@ -82,16 +82,15 @@ namespace libtf
             //Prevent creation of new Composition
             CHECK_HR(setIMState(false));
 
-            CHECK_HR(terminateComposition());
-            //Context will un-advise all sink when pop
-            CHECK_HR(m_documentMgr->Pop(TF_POPF_ALL));
-
             //Cleanup
             CHECK_HR(m_compositionHandler->dispose());
             CHECK_HR(m_candHandler->dispose());
             CHECK_HR(m_fullScHandler->dispose());
             CHECK_HR(m_conversionHander->dispose());
             CHECK_HR(m_sentenceHander->dispose());
+
+            //Context will un-advise all the sinks when pop
+            CHECK_HR(m_documentMgr->Pop(TF_POPF_ALL));
 
             CHECK_HR(m_threadMgr->Deactivate());
 
