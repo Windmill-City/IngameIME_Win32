@@ -214,7 +214,7 @@ namespace libtf
         HRESULT GetTextExt(LONG acpStart, LONG acpEnd, RECT *prc, BOOL *pfClipped) override
         {
             //Always return the bounding box of pre edit text, for positioning the Candidate List window
-            m_compHandler->m_sigBoundingBox(m_hWnd, prc);
+            m_compHandler->m_sigBoundingBox(prc);
             return S_OK;
         }
 
