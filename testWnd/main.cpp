@@ -154,7 +154,54 @@ void onCandidateList(libtf_CandidateList_t list)
         break;
     }
 }
+void onInputProcessor(libtf_InputProcessorActivation_t activation)
+{
+    printf("[%s] [%x-%x-%x-%llx] State:%d\n",
+           activation.dwProfileType & TF_PROFILETYPE_INPUTPROCESSOR ? "TIP" : "HKL",
+           activation.guidProfile.Data1, activation.guidProfile.Data2, activation.guidProfile.Data3, *(unsigned long long *)activation.guidProfile.Data4,
+           activation.dwFlags & TF_IPSINK_FLAG_ACTIVE);
+}
 #pragma endregion
+
+void testGetCurInputProcessor()
+{
+    libtf_InputProcessorProfile_t curActiveInputProcessor;
+    libtf_get_active_input_processor(&curActiveInputProcessor);
+    printf("Cur Active:[%s][%x-%x-%x-%llx]Lang Id:%d, Active:%d\n",
+           curActiveInputProcessor.dwProfileType & TF_PROFILETYPE_INPUTPROCESSOR ? "TIP" : "HKL",
+           curActiveInputProcessor.guidProfile.Data1, curActiveInputProcessor.guidProfile.Data2, curActiveInputProcessor.guidProfile.Data3, *(unsigned long long *)curActiveInputProcessor.guidProfile.Data4,
+           curActiveInputProcessor.langid,
+           curActiveInputProcessor.dwFlags & TF_IPP_FLAG_ACTIVE);
+}
+
+void testSetInputProcessor()
+{
+    size_t fetched;
+    libtf_get_input_processors(NULL, 0, &fetched);
+    libtf_pInputProcessorProfile profiles = new libtf_InputProcessorProfile_t[fetched];
+    libtf_get_input_processors(profiles, fetched, &fetched);
+
+    printf("Found %d InputProcessors\n", (int)fetched);
+    for (size_t i = 0; i < fetched; i++)
+    {
+        printf("[%d][%s][%x-%x-%x-%llx]Lang Id:%d, Active:%d\n",
+               (int)i,
+               profiles[i].dwProfileType & TF_PROFILETYPE_INPUTPROCESSOR ? "TIP" : "HKL",
+               profiles[i].guidProfile.Data1, profiles[i].guidProfile.Data2, profiles[i].guidProfile.Data3, *(unsigned long long *)profiles[i].guidProfile.Data4,
+               profiles[i].langid,
+               profiles[i].dwFlags & TF_IPP_FLAG_ACTIVE);
+
+        //If the input processor is not active, try to active it
+        if (!(profiles[i].dwFlags & TF_IPP_FLAG_ACTIVE))
+        {
+            testGetCurInputProcessor();
+            libtf_set_active_input_processor(profiles[i]);
+            testGetCurInputProcessor();
+        }
+    }
+
+    delete[] profiles;
+}
 
 int main()
 {
@@ -174,6 +221,8 @@ int main()
         }
         glfwMakeContextCurrent(window);
 
+        testSetInputProcessor();
+
 #pragma region libtf init
         CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
         HRESULT hr;
@@ -192,6 +241,7 @@ int main()
         libtf_set_commit_callback(ctx, onCommit);
         libtf_set_candidate_list_callback(ctx, onCandidateList);
         libtf_set_bounding_box_callback(ctx, onBoundingBox);
+        libtf_set_input_processor_callback(ctx, onInputProcessor);
 #pragma endregion
 
         while (!glfwWindowShouldClose(window))

@@ -1,6 +1,96 @@
 #include "libtf.h"
+#include <string>
 
 using namespace libtf;
+#pragma region InputProcesser Profile
+/**
+ * @brief Get available input processor profies of current thread
+ * 
+ * @param profiles Pointer to an array of libtf_InputProcessorProfile_t.
+ *                  This array must be at least maxSize elements in size
+ * @param maxSize the max size of the profiles array
+ * @param fetched if profiles is NULL, return the max number can obtain,
+ *                otherwise, return the number of elements actually obtained
+ */
+HRESULT libtf_get_input_processors(libtf_InputProcessorProfile_t *profiles, size_t maxSize, size_t *fetched)
+{
+    CComPtr<ITfInputProcessorProfiles> inputProcessorProfiles;
+    CHECK_HR(inputProcessorProfiles.CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER));
+    CComQIPtr<ITfInputProcessorProfileMgr> inputProcessorMgr = inputProcessorProfiles;
+
+    CComPtr<IEnumTfInputProcessorProfiles> enumProfiles;
+    //Pass 0 to langid to enum all profiles
+    CHECK_HR(inputProcessorMgr->EnumProfiles(0, &enumProfiles));
+
+    size_t number = 0;
+    libtf_InputProcessorProfile_t profile[1];
+    while (true)
+    {
+        ULONG fetch;
+        CHECK_HR(enumProfiles->Next(1, profile, &fetch));
+
+        //No more
+        if (fetch == 0) break;
+
+        //InputProcessor not enabled can't be use
+        if (!(profile[0].dwFlags & TF_IPP_FLAG_ENABLED)) continue;
+
+        //Copy data
+        if (profiles)
+        {
+            //Reach max size
+            if (number >= maxSize) break;
+
+            memcpy(&profiles[number], &profile[0], sizeof(libtf_InputProcessorProfile_t));
+            memcpy(&profiles[number].clsid, &profile[0].clsid, sizeof(CLSID));
+            memcpy(&profiles[number].guidProfile, &profile[0].guidProfile, sizeof(GUID));
+            memcpy(&profiles[number].catid, &profile[0].catid, sizeof(GUID));
+            memcpy(&profiles[number].hklSubstitute, &profile[0].hklSubstitute, sizeof(HKL));
+            memcpy(&profiles[number].hkl, &profile[0].hkl, sizeof(HKL));
+        }
+
+        number++;
+    }
+    *fetched = number;
+
+    return S_OK;
+}
+
+/**
+ * @brief Get active input processor profie of current thread
+ */
+HRESULT libtf_get_active_input_processor(libtf_InputProcessorProfile_t *profile)
+{
+    CComPtr<ITfInputProcessorProfiles> inputProcessorProfiles;
+    CHECK_HR(inputProcessorProfiles.CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER));
+    CComQIPtr<ITfInputProcessorProfileMgr> inputProcessorMgr = inputProcessorProfiles;
+
+    CHECK_HR(inputProcessorMgr->GetActiveProfile(GUID_TFCAT_TIP_KEYBOARD, profile));
+
+    return S_OK;
+}
+
+/**
+ * @brief Set active input processor profie of current thread
+ */
+HRESULT libtf_set_active_input_processor(libtf_InputProcessorProfile_t profile)
+{
+    CComPtr<ITfInputProcessorProfiles> inputProcessorProfiles;
+    CHECK_HR(inputProcessorProfiles.CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER));
+    CComQIPtr<ITfInputProcessorProfileMgr> inputProcessorMgr = inputProcessorProfiles;
+
+    CHECK_HR(inputProcessorMgr->ActivateProfile(profile.dwProfileType,
+                                                profile.langid,
+                                                profile.clsid,
+                                                profile.guidProfile,
+                                                profile.hkl,
+                                                TF_IPPMF_DONTCARECURRENTINPUTLANGUAGE));
+
+    return S_OK;
+}
+#pragma endregion
+
+#pragma region Context
 /**
  * @brief Create input context on calling thread
  */
@@ -111,6 +201,7 @@ HRESULT libtf_set_show_candidate_list_wnd(libtf_pInputContext ctx, bool show)
     ctx->ctx->m_candHandler->m_showIMCandidateListWindow = show;
     return S_OK;
 }
+#pragma endregion
 
 #pragma region setCallback
 /**
@@ -164,6 +255,15 @@ HRESULT libtf_set_conversion_mode_callback(libtf_pInputContext ctx, libtf_Callba
 HRESULT libtf_set_sentence_mode_callback(libtf_pInputContext ctx, libtf_CallbackSentenceMode callback)
 {
     ctx->ctx->m_sentenceHander->sigSentenceMode = callback;
+    return S_OK;
+}
+
+/**
+ * @brief Set Input Processor Callback
+ */
+HRESULT libtf_set_input_processor_callback(libtf_pInputContext ctx, libtf_CallbackInputProcessor callback)
+{
+    ctx->ctx->m_inputProcessor->sigInputProcessor = callback;
     return S_OK;
 }
 #pragma endregion

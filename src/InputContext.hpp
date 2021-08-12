@@ -5,6 +5,7 @@
 #include "CompositionHandler.hpp"
 #include "ConversionModeHandler.hpp"
 #include "FullScreenUIElementHandler.hpp"
+#include "InputProcessorHandler.hpp"
 #include "SentenceModeHandler.hpp"
 
 #include <msctf.h>
@@ -28,6 +29,7 @@ namespace libtf
         CComPtr<CCompositionHandler> m_compositionHandler = new CCompositionHandler();
         CComPtr<CConversionModeHandler> m_conversionHander = new CConversionModeHandler();
         CComPtr<CSentenceModeHandler> m_sentenceHander = new CSentenceModeHandler();
+        CComPtr<CInputProcessorHandler> m_inputProcessor = new CInputProcessorHandler();
 
         BEGIN_COM_MAP(InputContext)
         COM_INTERFACE_ENTRY(ITfContextOwner)
@@ -39,7 +41,7 @@ namespace libtf
          * @return HRESULT 
          */
         HRESULT initialize()
-        {   
+        {
             CHECK_HR(m_threadMgr.CoCreateInstance(CLSID_TF_ThreadMgr, NULL, CLSCTX_INPROC_SERVER));
 
             CComQIPtr<ITfThreadMgrEx> threadMgrEx = m_threadMgr;
@@ -61,6 +63,8 @@ namespace libtf
             if (FAILED(hr = evtCtx->AdviseSink(IID_ITfContextOwner, this, &m_contextOwnerCookie))) goto Cleanup;
 
             if (FAILED(hr = m_compositionHandler->initialize(m_clientId, m_context))) goto Cleanup;
+
+            if (FAILED(hr = m_inputProcessor->initialize(m_threadMgr))) goto Cleanup;
 
             if (FAILED(hr = m_candHandler->initialize(uiElementMgr))) goto Cleanup;
             if (FAILED(hr = m_fullScHandler->initialize(uiElementMgr))) goto Cleanup;
@@ -86,6 +90,7 @@ namespace libtf
 
             //Cleanup
             CHECK_HR(m_compositionHandler->dispose());
+            CHECK_HR(m_inputProcessor->dispose());
             CHECK_HR(m_candHandler->dispose());
             CHECK_HR(m_fullScHandler->dispose());
             CHECK_HR(m_conversionHander->dispose());

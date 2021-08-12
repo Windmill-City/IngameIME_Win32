@@ -2,17 +2,46 @@
 #include "InputContext.hpp"
 #include "libtfdef.h"
 
-typedef struct InputContext
+namespace libtf
 {
-    /**
+    typedef struct tagInputContext
+    {
+        /**
      * @brief Current Window of the context
      */
-    HWND hWnd;
-    CComPtr<libtf::CInputContext> ctx;
-} InputContext_t, *libtf_pInputContext;
+        HWND hWnd;
+        CComPtr<libtf::CInputContext> ctx;
+    } InputContext_t;
+}
 
 extern "C"
 {
+    typedef struct libtf::tagInputContext *libtf_pInputContext;
+    typedef struct TF_INPUTPROCESSORPROFILE libtf_InputProcessorProfile_t, *libtf_pInputProcessorProfile;
+#pragma region InputProcesser Profile
+    /**
+     * @brief Get available input processor profies of current thread
+     * 
+     * @param profiles Pointer to an array of libtf_InputProcessorProfile_t.
+     *                  This array must be at least maxSize elements in size
+     * @param maxSize the max size of the profiles array
+     * @param fetched if profiles is NULL, return the max number can obtain,
+     *                otherwise, return the number of elements actually obtained
+     */
+    HRESULT libtf_get_input_processors(libtf_InputProcessorProfile_t *profiles, size_t maxSize, size_t *fetched);
+
+    /**
+     * @brief Get active input processor profie of current thread
+     */
+    HRESULT libtf_get_active_input_processor(libtf_InputProcessorProfile_t *);
+
+    /**
+     * @brief Set active input processor profie of current thread
+     */
+    HRESULT libtf_set_active_input_processor(libtf_InputProcessorProfile_t);
+#pragma endregion
+
+#pragma region Context
     /**
      * @brief Create input context on calling thread
      */
@@ -81,6 +110,7 @@ extern "C"
      * @return HRESULT 
      */
     HRESULT libtf_set_show_candidate_list_wnd(libtf_pInputContext, bool);
+#pragma endregion
 
 #pragma region setCallback
     /**
@@ -112,5 +142,10 @@ extern "C"
      * @brief Set Sentence mode Callback
      */
     HRESULT libtf_set_sentence_mode_callback(libtf_pInputContext, libtf_CallbackSentenceMode);
+
+    /**
+     * @brief Set Input Processor Callback
+     */
+    HRESULT libtf_set_input_processor_callback(libtf_pInputContext, libtf_CallbackInputProcessor);
 #pragma endregion
 }
