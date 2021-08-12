@@ -16,7 +16,7 @@ extern "C"
     } libtf_CompositionState_t;
     typedef RECT libtf_BoundingBox_t;
     typedef BSTR libtf_PreEdit;
-    typedef struct libtf_Composition
+    typedef struct libtf_tagComposition
     {
         libtf_CompositionState_t state;
         /**

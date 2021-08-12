@@ -18,7 +18,7 @@ extern "C"
      * @brief Candidate String format is Binary String
      */
     typedef BSTR libtf_Candidate;
-    typedef struct libtf_CandidateList
+    typedef struct libtf_tagCandidateList
     {
         /**
          * @brief The property below only available at CandidateListUpdate
