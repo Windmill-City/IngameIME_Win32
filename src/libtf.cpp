@@ -232,7 +232,7 @@ HRESULT libtf_set_full_screen(libtf_pInputContext ctx, bool isFullScreen)
  */
 HRESULT libtf_set_show_candidate_list_wnd(libtf_pInputContext ctx, bool show)
 {
-    ctx->ctx->m_candHandler->m_showIMCandidateListWindow = show;
+    ctx->ctx->m_candHandler->m_show = show;
     return S_OK;
 }
 
@@ -254,7 +254,7 @@ HRESULT libtf_get_full_screen(libtf_pInputContext ctx, bool* isFullScreen)
  */
 HRESULT libtf_get_show_candidate_list_wnd(libtf_pInputContext ctx, bool* show)
 {
-    *show = ctx->ctx->m_candHandler->m_showIMCandidateListWindow;
+    *show = ctx->ctx->m_candHandler->m_show;
     return S_OK;
 }
 #pragma endregion

@@ -157,7 +157,7 @@ namespace libtf {
          *
          * Set to false to get candidate data from IM
          */
-        bool m_showIMCandidateListWindow = true;
+        bool m_show = true;
 
         /**
          * @brief Callback when Candidate List updates
@@ -246,7 +246,7 @@ namespace libtf {
             if (uiElement) {
                 m_curCandEle = uiElement;
 
-                *pbShow = m_showIMCandidateListWindow;
+                *pbShow = m_show;
 
                 m_sigCandidateList({libtf_CandidateListBegin});
             }
