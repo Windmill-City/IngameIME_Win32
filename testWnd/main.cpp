@@ -183,7 +183,9 @@ int main()
         }
         glfwMakeContextCurrent(window);
 
-        CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+        //libtf support both ApartMentThreaded and MultiThreaded
+        //CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+        CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
         testSetInputProcessor();
 
