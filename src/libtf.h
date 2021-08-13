@@ -94,6 +94,16 @@ HRESULT libtf_get_focus_wnd(libtf_pInputContext, HWND*);
 HRESULT libtf_set_conversion_mode(libtf_pInputContext, libtf_ConversionMode);
 
 /**
+ * @brief Get Sentence Mode of the context
+ */
+HRESULT libtf_get_sentence_mode(libtf_pInputContext, libtf_SentenceMode*);
+
+/**
+ * @brief Get Conversion Mode of the context
+ */
+HRESULT libtf_get_conversion_mode(libtf_pInputContext, libtf_ConversionMode*);
+
+/**
  * @brief Set Sentence Mode of the context
  */
 HRESULT libtf_set_sentence_mode(libtf_pInputContext, libtf_SentenceMode);
@@ -111,6 +121,20 @@ HRESULT libtf_set_full_screen(libtf_pInputContext, bool);
  * @note this call will not be handled in the creator thread of the context
  */
 HRESULT libtf_set_show_candidate_list_wnd(libtf_pInputContext, bool);
+
+/**
+ * @brief Get Full Screen mode of the context
+ *
+ * @note this call will not be handled in the creator thread of the context
+ */
+HRESULT libtf_get_full_screen(libtf_pInputContext, bool*);
+
+/**
+ * @brief Get if input method should show its Candidate Window of the context
+ *
+ * @note this call will not be handled in the creator thread of the context
+ */
+HRESULT libtf_get_show_candidate_list_wnd(libtf_pInputContext, bool*);
 #pragma endregion
 
 /**

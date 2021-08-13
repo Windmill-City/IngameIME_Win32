@@ -157,7 +157,8 @@ HRESULT libtf_get_im_state(libtf_pInputContext ctx, bool* imState)
  * @param hWnd The window who receives the message
  * @param message can be one of WM_SETFOCUS/WM_KILLFOCUS
  */
-HRESULT libtf_on_focus_msg(libtf_pInputContext ctx, HWND hWnd, UINT message) {
+HRESULT libtf_on_focus_msg(libtf_pInputContext ctx, HWND hWnd, UINT message)
+{
     return ctx->ctx->onFocusMsg(hWnd, message);
 }
 
@@ -188,6 +189,32 @@ HRESULT libtf_set_sentence_mode(libtf_pInputContext ctx, libtf_SentenceMode mode
 }
 
 /**
+ * @brief Get Sentence Mode of the context
+ */
+HRESULT libtf_get_sentence_mode(libtf_pInputContext ctx, libtf_SentenceMode* mode)
+{
+    return ctx->ctx->m_sentenceHander->getSentenceMode(mode);
+}
+
+/**
+ * @brief Get Conversion Mode of the context
+ */
+HRESULT libtf_get_conversion_mode(libtf_pInputContext ctx, libtf_ConversionMode* mode)
+{
+    return ctx->ctx->m_conversionHander->getConversionMode(mode);
+}
+
+/**
+ * @brief Set Conversion Mode of the context
+ */
+HRESULT libtf_set_conversion_mode(libtf_pInputContext, libtf_ConversionMode);
+
+/**
+ * @brief Set Sentence Mode of the context
+ */
+HRESULT libtf_set_sentence_mode(libtf_pInputContext, libtf_SentenceMode);
+
+/**
  * @brief Set Full Screen mode of the context
  *
  * @note this call will not be handled in the creator thread of the context
@@ -206,6 +233,28 @@ HRESULT libtf_set_full_screen(libtf_pInputContext ctx, bool isFullScreen)
 HRESULT libtf_set_show_candidate_list_wnd(libtf_pInputContext ctx, bool show)
 {
     ctx->ctx->m_candHandler->m_showIMCandidateListWindow = show;
+    return S_OK;
+}
+
+/**
+ * @brief Get Full Screen mode of the context
+ *
+ * @note this call will not be handled in the creator thread of the context
+ */
+HRESULT libtf_get_full_screen(libtf_pInputContext ctx, bool* isFullScreen)
+{
+    *isFullScreen = ctx->ctx->m_fullScHandler->m_isFullScreen;
+    return S_OK;
+}
+
+/**
+ * @brief Get if input method should show its Candidate Window of the context
+ *
+ * @note this call will not be handled in the creator thread of the context
+ */
+HRESULT libtf_get_show_candidate_list_wnd(libtf_pInputContext ctx, bool* show)
+{
+    *show = ctx->ctx->m_candHandler->m_showIMCandidateListWindow;
     return S_OK;
 }
 #pragma endregion
