@@ -5,25 +5,22 @@
 #include <functional>
 #include <msctf.h>
 
-extern "C"
-{
-    typedef BSTR libtf_Commit;
-    typedef void (*libtf_CallbackCommit)(libtf_Commit);
+extern "C" {
+typedef BSTR libtf_Commit;
+typedef void (*libtf_CallbackCommit)(libtf_Commit);
 }
 
-namespace libtf
-{
-    class CommitHandler : public CComObjectRoot, public ITfEditSession
-    {
-    protected:
+namespace libtf {
+    class CommitHandler : public CComObjectRoot, public ITfEditSession {
+      protected:
         CComPtr<ITfContext> m_context;
 
-    public:
+      public:
         /**
          * @brief Callback when input method Commit
          */
         typedef std::function<void(libtf_Commit)> signalCommit;
-        signalCommit m_sigCommit = [](libtf_Commit) {};
+        signalCommit                              m_sigCommit = [](libtf_Commit) {};
 
         BEGIN_COM_MAP(CommitHandler)
         COM_INTERFACE_ENTRY(ITfEditSession)
@@ -31,9 +28,9 @@ namespace libtf
 
         /**
          * @brief Initialize handler
-         * 
+         *
          * @param context ITfContext to get Commit
-         * @return HRESULT 
+         * @return HRESULT
          */
         HRESULT initialize(CComPtr<ITfContext> context)
         {
@@ -43,8 +40,8 @@ namespace libtf
 
         /**
          * @brief Dispose the handler
-         * 
-         * @return HRESULT 
+         *
+         * @return HRESULT
          */
         HRESULT dispose()
         {
@@ -56,7 +53,7 @@ namespace libtf
          */
         HRESULT DoEditSession(TfEditCookie ec) override
         {
-            //Get a range which cover all the text in the context
+            // Get a range which cover all the text in the context
             CComPtr<ITfRange> fullRange;
             CComPtr<ITfRange> rangeAtEnd;
             CHECK_HR(m_context->GetStart(ec, &fullRange));
@@ -67,8 +64,8 @@ namespace libtf
             CHECK_HR(fullRange->IsEmpty(ec, &isEmpty));
             if (isEmpty) return S_OK;
 
-            ULONG charCount;
-            WCHAR *buf = new WCHAR[65];
+            ULONG  charCount;
+            WCHAR* buf = new WCHAR[65];
             CHECK_OOM(buf);
 
             CHECK_HR(fullRange->GetText(ec, 0, buf, 64, &charCount));
@@ -78,10 +75,10 @@ namespace libtf
 
             m_sigCommit(bstr);
 
-            //Cleanup
+            // Cleanup
             SysFreeString(bstr);
 
-            //Clean the handled Commit str
+            // Clean the handled Commit str
             CHECK_HR(fullRange->SetText(ec, 0, NULL, 0));
 
             return S_OK;
@@ -89,4 +86,4 @@ namespace libtf
     };
 
     typedef CComObjectNoLock<CommitHandler> CCommitHandler;
-}
+}// namespace libtf

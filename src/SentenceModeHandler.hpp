@@ -5,25 +5,22 @@
 #include <functional>
 #include <msctf.h>
 
-extern "C"
-{
-    typedef unsigned long libtf_SentenceMode;
-    typedef void (*libtf_CallbackSentenceMode)(libtf_SentenceMode);
+extern "C" {
+typedef unsigned long libtf_SentenceMode;
+typedef void (*libtf_CallbackSentenceMode)(libtf_SentenceMode);
 }
 
-namespace libtf
-{
-    class SentenceModeHandler : public CComObjectRoot, public ITfCompartmentEventSink
-    {
-    protected:
+namespace libtf {
+    class SentenceModeHandler : public CComObjectRoot, public ITfCompartmentEventSink {
+      protected:
         CComPtr<ITfCompartmentMgr> m_compartmentMgr;
-        CComPtr<ITfCompartment> m_sentenceMode;
-        DWORD m_sentenceModeCookie;
-        TfClientId m_clientId;
+        CComPtr<ITfCompartment>    m_sentenceMode;
+        DWORD                      m_sentenceModeCookie;
+        TfClientId                 m_clientId;
 
-    public:
+      public:
         typedef std::function<void(libtf_SentenceMode)> signalSentenceMode;
-        signalSentenceMode sigSentenceMode = [](libtf_SentenceMode) {};
+        signalSentenceMode                              sigSentenceMode = [](libtf_SentenceMode) {};
 
         BEGIN_COM_MAP(SentenceModeHandler)
         COM_INTERFACE_ENTRY(ITfCompartmentEventSink)
@@ -31,13 +28,13 @@ namespace libtf
 
         /**
          * @brief Initialize handler
-         * 
+         *
          * @param compartmentMgr Query interface from ITfThreadMgr
          * @return HRESULT
          */
         HRESULT initialize(TfClientId clientId, CComPtr<ITfCompartmentMgr> compartmentMgr)
         {
-            m_clientId = clientId;
+            m_clientId       = clientId;
             m_compartmentMgr = compartmentMgr;
             CHECK_HR(m_compartmentMgr->GetCompartment(GUID_COMPARTMENT_KEYBOARD_INPUTMODE_SENTENCE, &m_sentenceMode));
             CComQIPtr<ITfSource> evt = m_sentenceMode;
@@ -47,7 +44,7 @@ namespace libtf
 
         /**
          * @brief Dispose the handler
-         * 
+         *
          * @return HRESULT
          */
         HRESULT dispose()
@@ -57,10 +54,18 @@ namespace libtf
         }
 
         /**
+         * @brief Get the Sentence Mode of current thread
+         */
+        HRESULT getSentenceMode(libtf_SentenceMode* mode)
+        {
+            CComVariant val;
+            CHECK_HR(m_sentenceMode->GetValue(&val));
+            *mode = val.ulVal;
+            return S_OK;
+        }
+
+        /**
          * @brief Set the Sentence Mode of current thread
-         * 
-         * @param mode mode
-         * @return HRESULT 
          */
         HRESULT setSentenceMode(libtf_SentenceMode mode)
         {
@@ -74,8 +79,7 @@ namespace libtf
          */
         HRESULT OnChange(REFGUID rguid) override
         {
-            if (IsEqualGUID(rguid, GUID_COMPARTMENT_KEYBOARD_INPUTMODE_SENTENCE))
-            {
+            if (IsEqualGUID(rguid, GUID_COMPARTMENT_KEYBOARD_INPUTMODE_SENTENCE)) {
                 CComVariant val;
                 CHECK_HR(m_sentenceMode->GetValue(&val));
                 sigSentenceMode(val.ulVal);
@@ -85,4 +89,4 @@ namespace libtf
     };
 
     typedef CComObjectNoLock<SentenceModeHandler> CSentenceModeHandler;
-}
+}// namespace libtf

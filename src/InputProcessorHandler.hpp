@@ -5,59 +5,56 @@
 #include <functional>
 #include <msctf.h>
 
-extern "C"
+extern "C" {
+typedef struct tagInputProcessorActivation
 {
-    typedef struct tagInputProcessorActivation
-    {
-        /**
-         * @brief The type of this profile. This is one of these values.
-         * TF_PROFILETYPE_INPUTPROCESSOR - This is a text service.
-         * TF_PROFILETYPE_KEYBOARDLAYOUT - This is a keyboard layout.
-         */
-        DWORD dwProfileType;
-        /**
-         * @brief Specifies the language id of the profile.
-         */
-        LANGID langid;
-        /**
-         * @brief Specifies the CLSID of the text service.
-         * If dwProfileType is TF_PROFILETYPE_KEYBOARDLAYOUT, this is CLSID_NULL.
-         */
-        CLSID clsid;
-        /**
-         * @brief Specifies the category of this text service.
-         * This category is GUID_TFCAT_TIP_KEYBOARD, GUID_TFCAT_TIP_SPEECH, GUID_TFCAT_TIP_HANDWRITING or something in GUID_TFCAT_CATEGORY_OF_TIP.
-         * If dwProfileType is TF_PROFILETYPE_KEYBOARDLAYOUT, this is GUID_NULL.
-         */
-        GUID catid;
-        /**
-         * @brief Specifies the GUID to identify the profile.
-         * If dwProfileType is TF_PROFILETYPE_KEYBOARDLAYOUT, this is GUID_NULL.
-         */
-        GUID guidProfile;
-        /**
-         * @brief Specifies the keyboard layout handle of this profile.
-         * If dwProfileType is TF_PROFILETYPE_ INPUTPROCESSOR, this is NULL.
-         */
-        HKL hkl;
-        /**
-         * @brief TF_IPSINK_FLAG_ACTIVE - This is on if this profile is activated.
-         */
-        DWORD dwFlags;
+    /**
+     * @brief The type of this profile. This is one of these values.
+     * TF_PROFILETYPE_INPUTPROCESSOR - This is a text service.
+     * TF_PROFILETYPE_KEYBOARDLAYOUT - This is a keyboard layout.
+     */
+    DWORD dwProfileType;
+    /**
+     * @brief Specifies the language id of the profile.
+     */
+    LANGID langid;
+    /**
+     * @brief Specifies the CLSID of the text service.
+     * If dwProfileType is TF_PROFILETYPE_KEYBOARDLAYOUT, this is CLSID_NULL.
+     */
+    CLSID clsid;
+    /**
+     * @brief Specifies the category of this text service.
+     * This category is GUID_TFCAT_TIP_KEYBOARD, GUID_TFCAT_TIP_SPEECH, GUID_TFCAT_TIP_HANDWRITING or something in
+     * GUID_TFCAT_CATEGORY_OF_TIP. If dwProfileType is TF_PROFILETYPE_KEYBOARDLAYOUT, this is GUID_NULL.
+     */
+    GUID catid;
+    /**
+     * @brief Specifies the GUID to identify the profile.
+     * If dwProfileType is TF_PROFILETYPE_KEYBOARDLAYOUT, this is GUID_NULL.
+     */
+    GUID guidProfile;
+    /**
+     * @brief Specifies the keyboard layout handle of this profile.
+     * If dwProfileType is TF_PROFILETYPE_ INPUTPROCESSOR, this is NULL.
+     */
+    HKL hkl;
+    /**
+     * @brief TF_IPSINK_FLAG_ACTIVE - This is on if this profile is activated.
+     */
+    DWORD dwFlags;
 
-    } libtf_InputProcessorActivation_t, libtf_pInputProcessorActivation;
-    typedef void (*libtf_CallbackInputProcessor)(libtf_InputProcessorActivation_t);
+} libtf_InputProcessorActivation_t, libtf_pInputProcessorActivation;
+typedef void (*libtf_CallbackInputProcessor)(libtf_InputProcessorActivation_t);
 };
 
-namespace libtf
-{
-    class InputProcessorHandler : public CComObjectRoot, public ITfInputProcessorProfileActivationSink
-    {
-    protected:
+namespace libtf {
+    class InputProcessorHandler : public CComObjectRoot, public ITfInputProcessorProfileActivationSink {
+      protected:
         CComPtr<ITfThreadMgr> m_threadMgr;
-        DWORD m_inputProcessorActivationSinkCookie;
+        DWORD                 m_inputProcessorActivationSinkCookie;
 
-    public:
+      public:
         /**
          * @brief Callback when Input Processor Activated or Deactivated
          */
@@ -70,20 +67,21 @@ namespace libtf
 
         /**
          * @brief Initialize handler
-         * 
+         *
          * @param  threadMgr ITfThreadMgr
          * @return HRESULT
          */
         HRESULT initialize(CComPtr<ITfThreadMgr> threadMgr)
         {
-            m_threadMgr = threadMgr;
+            m_threadMgr                    = threadMgr;
             CComQIPtr<ITfSource> evtSource = m_threadMgr;
-            return evtSource->AdviseSink(IID_ITfInputProcessorProfileActivationSink, this, &m_inputProcessorActivationSinkCookie);
+            return evtSource->AdviseSink(IID_ITfInputProcessorProfileActivationSink, this,
+                                         &m_inputProcessorActivationSinkCookie);
         }
 
         /**
          * @brief Dispose the handler
-         * 
+         *
          * @return HRESULT
          */
         HRESULT dispose()
@@ -96,7 +94,13 @@ namespace libtf
         /**
          * @brief Pack params into a struct
          */
-        HRESULT STDMETHODCALLTYPE OnActivated(DWORD dwProfileType, LANGID langid, REFCLSID clsid, REFGUID catid, REFGUID guidProfile, HKL hkl, DWORD dwFlags)
+        HRESULT STDMETHODCALLTYPE OnActivated(DWORD    dwProfileType,
+                                              LANGID   langid,
+                                              REFCLSID clsid,
+                                              REFGUID  catid,
+                                              REFGUID  guidProfile,
+                                              HKL      hkl,
+                                              DWORD    dwFlags)
         {
             sigInputProcessor({dwProfileType, langid, clsid, catid, guidProfile, hkl, dwFlags});
 
@@ -106,4 +110,4 @@ namespace libtf
     };
 
     typedef CComObjectNoLock<InputProcessorHandler> CInputProcessorHandler;
-}
+}// namespace libtf

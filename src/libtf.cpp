@@ -1,44 +1,50 @@
 #include "libtf.h"
+#include "InputContext.hpp"
+#include "TfFunction.hpp"
 #include <string>
 
 using namespace libtf;
+struct libtf::tagInputContext
+{
+    CComPtr<libtf::CInputContext> ctx;
+};
+typedef struct libtf::tagInputContext InputContext_t;
+
 #pragma region InputProcesser Profile
 /**
- * @brief Get available input processor profies of current thread
- * 
+ * @brief Get available input processor profies for the calling thread
+ *
  * @param profiles Pointer to an array of libtf_InputProcessorProfile_t.
- *                  This array must be at least maxSize elements in size
+ * This array must be at least maxSize elements in size
  * @param maxSize the max size of the profiles array
- * @param fetched if profiles is NULL, return the max number can obtain,
- *                otherwise, return the number of elements actually obtained
+ * @param fetched if profiles is NULL, return the max count can obtain,
+ * otherwise, return the count of elements actually obtained
  */
-HRESULT libtf_get_input_processors(libtf_InputProcessorProfile_t *profiles, size_t maxSize, size_t *fetched)
+HRESULT libtf_get_input_processors(libtf_InputProcessorProfile_t* profiles, size_t maxSize, size_t* fetched)
 {
     CComPtr<ITfInputProcessorProfiles> inputProcessorProfiles;
-    CHECK_HR(inputProcessorProfiles.CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER));
+    CHECK_HR(createInputProcessorProfiles(&inputProcessorProfiles));
     CComQIPtr<ITfInputProcessorProfileMgr> inputProcessorMgr = inputProcessorProfiles;
 
     CComPtr<IEnumTfInputProcessorProfiles> enumProfiles;
-    //Pass 0 to langid to enum all profiles
+    // Pass 0 to langid to enum all profiles
     CHECK_HR(inputProcessorMgr->EnumProfiles(0, &enumProfiles));
 
-    size_t number = 0;
+    size_t                        number = 0;
     libtf_InputProcessorProfile_t profile[1];
-    while (true)
-    {
+    while (true) {
         ULONG fetch;
         CHECK_HR(enumProfiles->Next(1, profile, &fetch));
 
-        //No more
+        // No more
         if (fetch == 0) break;
 
-        //InputProcessor not enabled can't be use
+        // InputProcessor not enabled can't be use
         if (!(profile[0].dwFlags & TF_IPP_FLAG_ENABLED)) continue;
 
-        //Copy data
-        if (profiles)
-        {
-            //Reach max size
+        // Copy data
+        if (profiles) {
+            // Reach max size
             if (number >= maxSize) break;
 
             memcpy(&profiles[number], &profile[0], sizeof(libtf_InputProcessorProfile_t));
@@ -57,12 +63,12 @@ HRESULT libtf_get_input_processors(libtf_InputProcessorProfile_t *profiles, size
 }
 
 /**
- * @brief Get active input processor profie of current thread
+ * @brief Get active input processor profie for the calling thread
  */
-HRESULT libtf_get_active_input_processor(libtf_InputProcessorProfile_t *profile)
+HRESULT libtf_get_active_input_processor(libtf_InputProcessorProfile_t* profile)
 {
     CComPtr<ITfInputProcessorProfiles> inputProcessorProfiles;
-    CHECK_HR(inputProcessorProfiles.CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER));
+    CHECK_HR(createInputProcessorProfiles(&inputProcessorProfiles));
     CComQIPtr<ITfInputProcessorProfileMgr> inputProcessorMgr = inputProcessorProfiles;
 
     CHECK_HR(inputProcessorMgr->GetActiveProfile(GUID_TFCAT_TIP_KEYBOARD, profile));
@@ -71,19 +77,16 @@ HRESULT libtf_get_active_input_processor(libtf_InputProcessorProfile_t *profile)
 }
 
 /**
- * @brief Set active input processor profie of current thread
+ * @brief Set active input processor profie for the calling thread
  */
 HRESULT libtf_set_active_input_processor(libtf_InputProcessorProfile_t profile)
 {
     CComPtr<ITfInputProcessorProfiles> inputProcessorProfiles;
-    CHECK_HR(inputProcessorProfiles.CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER));
+    CHECK_HR(createInputProcessorProfiles(&inputProcessorProfiles));
     CComQIPtr<ITfInputProcessorProfileMgr> inputProcessorMgr = inputProcessorProfiles;
 
-    CHECK_HR(inputProcessorMgr->ActivateProfile(profile.dwProfileType,
-                                                profile.langid,
-                                                profile.clsid,
-                                                profile.guidProfile,
-                                                profile.hkl,
+    CHECK_HR(inputProcessorMgr->ActivateProfile(profile.dwProfileType, profile.langid, profile.clsid,
+                                                profile.guidProfile, profile.hkl,
                                                 TF_IPPMF_DONTCARECURRENTINPUTLANGUAGE));
 
     return S_OK;
@@ -92,19 +95,25 @@ HRESULT libtf_set_active_input_processor(libtf_InputProcessorProfile_t profile)
 
 #pragma region Context
 /**
- * @brief Create input context on calling thread
+ * @brief Create input context for the calling thread
+ *
+ * @note the following method in the Context region need to be call from the creator thread of the context,
+ * if you are calling which from another thread, your call will be handled at the creator thread,
+ * and the call will not return until the handling is finished, this may cause a dead lock!
  */
-HRESULT libtf_create_ctx(libtf_pInputContext *ctx)
+HRESULT libtf_create_ctx(libtf_pInputContext* ctx)
 {
     auto context = new InputContext_t();
-    *ctx = context;
-
+    *ctx         = context;
     context->ctx = new CInputContext();
-    return context->ctx->initialize();
+
+    CHECK_HR(context->ctx->initialize());
+
+    return S_OK;
 }
 
 /**
- * @brief Dispose input context
+ * @brief Dispose the input context, the pointer to the context will be invailed
  */
 HRESULT libtf_dispose_ctx(libtf_pInputContext ctx)
 {
@@ -114,7 +123,7 @@ HRESULT libtf_dispose_ctx(libtf_pInputContext ctx)
 }
 
 /**
- * @brief Terminate all the compositions in the context
+ * @brief Terminate active composition of the context
  */
 HRESULT libtf_terminate_composition(libtf_pInputContext ctx)
 {
@@ -122,7 +131,9 @@ HRESULT libtf_terminate_composition(libtf_pInputContext ctx)
 }
 
 /**
- * @brief Set input method state
+ * @brief Set input method state of the context
+ *
+ * @param bool true to enable the input method, false to disable it
  */
 HRESULT libtf_set_im_state(libtf_pInputContext ctx, bool enable)
 {
@@ -130,40 +141,38 @@ HRESULT libtf_set_im_state(libtf_pInputContext ctx, bool enable)
 }
 
 /**
- * @brief Get input method state
- * 
- * @return true IM has enabled
- * @return false IM has disabled
+ * @brief Get input method(IM) state of the context
+ *
+ * @param bool returns true if IM is enabled, false otherwise
  */
-HRESULT libtf_get_im_state(libtf_pInputContext ctx, bool *imState)
+HRESULT libtf_get_im_state(libtf_pInputContext ctx, bool* imState)
 {
     return ctx->ctx->getIMState(imState);
 }
 
 /**
- * @brief Set current focused window
- * 
- * @param hWnd window who receive WM_SETFOCUS on its message queue
- *             this parameter can be NULL if the context does not have the corresponding handle to the window.
+ * @brief This method should be called from the WndProc of the ui-thread, of whom is the creator of this
+ * context
+ *
+ * @param hWnd The window who receives the message
+ * @param message can be one of WM_SETFOCUS/WM_KILLFOCUS
  */
-HRESULT libtf_set_focus_wnd(libtf_pInputContext ctx, HWND hWnd)
-{
-    return ctx->ctx->setFocus(hWnd);
+HRESULT libtf_on_focus_msg(libtf_pInputContext ctx, HWND hWnd, UINT message) {
+    return ctx->ctx->onFocusMsg(hWnd, message);
 }
 
 /**
- * @brief Get current focused window
+ * @brief Get current focused window of the context
+ *
+ * @param HWND* current focused window, this can be NULL if no window get focused
  */
-HRESULT libtf_get_focus_wnd(libtf_pInputContext ctx, HWND *hWnd)
+HRESULT libtf_get_focus_wnd(libtf_pInputContext ctx, HWND* hWnd)
 {
-    *hWnd = ctx->hWnd;
-    return S_OK;
+    return ctx->ctx->getFocusedWnd(hWnd);
 }
 
 /**
- * @brief Set Conversion Mode
- * 
- * @return HRESULT 
+ * @brief Set Conversion Mode of the context
  */
 HRESULT libtf_set_conversion_mode(libtf_pInputContext ctx, libtf_ConversionMode mode)
 {
@@ -171,9 +180,7 @@ HRESULT libtf_set_conversion_mode(libtf_pInputContext ctx, libtf_ConversionMode 
 }
 
 /**
- * @brief Set Sentence Mode
- * 
- * @return HRESULT 
+ * @brief Set Sentence Mode of the context
  */
 HRESULT libtf_set_sentence_mode(libtf_pInputContext ctx, libtf_SentenceMode mode)
 {
@@ -181,9 +188,9 @@ HRESULT libtf_set_sentence_mode(libtf_pInputContext ctx, libtf_SentenceMode mode
 }
 
 /**
- * @brief Set if in Full Screen mode
- * 
- * @return HRESULT 
+ * @brief Set Full Screen mode of the context
+ *
+ * @note this call will not be handled in the creator thread of the context
  */
 HRESULT libtf_set_full_screen(libtf_pInputContext ctx, bool isFullScreen)
 {
@@ -192,9 +199,9 @@ HRESULT libtf_set_full_screen(libtf_pInputContext ctx, bool isFullScreen)
 }
 
 /**
- * @brief Set if input method should show its Candidate Window
- * 
- * @return HRESULT 
+ * @brief Set if input method should show its Candidate Window of the context
+ *
+ * @note this call will not be handled in the creator thread of the context
  */
 HRESULT libtf_set_show_candidate_list_wnd(libtf_pInputContext ctx, bool show)
 {
@@ -203,9 +210,12 @@ HRESULT libtf_set_show_candidate_list_wnd(libtf_pInputContext ctx, bool show)
 }
 #pragma endregion
 
+/**
+ * @note these call will not be handled in the creator thread of the context
+ */
 #pragma region setCallback
 /**
- * @brief Set Composition Callback
+ * @brief Set Composition Callback of the context
  */
 HRESULT libtf_set_composition_callback(libtf_pInputContext ctx, libtf_CallbackComposition callback)
 {
@@ -214,7 +224,7 @@ HRESULT libtf_set_composition_callback(libtf_pInputContext ctx, libtf_CallbackCo
 }
 
 /**
- * @brief Set Commit Callback
+ * @brief Set Commit Callback of the context
  */
 HRESULT libtf_set_commit_callback(libtf_pInputContext ctx, libtf_CallbackCommit callback)
 {
@@ -223,7 +233,7 @@ HRESULT libtf_set_commit_callback(libtf_pInputContext ctx, libtf_CallbackCommit 
 }
 
 /**
- * @brief Set PreEdit Bounding Box Callback
+ * @brief Set PreEdit Bounding Box Callback of the context
  */
 HRESULT libtf_set_bounding_box_callback(libtf_pInputContext ctx, libtf_CallbackBoundingBox callback)
 {
@@ -232,7 +242,7 @@ HRESULT libtf_set_bounding_box_callback(libtf_pInputContext ctx, libtf_CallbackB
 }
 
 /**
- * @brief Set Candidate List Callback
+ * @brief Set Candidate List Callback of the context
  */
 HRESULT libtf_set_candidate_list_callback(libtf_pInputContext ctx, libtf_CallbackCandidateList callback)
 {
@@ -241,7 +251,7 @@ HRESULT libtf_set_candidate_list_callback(libtf_pInputContext ctx, libtf_Callbac
 }
 
 /**
- * @brief Set Conversion mode Callback
+ * @brief Set Conversion mode Callback of the context
  */
 HRESULT libtf_set_conversion_mode_callback(libtf_pInputContext ctx, libtf_CallbackConversionMode callback)
 {
@@ -250,7 +260,7 @@ HRESULT libtf_set_conversion_mode_callback(libtf_pInputContext ctx, libtf_Callba
 }
 
 /**
- * @brief Set Sentence mode Callback
+ * @brief Set Sentence mode Callback of the context
  */
 HRESULT libtf_set_sentence_mode_callback(libtf_pInputContext ctx, libtf_CallbackSentenceMode callback)
 {
@@ -259,7 +269,7 @@ HRESULT libtf_set_sentence_mode_callback(libtf_pInputContext ctx, libtf_Callback
 }
 
 /**
- * @brief Set Input Processor Callback
+ * @brief Set Input Processor Callback of the context
  */
 HRESULT libtf_set_input_processor_callback(libtf_pInputContext ctx, libtf_CallbackInputProcessor callback)
 {

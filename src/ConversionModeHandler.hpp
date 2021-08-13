@@ -5,25 +5,22 @@
 #include <functional>
 #include <msctf.h>
 
-extern "C"
-{
-    typedef unsigned long libtf_ConversionMode;
-    typedef void (*libtf_CallbackConversionMode)(libtf_ConversionMode);
+extern "C" {
+typedef unsigned long libtf_ConversionMode;
+typedef void (*libtf_CallbackConversionMode)(libtf_ConversionMode);
 }
 
-namespace libtf
-{
-    class ConversionModeHandler : public CComObjectRoot, public ITfCompartmentEventSink
-    {
-    protected:
+namespace libtf {
+    class ConversionModeHandler : public CComObjectRoot, public ITfCompartmentEventSink {
+      protected:
         CComPtr<ITfCompartmentMgr> m_compartmentMgr;
-        CComPtr<ITfCompartment> m_conversionMode;
-        DWORD m_conversionModeCookie;
-        TfClientId m_clientId;
+        CComPtr<ITfCompartment>    m_conversionMode;
+        DWORD                      m_conversionModeCookie;
+        TfClientId                 m_clientId;
 
-    public:
+      public:
         typedef std::function<void(libtf_ConversionMode)> signalConversionMode;
-        signalConversionMode sigConversionMode = [](libtf_ConversionMode) {};
+        signalConversionMode                              sigConversionMode = [](libtf_ConversionMode) {};
 
         BEGIN_COM_MAP(ConversionModeHandler)
         COM_INTERFACE_ENTRY(ITfCompartmentEventSink)
@@ -31,15 +28,15 @@ namespace libtf
 
         /**
          * @brief Initialize handler
-         * 
+         *
          * @param compartmentMgr Query interface from ITfThreadMgr
-         * @return HRESULT
          */
         HRESULT initialize(TfClientId clientId, CComPtr<ITfCompartmentMgr> compartmentMgr)
         {
-            m_clientId = clientId;
+            m_clientId       = clientId;
             m_compartmentMgr = compartmentMgr;
-            CHECK_HR(m_compartmentMgr->GetCompartment(GUID_COMPARTMENT_KEYBOARD_INPUTMODE_CONVERSION, &m_conversionMode));
+            CHECK_HR(
+                m_compartmentMgr->GetCompartment(GUID_COMPARTMENT_KEYBOARD_INPUTMODE_CONVERSION, &m_conversionMode));
             CComQIPtr<ITfSource> evt = m_conversionMode;
             CHECK_HR(evt->AdviseSink(IID_ITfCompartmentEventSink, this, &m_conversionModeCookie))
             return S_OK;
@@ -47,8 +44,6 @@ namespace libtf
 
         /**
          * @brief Dispose the handler
-         * 
-         * @return HRESULT
          */
         HRESULT dispose()
         {
@@ -57,10 +52,18 @@ namespace libtf
         }
 
         /**
+         * @brief Get the Conversion Mode of current thread
+         */
+        HRESULT getConversionMode(libtf_ConversionMode* mode)
+        {
+            CComVariant val;
+            CHECK_HR(m_conversionMode->GetValue(&val));
+            *mode = val.ulVal;
+            return S_OK;
+        }
+
+        /**
          * @brief Set the Conversion Mode of current thread
-         * 
-         * @param mode mode
-         * @return HRESULT 
          */
         HRESULT setConversionMode(libtf_ConversionMode mode)
         {
@@ -74,8 +77,7 @@ namespace libtf
          */
         HRESULT OnChange(REFGUID rguid) override
         {
-            if (IsEqualGUID(rguid, GUID_COMPARTMENT_KEYBOARD_INPUTMODE_CONVERSION))
-            {
+            if (IsEqualGUID(rguid, GUID_COMPARTMENT_KEYBOARD_INPUTMODE_CONVERSION)) {
                 CComVariant val;
                 CHECK_HR(m_conversionMode->GetValue(&val));
                 sigConversionMode(val.ulVal);
@@ -85,4 +87,4 @@ namespace libtf
     };
 
     typedef CComObjectNoLock<ConversionModeHandler> CConversionModeHandler;
-}
+}// namespace libtf
