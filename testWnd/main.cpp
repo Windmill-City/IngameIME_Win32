@@ -172,7 +172,7 @@ void testSetInputProcessor()
         BSTR locale;
         libtf_get_input_processor_locale(profiles[i], &locale);
         BSTR name;
-        libtf_get_input_processor_locale_name(profiles[i], &name);
+        libtf_get_locale_name(locale, &name);
         BSTR desc;
         libtf_get_input_processor_desc(profiles[i], &desc);
         printf("InputProcessor:[%ls][%ls][%ls]\n", locale, name, desc);

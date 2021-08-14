@@ -46,12 +46,13 @@ HRESULT libtf_set_active_input_processor(libtf_InputProcessorProfile_t);
 HRESULT libtf_get_input_processor_locale(libtf_InputProcessorProfile_t, BSTR*);
 
 /**
- * @brief Get the localized name of the locale of the input processor
+ * @brief Get the localized name of the locale
  *
+ * @param BSTR locale
  * @param BSTR* Pointer to a BSTR value that receives the name string. The caller is responsible for freeing
  * this memory using SysFreeString when it is no longer required.
  */
-HRESULT libtf_get_input_processor_locale_name(libtf_InputProcessorProfile_t, BSTR*);
+HRESULT libtf_get_locale_name(BSTR, BSTR*);
 
 /**
  * @brief Get the localized name of the input processor
