@@ -1,5 +1,6 @@
 #pragma once
-#include <atlbase.h>
+#include <stdint.h>
+#include <wtypes.h>
 #include <winerror.h>
 
 #define LIBTF_EXPORT __declspec(dllexport)
