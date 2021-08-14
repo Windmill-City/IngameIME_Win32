@@ -1,7 +1,7 @@
 #pragma once
 #include <stdint.h>
-#include <wtypes.h>
 #include <winerror.h>
+#include <wtypes.h>
 
 #define LIBTF_EXPORT __declspec(dllexport)
 
@@ -28,8 +28,10 @@
 #define CHECK_OOM(ptr)                                                                                                 \
     if (!(ptr)) return E_OUTOFMEMORY;
 
-#pragma region CandidateList
+#ifdef __cplusplus
 extern "C" {
+#endif
+#pragma region CandidateList
 LIBTF_EXPORT typedef enum libtf_CandidateListState {
     libtf_CandidateListBegin,
     libtf_CandidateListUpdate,
@@ -67,18 +69,14 @@ LIBTF_EXPORT typedef struct libtf_tagCandidateList
     libtf_Candidate* candidates;
 } libtf_CandidateList_t, *libtf_pCandidateList;
 LIBTF_EXPORT typedef void (*libtf_CallbackCandidateList)(libtf_CandidateList_t);
-}
 #pragma endregion
 
-#pragma region Commit
-extern "C" {
+#pragma region            Commit
 LIBTF_EXPORT typedef BSTR libtf_Commit;
 LIBTF_EXPORT typedef void (*libtf_CallbackCommit)(libtf_Commit);
-}
 #pragma endregion
 
 #pragma region Composition
-extern "C" {
 LIBTF_EXPORT typedef enum libtf_CompositionState {
     libtf_CompositionBegin,
     libtf_CompositionUpdate,
@@ -100,25 +98,19 @@ LIBTF_EXPORT typedef struct libtf_tagComposition
 } libtf_Composition_t, *libtf_pComposition;
 LIBTF_EXPORT typedef void (*libtf_CallbackComposition)(libtf_Composition_t);
 LIBTF_EXPORT typedef void (*libtf_CallbackBoundingBox)(libtf_BoundingBox_t*);
-}
 #pragma endregion
 
-#pragma region ConversionMode
-extern "C" {
+#pragma region                     ConversionMode
 LIBTF_EXPORT typedef unsigned long libtf_ConversionMode;
 LIBTF_EXPORT typedef void (*libtf_CallbackConversionMode)(libtf_ConversionMode);
-}
 #pragma endregion
 
-#pragma region SentenceMode
-extern "C" {
+#pragma region                     SentenceMode
 LIBTF_EXPORT typedef unsigned long libtf_SentenceMode;
 LIBTF_EXPORT typedef void (*libtf_CallbackSentenceMode)(libtf_SentenceMode);
-}
 #pragma endregion
 
 #pragma region InputProcessor
-extern "C" {
 LIBTF_EXPORT typedef struct tagInputProcessorActivation
 {
     /**
@@ -159,5 +151,7 @@ LIBTF_EXPORT typedef struct tagInputProcessorActivation
 
 } libtf_InputProcessorActivation_t, libtf_pInputProcessorActivation;
 LIBTF_EXPORT typedef void (*libtf_CallbackInputProcessor)(libtf_InputProcessorActivation_t);
-};
 #pragma endregion
+#ifdef __cplusplus
+}
+#endif

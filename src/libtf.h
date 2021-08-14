@@ -5,8 +5,10 @@ namespace libtf {
     struct tagInputContext;
 }// namespace libtf
 
+#ifdef __cplusplus
 extern "C" {
-LIBTF_EXPORT typedef struct libtf::tagInputContext* libtf_pInputContext;
+#endif
+LIBTF_EXPORT typedef struct libtf::tagInputContext*  libtf_pInputContext;
 LIBTF_EXPORT typedef struct TF_INPUTPROCESSORPROFILE libtf_InputProcessorProfile_t, *libtf_pInputProcessorProfile;
 
 #pragma region InputProcesser Profile
@@ -197,4 +199,6 @@ LIBTF_EXPORT HRESULT libtf_set_sentence_mode_callback(libtf_pInputContext, libtf
  */
 LIBTF_EXPORT HRESULT libtf_set_input_processor_callback(libtf_pInputContext, libtf_CallbackInputProcessor);
 #pragma endregion
+#ifdef __cplusplus
 }
+#endif
