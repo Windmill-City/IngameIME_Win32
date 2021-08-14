@@ -1,14 +1,12 @@
 #pragma once
 #include "libtfdef.h"
 
-namespace libtf {
-    struct tagInputContext;
-}// namespace libtf
-
 #ifdef __cplusplus
 extern "C" {
 #endif
-LIBTF_EXPORT typedef struct libtf::tagInputContext*  libtf_pInputContext;
+struct libtf_tagInputContext;
+
+LIBTF_EXPORT typedef struct libtf_tagInputContext*  libtf_pInputContext;
 LIBTF_EXPORT typedef struct TF_INPUTPROCESSORPROFILE libtf_InputProcessorProfile_t, *libtf_pInputProcessorProfile;
 
 #pragma region InputProcesser Profile

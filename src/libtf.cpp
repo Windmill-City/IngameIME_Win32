@@ -8,11 +8,11 @@
 #include <winreg.h>
 
 using namespace libtf;
-struct libtf::tagInputContext
+struct libtf_tagInputContext
 {
     CComPtr<libtf::CInputContext> ctx;
 };
-typedef struct libtf::tagInputContext InputContext_t;
+typedef struct libtf_tagInputContext InputContext_t;
 
 #pragma region InputProcesser Profile
 /**
