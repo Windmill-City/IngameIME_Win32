@@ -1,7 +1,11 @@
 #include "libtf.h"
 #include "InputContext.hpp"
 #include "TfFunction.hpp"
+
 #include <string>
+
+#include <stdio.h>
+#include <winreg.h>
 
 using namespace libtf;
 struct libtf::tagInputContext
@@ -17,8 +21,8 @@ typedef struct libtf::tagInputContext InputContext_t;
  * @param profiles Pointer to an array of libtf_InputProcessorProfile_t.
  * This array must be at least maxSize elements in size
  * @param maxSize the max size of the profiles array
- * @param fetched if profiles is NULL, return the max count can obtain,
- * otherwise, return the count of elements actually obtained
+ * @param fetched if profiles is NULL, return the max size of the profiles, otherwise, return the fetched size.
+ * The fetched size can change from one call to the next, pay attention to it.
  */
 HRESULT libtf_get_input_processors(libtf_InputProcessorProfile_t* profiles, size_t maxSize, size_t* fetched)
 {
@@ -85,10 +89,113 @@ HRESULT libtf_set_active_input_processor(libtf_InputProcessorProfile_t profile)
     CHECK_HR(createInputProcessorProfiles(&inputProcessorProfiles));
     CComQIPtr<ITfInputProcessorProfileMgr> inputProcessorMgr = inputProcessorProfiles;
 
-    CHECK_HR(inputProcessorMgr->ActivateProfile(profile.dwProfileType, profile.langid, profile.clsid,
-                                                profile.guidProfile, profile.hkl,
+    CHECK_HR(inputProcessorMgr->ActivateProfile(profile.dwProfileType,
+                                                profile.langid,
+                                                profile.clsid,
+                                                profile.guidProfile,
+                                                profile.hkl,
                                                 TF_IPPMF_DONTCARECURRENTINPUTLANGUAGE));
 
+    return S_OK;
+}
+
+/**
+ * @brief Get the locale of the input processor
+ *
+ * @param BSTR* Pointer to a BSTR value that receives the locale string. The caller is responsible for freeing
+ * this memory using SysFreeString when it is no longer required.
+ */
+HRESULT libtf_get_input_processor_locale(libtf_InputProcessorProfile_t profile, BSTR* locale)
+{
+    LCID    lcid = MAKELCID(profile.langid, SORT_DEFAULT);
+    wchar_t buf[85];
+    GetLocaleInfoW(lcid, LOCALE_SNAME, buf, 85);
+    *locale = SysAllocString(buf);
+    return S_OK;
+}
+
+/**
+ * @brief Get the localized name of the locale of the input processor
+ *
+ * @param BSTR* Pointer to a BSTR value that receives the name string. The caller is responsible for freeing
+ * this memory using SysFreeString when it is no longer required.
+ */
+HRESULT libtf_get_input_processor_locale_name(libtf_InputProcessorProfile_t profile, BSTR* name)
+{
+    LCID    lcid = MAKELCID(profile.langid, SORT_DEFAULT);
+    wchar_t buf[128];
+    GetLocaleInfoW(lcid, LOCALE_SLOCALIZEDDISPLAYNAME, buf, 128);
+    *name = SysAllocString(buf);
+    return S_OK;
+}
+
+/**
+ * @brief Get the localized name of the input processor
+ *
+ * @param BSTR Pointer to a BSTR value that receives the description string. The caller is responsible for freeing this
+ * memory using SysFreeString when it is no longer required.
+ */
+HRESULT libtf_get_input_processor_desc(libtf_InputProcessorProfile_t profile, BSTR* desc)
+{
+    switch (profile.dwProfileType) {
+        case TF_PROFILETYPE_INPUTPROCESSOR: {
+            CComPtr<ITfInputProcessorProfiles> inputProcessorProfiles;
+            CHECK_HR(createInputProcessorProfiles(&inputProcessorProfiles));
+
+            CHECK_HR(inputProcessorProfiles->GetLanguageProfileDescription(
+                profile.clsid, profile.langid, profile.guidProfile, desc));
+        } break;
+        case TF_PROFILETYPE_KEYBOARDLAYOUT: {
+            HKEY layouts;
+            CHECK_ES(RegOpenKeyEx(HKEY_LOCAL_MACHINE,
+                                  TEXT("SYSTEM\\CurrentControlSet\\Control\\Keyboard Layouts"),
+                                  0,
+                                  KEY_READ,
+                                  &layouts));
+
+            HRESULT hr;
+            // the key of the keyboard layout is its langid
+            char layoutKey[9];
+            snprintf(layoutKey, 9, "%08x", profile.langid);
+            HKEY layout;
+            if (NOT_ES(hr = RegOpenKeyExA(layouts, layoutKey, 0, KEY_READ, &layout))) goto CloseParentKey;
+
+            DWORD size;
+            // Get data size first
+            if (NOT_ES(
+                    hr = RegGetValueW(
+                        layout, NULL, L"Layout Display Name", RRF_RT_REG_EXPAND_SZ | RRF_NOEXPAND, NULL, NULL, &size)))
+                goto CloseSubKey;
+
+            {
+                std::unique_ptr<uint8_t[]> buf(new uint8_t[size]);
+                // Get resource key of the name
+                if (NOT_ES(hr = RegGetValueW(layout,
+                                             NULL,
+                                             L"Layout Display Name",
+                                             RRF_RT_REG_EXPAND_SZ | RRF_NOEXPAND,
+                                             NULL,
+                                             buf.get(),
+                                             &size)))
+                    goto CloseSubKey;
+
+                // Get the layout name by resource key
+                std::unique_ptr<wchar_t[]> layoutName(new wchar_t[KL_NAMELENGTH]);
+                if (FAILED(hr = SHLoadIndirectString((wchar_t*)buf.get(), layoutName.get(), KL_NAMELENGTH, NULL)))
+                    goto CloseSubKey;
+
+                // Return result
+                *desc = SysAllocString(layoutName.get());
+                CHECK_OOM(*desc);
+            }
+        CloseSubKey:
+            RegCloseKey(layout);
+        CloseParentKey:
+            RegCloseKey(layouts);
+            return hr;
+        } break;
+        default: return E_INVALIDARG;
+    }
     return S_OK;
 }
 #pragma endregion
@@ -97,8 +204,8 @@ HRESULT libtf_set_active_input_processor(libtf_InputProcessorProfile_t profile)
 /**
  * @brief Create input context for the calling thread
  *
- * @note the following method in the Context region need to be call from the creator thread of the context,
- * if you are calling which from another thread, your call will be handled at the creator thread,
+ * @note the following method in the Context region should be called only from the thread who created the context,
+ * if you are calling from another thread, your call will be handled at the creator thread of the context,
  * and the call will not return until the handling is finished, this may cause a dead lock!
  */
 HRESULT libtf_create_ctx(libtf_pInputContext* ctx)
@@ -151,8 +258,8 @@ HRESULT libtf_get_im_state(libtf_pInputContext ctx, bool* imState)
 }
 
 /**
- * @brief This method should be called from the WndProc of the ui-thread, of whom is the creator of this
- * context
+ * @brief This method should be called from the WndProc of the ui-thread,
+ * of whom should be the creator of this context
  *
  * @param hWnd The window who receives the message
  * @param message can be one of WM_SETFOCUS/WM_KILLFOCUS

@@ -112,8 +112,8 @@ void onCandidateList(libtf_CandidateList_t list)
         case libtf_CandidateListBegin: printf("Candidate List Begin\n"); break;
         case libtf_CandidateListUpdate:
             printf("Composition Update\n");
-            printf("Total:%d; Page:%d, %d; CurSel:%d\n", list.totalCount, list.pageStart, list.pageEnd,
-                   list.curSelection);
+            printf(
+                "Total:%d; Page:%d, %d; CurSel:%d\n", list.totalCount, list.pageStart, list.pageEnd, list.curSelection);
 
             for (size_t i = list.pageStart; i <= list.pageEnd; i++) {
                 printf("[%zd]%ls\n", i - list.pageStart + 1, list.candidates[i]);
@@ -125,9 +125,13 @@ void onCandidateList(libtf_CandidateList_t list)
 }
 void onInputProcessor(libtf_InputProcessorActivation_t activation)
 {
-    printf("[%s] [%x-%x-%x-%llx] State:%d\n", activation.dwProfileType & TF_PROFILETYPE_INPUTPROCESSOR ? "TIP" : "HKL",
-           activation.clsid.Data1, activation.clsid.Data2, activation.clsid.Data3,
-           *(unsigned long long*)activation.clsid.Data4, activation.dwFlags & TF_IPSINK_FLAG_ACTIVE);
+    printf("[%s] [%x-%x-%x-%llx] State:%d\n",
+           activation.dwProfileType & TF_PROFILETYPE_INPUTPROCESSOR ? "TIP" : "HKL",
+           activation.clsid.Data1,
+           activation.clsid.Data2,
+           activation.clsid.Data3,
+           *(unsigned long long*)activation.clsid.Data4,
+           activation.dwFlags & TF_IPSINK_FLAG_ACTIVE);
 }
 #pragma endregion
 
@@ -137,9 +141,12 @@ void testGetCurInputProcessor()
     libtf_get_active_input_processor(&curActiveInputProcessor);
     printf("Cur Active:[%s][%x-%x-%x-%llx]Lang Id:%d, Active:%d\n",
            curActiveInputProcessor.dwProfileType & TF_PROFILETYPE_INPUTPROCESSOR ? "TIP" : "HKL",
-           curActiveInputProcessor.clsid.Data1, curActiveInputProcessor.clsid.Data2,
-           curActiveInputProcessor.clsid.Data3, *(unsigned long long*)curActiveInputProcessor.clsid.Data4,
-           curActiveInputProcessor.langid, curActiveInputProcessor.dwFlags & TF_IPP_FLAG_ACTIVE);
+           curActiveInputProcessor.clsid.Data1,
+           curActiveInputProcessor.clsid.Data2,
+           curActiveInputProcessor.clsid.Data3,
+           *(unsigned long long*)curActiveInputProcessor.clsid.Data4,
+           curActiveInputProcessor.langid,
+           curActiveInputProcessor.dwFlags & TF_IPP_FLAG_ACTIVE);
 }
 
 void testSetInputProcessor()
@@ -151,10 +158,27 @@ void testSetInputProcessor()
 
     printf("Found %d InputProcessors\n", (int)fetched);
     for (size_t i = 0; i < fetched; i++) {
-        printf("[%d][%s][%x-%x-%x-%llx]Lang Id:%d, Active:%d\n", (int)i,
-               profiles[i].dwProfileType & TF_PROFILETYPE_INPUTPROCESSOR ? "TIP" : "HKL", profiles[i].clsid.Data1,
-               profiles[i].clsid.Data2, profiles[i].clsid.Data3, *(unsigned long long*)profiles[i].clsid.Data4,
-               profiles[i].langid, profiles[i].dwFlags & TF_IPP_FLAG_ACTIVE);
+        printf("[%d][%s][%x-%x-%x-%llx]Lang Id:%d, Active:%d\n",
+               (int)i,
+               profiles[i].dwProfileType & TF_PROFILETYPE_INPUTPROCESSOR ? "TIP" : "HKL",
+               profiles[i].clsid.Data1,
+               profiles[i].clsid.Data2,
+               profiles[i].clsid.Data3,
+               *(unsigned long long*)profiles[i].clsid.Data4,
+               profiles[i].langid,
+               profiles[i].dwFlags & TF_IPP_FLAG_ACTIVE);
+
+        setlocale(LC_ALL, "");
+        BSTR locale;
+        libtf_get_input_processor_locale(profiles[i], &locale);
+        BSTR name;
+        libtf_get_input_processor_locale_name(profiles[i], &name);
+        BSTR desc;
+        libtf_get_input_processor_desc(profiles[i], &desc);
+        printf("InputProcessor:[%ls][%ls][%ls]\n", locale, name, desc);
+        SysFreeString(locale);
+        SysFreeString(name);
+        SysFreeString(desc);
 
         // If the input processor is not active, try to active it
         if (!(profiles[i].dwFlags & TF_IPP_FLAG_ACTIVE)) {
@@ -183,8 +207,8 @@ int main()
         }
         glfwMakeContextCurrent(window);
 
-        //libtf support both ApartMentThreaded and MultiThreaded
-        //CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+        // libtf support both ApartMentThreaded and MultiThreaded
+        // CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
         CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
         testSetInputProcessor();
