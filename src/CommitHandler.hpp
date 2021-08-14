@@ -6,8 +6,8 @@
 #include <msctf.h>
 
 extern "C" {
-typedef BSTR libtf_Commit;
-typedef void (*libtf_CallbackCommit)(libtf_Commit);
+LIBTF_EXPORT typedef BSTR libtf_Commit;
+LIBTF_EXPORT typedef void (*libtf_CallbackCommit)(libtf_Commit);
 }
 
 namespace libtf {

@@ -6,8 +6,8 @@
 #include <msctf.h>
 
 extern "C" {
-typedef unsigned long libtf_SentenceMode;
-typedef void (*libtf_CallbackSentenceMode)(libtf_SentenceMode);
+LIBTF_EXPORT typedef unsigned long libtf_SentenceMode;
+LIBTF_EXPORT typedef void (*libtf_CallbackSentenceMode)(libtf_SentenceMode);
 }
 
 namespace libtf {

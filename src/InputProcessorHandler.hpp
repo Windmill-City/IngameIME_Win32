@@ -6,7 +6,7 @@
 #include <msctf.h>
 
 extern "C" {
-typedef struct tagInputProcessorActivation
+LIBTF_EXPORT typedef struct tagInputProcessorActivation
 {
     /**
      * @brief The type of this profile. This is one of these values.
@@ -45,7 +45,7 @@ typedef struct tagInputProcessorActivation
     DWORD dwFlags;
 
 } libtf_InputProcessorActivation_t, libtf_pInputProcessorActivation;
-typedef void (*libtf_CallbackInputProcessor)(libtf_InputProcessorActivation_t);
+LIBTF_EXPORT typedef void (*libtf_CallbackInputProcessor)(libtf_InputProcessorActivation_t);
 };
 
 namespace libtf {

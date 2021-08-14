@@ -7,7 +7,7 @@
 #include <msctf.h>
 
 extern "C" {
-typedef enum libtf_CandidateListState {
+LIBTF_EXPORT typedef enum libtf_CandidateListState {
     libtf_CandidateListBegin,
     libtf_CandidateListUpdate,
     libtf_CandidateListEnd
@@ -15,8 +15,8 @@ typedef enum libtf_CandidateListState {
 /**
  * @brief Candidate String format is Binary String
  */
-typedef BSTR libtf_Candidate;
-typedef struct libtf_tagCandidateList
+LIBTF_EXPORT typedef BSTR libtf_Candidate;
+LIBTF_EXPORT typedef struct libtf_tagCandidateList
 {
     /**
      * @brief The property below only available at CandidateListUpdate
@@ -43,7 +43,7 @@ typedef struct libtf_tagCandidateList
      */
     libtf_Candidate* candidates;
 } libtf_CandidateList_t, *libtf_pCandidateList;
-typedef void (*libtf_CallbackCandidateList)(libtf_CandidateList_t);
+LIBTF_EXPORT typedef void (*libtf_CallbackCandidateList)(libtf_CandidateList_t);
 }
 
 namespace libtf {

@@ -7,14 +7,14 @@
 #include <msctf.h>
 
 extern "C" {
-typedef enum libtf_CompositionState {
+LIBTF_EXPORT typedef enum libtf_CompositionState {
     libtf_CompositionBegin,
     libtf_CompositionUpdate,
     libtf_CompositionEnd
 } libtf_CompositionState_t;
-typedef RECT libtf_BoundingBox_t;
-typedef BSTR libtf_PreEdit;
-typedef struct libtf_tagComposition
+LIBTF_EXPORT typedef RECT libtf_BoundingBox_t;
+LIBTF_EXPORT typedef BSTR libtf_PreEdit;
+LIBTF_EXPORT typedef struct libtf_tagComposition
 {
     libtf_CompositionState_t state;
     /**
@@ -26,8 +26,8 @@ typedef struct libtf_tagComposition
      */
     long selection[2];
 } libtf_Composition_t, *libtf_pComposition;
-typedef void (*libtf_CallbackComposition)(libtf_Composition_t);
-typedef void (*libtf_CallbackBoundingBox)(libtf_BoundingBox_t*);
+LIBTF_EXPORT typedef void (*libtf_CallbackComposition)(libtf_Composition_t);
+LIBTF_EXPORT typedef void (*libtf_CallbackBoundingBox)(libtf_BoundingBox_t*);
 }
 
 namespace libtf {

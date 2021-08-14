@@ -6,8 +6,8 @@
 #include <msctf.h>
 
 extern "C" {
-typedef unsigned long libtf_ConversionMode;
-typedef void (*libtf_CallbackConversionMode)(libtf_ConversionMode);
+LIBTF_EXPORT typedef unsigned long libtf_ConversionMode;
+LIBTF_EXPORT typedef void (*libtf_CallbackConversionMode)(libtf_ConversionMode);
 }
 
 namespace libtf {

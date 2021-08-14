@@ -2,6 +2,8 @@
 
 #include <winerror.h>
 
+#define LIBTF_EXPORT __declspec(dllexport)
+
 #define CHECK_HR(hresultItem)                                                                                          \
     {                                                                                                                  \
         HRESULT _hr = hresultItem;                                                                                     \
