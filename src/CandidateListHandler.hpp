@@ -201,7 +201,7 @@ namespace libtf {
          *
          * @param pbShow should show?
          */
-        HRESULT BeginUIElement(DWORD dwUIElementId, BOOL* pbShow) override
+        HRESULT STDMETHODCALLTYPE BeginUIElement(DWORD dwUIElementId, BOOL* pbShow) override
         {
             // It's possible that other uiElement Begins while handling Candidate List
             // to avoid wrongly overwrite, we use a local var here
@@ -219,7 +219,7 @@ namespace libtf {
         /**
          * @brief Get Candidates from input method
          */
-        HRESULT UpdateUIElement(DWORD dwUIElementId) override
+        HRESULT STDMETHODCALLTYPE UpdateUIElement(DWORD dwUIElementId) override
         {
             if (m_curCandEle == getCandidateListUIElement(dwUIElementId)) {
                 libtf_CandidateList_t list = {libtf_CandidateListUpdate};
@@ -237,7 +237,7 @@ namespace libtf {
         /**
          * @brief Candidate list End
          */
-        HRESULT EndUIElement(DWORD dwUIElementId) override
+        HRESULT STDMETHODCALLTYPE EndUIElement(DWORD dwUIElementId) override
         {
             if (m_curCandEle == getCandidateListUIElement(dwUIElementId)) {
                 // Always Release CandUIEle

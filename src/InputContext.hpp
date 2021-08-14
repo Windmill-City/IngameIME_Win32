@@ -175,7 +175,7 @@ namespace libtf {
          *
          * @return HRESULT TS_E_NOLAYOUT - The Application not calculate a text layout
          */
-        HRESULT GetACPFromPoint(const POINT* ptScreen, DWORD dwFlags, LONG* pacp) override
+        HRESULT STDMETHODCALLTYPE GetACPFromPoint(const POINT* ptScreen, DWORD dwFlags, LONG* pacp) override
         {
             return TS_E_NOLAYOUT;
         }
@@ -184,7 +184,7 @@ namespace libtf {
          * @brief Input method call this method to get the bounding box, in screen coordinates, of the preedit texts,
          * and use which to position its candidate window
          */
-        HRESULT GetTextExt(LONG acpStart, LONG acpEnd, RECT* prc, BOOL* pfClipped) override
+        HRESULT STDMETHODCALLTYPE GetTextExt(LONG acpStart, LONG acpEnd, RECT* prc, BOOL* pfClipped) override
         {
             m_compositionHandler->m_sigBoundingBox(prc);
             return S_OK;
@@ -193,7 +193,7 @@ namespace libtf {
         /**
          * @brief Return the bounding box, in screen coordinates, of the display surface of the text stream
          */
-        HRESULT GetScreenExt(RECT* prc) override
+        HRESULT STDMETHODCALLTYPE GetScreenExt(RECT* prc) override
         {
             // If no window focused, just return nothing
             if (m_hWnd) GetWindowRect(m_hWnd, prc);
@@ -203,7 +203,7 @@ namespace libtf {
         /**
          * @brief Obtains the status of a document.
          */
-        HRESULT GetStatus(TF_STATUS* pdcs) override
+        HRESULT STDMETHODCALLTYPE GetStatus(TF_STATUS* pdcs) override
         {
             // Return 0 means the current context is editable
             pdcs->dwDynamicFlags = 0;
@@ -216,7 +216,7 @@ namespace libtf {
          * @brief Return current focused window, can be retrieve by ITfContextView, which can be query interface from
          * ITfContext
          */
-        HRESULT GetWnd(HWND* phwnd) override
+        HRESULT STDMETHODCALLTYPE GetWnd(HWND* phwnd) override
         {
             phwnd = &m_hWnd;
             return S_OK;
@@ -225,7 +225,7 @@ namespace libtf {
         /**
          * @brief Our context doesn't support any attributes, just return VT_EMPTY
          */
-        HRESULT GetAttribute(REFGUID rguidAttribute, VARIANT* pvarValue) override
+        HRESULT STDMETHODCALLTYPE GetAttribute(REFGUID rguidAttribute, VARIANT* pvarValue) override
         {
             pvarValue->vt = VT_EMPTY;
             return S_OK;

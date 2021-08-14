@@ -72,7 +72,7 @@ namespace libtf {
         /**
          * @brief Handle Sentence Mode change
          */
-        HRESULT OnChange(REFGUID rguid) override
+        HRESULT STDMETHODCALLTYPE OnChange(REFGUID rguid) override
         {
             if (IsEqualGUID(rguid, GUID_COMPARTMENT_KEYBOARD_INPUTMODE_SENTENCE)) {
                 CComVariant val;

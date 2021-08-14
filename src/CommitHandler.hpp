@@ -46,7 +46,7 @@ namespace libtf {
         /**
          * @brief Get all the text in the context, which is Commit
          */
-        HRESULT DoEditSession(TfEditCookie ec) override
+        HRESULT STDMETHODCALLTYPE DoEditSession(TfEditCookie ec) override
         {
             // Get a range which cover all the text in the context
             CComPtr<ITfRange> fullRange;

@@ -79,7 +79,7 @@ namespace libtf {
          * @param pfOk allow Composition start?
          * @return HRESULT
          */
-        HRESULT OnStartComposition(ITfCompositionView* pComposition, BOOL* pfOk) override
+        HRESULT STDMETHODCALLTYPE OnStartComposition(ITfCompositionView* pComposition, BOOL* pfOk) override
         {
             // Always allow Composition start
             *pfOk = TRUE;
@@ -94,7 +94,7 @@ namespace libtf {
          *
          * @return HRESULT
          */
-        HRESULT OnUpdateComposition(ITfCompositionView* pComposition, ITfRange* pRangeNew) override
+        HRESULT STDMETHODCALLTYPE OnUpdateComposition(ITfCompositionView* pComposition, ITfRange* pRangeNew) override
         {
             m_compositionView = pComposition;
             return S_OK;
@@ -105,7 +105,7 @@ namespace libtf {
          *
          * @return HRESULT
          */
-        HRESULT OnEndComposition(ITfCompositionView* pComposition) override
+        HRESULT STDMETHODCALLTYPE OnEndComposition(ITfCompositionView* pComposition) override
         {
             m_sigComposition({libtf_CompositionEnd});
 
@@ -120,7 +120,7 @@ namespace libtf {
         /**
          * @brief Get PreEdit text and its selection
          */
-        HRESULT OnEndEdit(ITfContext* pic, TfEditCookie ec, ITfEditRecord* pEditRecord) override
+        HRESULT STDMETHODCALLTYPE OnEndEdit(ITfContext* pic, TfEditCookie ec, ITfEditRecord* pEditRecord) override
         {
             // No active composition
             if (!m_compositionView) return S_OK;

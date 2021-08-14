@@ -47,7 +47,7 @@ namespace libtf {
         /**
          * @brief Hide all the window of input method in full screen mode
          */
-        HRESULT BeginUIElement(DWORD dwUIElementId, BOOL* pbShow) override
+        HRESULT STDMETHODCALLTYPE BeginUIElement(DWORD dwUIElementId, BOOL* pbShow) override
         {
             *pbShow = !m_isFullScreen;
             return S_OK;
@@ -56,7 +56,7 @@ namespace libtf {
         /**
          * @brief Do nothing
          */
-        HRESULT UpdateUIElement(DWORD dwUIElementId) override
+        HRESULT STDMETHODCALLTYPE UpdateUIElement(DWORD dwUIElementId) override
         {
             return S_OK;
         }
@@ -64,7 +64,7 @@ namespace libtf {
         /**
          * @brief Do nothing
          */
-        HRESULT EndUIElement(DWORD dwUIElementId) override
+        HRESULT STDMETHODCALLTYPE EndUIElement(DWORD dwUIElementId) override
         {
             return S_OK;
         }
