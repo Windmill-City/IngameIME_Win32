@@ -37,8 +37,6 @@ namespace libtf {
 
         /**
          * @brief Dispose the handler
-         *
-         * @return HRESULT if dispose succeed
          */
         HRESULT dispose()
         {
@@ -48,8 +46,6 @@ namespace libtf {
 
         /**
          * @brief Hide all the window of input method in full screen mode
-         *
-         * @param pbShow should show?
          */
         HRESULT BeginUIElement(DWORD dwUIElementId, BOOL* pbShow) override
         {

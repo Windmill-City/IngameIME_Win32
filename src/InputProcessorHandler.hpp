@@ -75,8 +75,8 @@ namespace libtf {
         {
             m_threadMgr                    = threadMgr;
             CComQIPtr<ITfSource> evtSource = m_threadMgr;
-            return evtSource->AdviseSink(IID_ITfInputProcessorProfileActivationSink, this,
-                                         &m_inputProcessorActivationSinkCookie);
+            return evtSource->AdviseSink(
+                IID_ITfInputProcessorProfileActivationSink, this, &m_inputProcessorActivationSinkCookie);
         }
 
         /**

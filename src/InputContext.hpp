@@ -49,8 +49,8 @@ namespace libtf {
             CHECK_HR(m_threadMgr->CreateDocumentMgr(&m_documentMgr));
 
             TfEditCookie ec;
-            CHECK_HR(m_documentMgr->CreateContext(m_clientId, 0, (ITfContextOwnerCompositionSink*)m_compositionHandler,
-                                                  &m_context, &ec));
+            CHECK_HR(m_documentMgr->CreateContext(
+                m_clientId, 0, (ITfContextOwnerCompositionSink*)m_compositionHandler, &m_context, &ec));
             CHECK_HR(m_documentMgr->Push(m_context));
 
             HRESULT                      hr;

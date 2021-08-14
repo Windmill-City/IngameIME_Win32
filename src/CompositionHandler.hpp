@@ -152,13 +152,14 @@ namespace libtf {
             CComPtr<ITfRange> preEditRange;
             CHECK_HR(m_compositionView->GetRange(&preEditRange));
 
-            ULONG  charCount;
-            WCHAR* buf = new WCHAR[65];
+            // Prealloc text buffer
+            ULONG                      charCount;
+            std::unique_ptr<wchar_t[]> buf(new wchar_t[64]);
             CHECK_OOM(buf);
 
-            CHECK_HR(preEditRange->GetText(ec, 0, buf, 64, &charCount));
-            BSTR bstr = SysAllocStringLen(buf, charCount);
-            delete[] buf;
+            // Get the preedit text
+            CHECK_HR(preEditRange->GetText(ec, 0, buf.get(), 64, &charCount));
+            BSTR bstr = SysAllocStringLen(buf.get(), charCount);
             CHECK_OOM(bstr);
 
             TF_SELECTION      sel[1];

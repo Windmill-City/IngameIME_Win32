@@ -70,13 +70,16 @@ namespace libtf {
             uint32_t totalCount;
             CHECK_HR(getTotalCount(candEle, totalCount));
 
+            // Page Total Count
             uint32_t pageCount;
             CHECK_HR(candEle->GetPageIndex(NULL, 0, &pageCount));
 
+            // Page start indexes' Array
             uint32_t* pageStarts = new uint32_t[pageCount];
             CHECK_OOM(pageStarts);
             CHECK_HR(candEle->GetPageIndex(pageStarts, pageCount, &pageCount));
 
+            // Current page's index in pageStarts
             uint32_t curPage;
             CHECK_HR(candEle->GetCurrentPage(&curPage));
 
