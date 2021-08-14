@@ -8,6 +8,8 @@
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
 
+#include <msctf.h>
+
 using namespace std;
 libtf_pInputContext ctx;
 
@@ -151,7 +153,7 @@ void testGetCurInputProcessor()
 
 void testSetInputProcessor()
 {
-    size_t fetched;
+    uint32_t fetched;
     libtf_get_input_processors(NULL, 0, &fetched);
     libtf_pInputProcessorProfile profiles = new libtf_InputProcessorProfile_t[fetched];
     libtf_get_input_processors(profiles, fetched, &fetched);
