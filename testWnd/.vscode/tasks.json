@@ -19,7 +19,9 @@
             "label": "Clean Build & ReBuild Project",
             "type": "shell",
             "command": "cmake -S ${workspaceFolder} -B ${workspaceFolder}/build",
-            "dependsOn":["Clean All"],
+            "dependsOn": [
+                "Clean All"
+            ],
             "problemMatcher": []
         },
     ]
