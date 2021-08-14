@@ -1,12 +1,6 @@
 #pragma once
 #include "libtfdef.h"
 
-#include "CandidateListHandler.hpp"
-#include "CompositionHandler.hpp"
-#include "ConversionModeHandler.hpp"
-#include "InputProcessorHandler.hpp"
-#include "SentenceModeHandler.hpp"
-
 namespace libtf {
     struct tagInputContext;
 }// namespace libtf
@@ -26,8 +20,8 @@ LIBTF_EXPORT typedef struct TF_INPUTPROCESSORPROFILE libtf_InputProcessorProfile
  * otherwise, return the count of elements actually obtained
  */
 LIBTF_EXPORT HRESULT libtf_get_input_processors(libtf_InputProcessorProfile_t* profiles,
-                                                size_t                         maxSize,
-                                                size_t*                        fetched);
+                                                uint32_t                       maxSize,
+                                                uint32_t*                      fetched);
 
 /**
  * @brief Get active input processor profie for the calling thread

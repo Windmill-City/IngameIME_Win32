@@ -5,11 +5,6 @@
 #include <functional>
 #include <msctf.h>
 
-extern "C" {
-LIBTF_EXPORT typedef unsigned long libtf_SentenceMode;
-LIBTF_EXPORT typedef void (*libtf_CallbackSentenceMode)(libtf_SentenceMode);
-}
-
 namespace libtf {
     class SentenceModeHandler : public CComObjectRoot, public ITfCompartmentEventSink {
       protected:

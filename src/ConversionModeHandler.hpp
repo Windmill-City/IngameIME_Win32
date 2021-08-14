@@ -5,11 +5,6 @@
 #include <functional>
 #include <msctf.h>
 
-extern "C" {
-LIBTF_EXPORT typedef unsigned long libtf_ConversionMode;
-LIBTF_EXPORT typedef void (*libtf_CallbackConversionMode)(libtf_ConversionMode);
-}
-
 namespace libtf {
     class ConversionModeHandler : public CComObjectRoot, public ITfCompartmentEventSink {
       protected:

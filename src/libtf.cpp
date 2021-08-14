@@ -24,7 +24,7 @@ typedef struct libtf::tagInputContext InputContext_t;
  * @param fetched if profiles is NULL, return the max size of the profiles, otherwise, return the fetched size.
  * The fetched size can change from one call to the next, pay attention to it.
  */
-HRESULT libtf_get_input_processors(libtf_InputProcessorProfile_t* profiles, size_t maxSize, size_t* fetched)
+HRESULT libtf_get_input_processors(libtf_InputProcessorProfile_t* profiles, uint32_t maxSize, uint32_t* fetched)
 {
     CComPtr<ITfInputProcessorProfiles> inputProcessorProfiles;
     CHECK_HR(createInputProcessorProfiles(&inputProcessorProfiles));
@@ -34,7 +34,7 @@ HRESULT libtf_get_input_processors(libtf_InputProcessorProfile_t* profiles, size
     // Pass 0 to langid to enum all profiles
     CHECK_HR(inputProcessorMgr->EnumProfiles(0, &enumProfiles));
 
-    size_t                        number = 0;
+    uint32_t                      number = 0;
     libtf_InputProcessorProfile_t profile[1];
     while (true) {
         ULONG fetch;

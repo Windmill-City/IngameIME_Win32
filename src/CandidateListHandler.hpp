@@ -6,46 +6,6 @@
 #include <memory>
 #include <msctf.h>
 
-extern "C" {
-LIBTF_EXPORT typedef enum libtf_CandidateListState {
-    libtf_CandidateListBegin,
-    libtf_CandidateListUpdate,
-    libtf_CandidateListEnd
-} libtf_CandidateListState_t;
-/**
- * @brief Candidate String format is Binary String
- */
-LIBTF_EXPORT typedef BSTR libtf_Candidate;
-LIBTF_EXPORT typedef struct libtf_tagCandidateList
-{
-    /**
-     * @brief The property below only available at CandidateListUpdate
-     */
-    libtf_CandidateListState_t state;
-    /**
-     * @brief Total count of the Candidates
-     */
-    uint32_t totalCount;
-    /**
-     * @brief At which index is current page start(inclusive)
-     */
-    uint32_t pageStart;
-    /**
-     * @brief At which index is current page end(inclusive)
-     */
-    uint32_t pageEnd;
-    /**
-     * @brief At which index is current selected Candidate
-     */
-    uint32_t curSelection;
-    /**
-     * @brief Array of Candidates
-     */
-    libtf_Candidate* candidates;
-} libtf_CandidateList_t, *libtf_pCandidateList;
-LIBTF_EXPORT typedef void (*libtf_CallbackCandidateList)(libtf_CandidateList_t);
-}
-
 namespace libtf {
     /**
      * @brief Default way to get CandidateList from ITfCandidateListUIElement

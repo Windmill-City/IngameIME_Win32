@@ -6,30 +6,6 @@
 #include <functional>
 #include <msctf.h>
 
-extern "C" {
-LIBTF_EXPORT typedef enum libtf_CompositionState {
-    libtf_CompositionBegin,
-    libtf_CompositionUpdate,
-    libtf_CompositionEnd
-} libtf_CompositionState_t;
-LIBTF_EXPORT typedef RECT libtf_BoundingBox_t;
-LIBTF_EXPORT typedef BSTR libtf_PreEdit;
-LIBTF_EXPORT typedef struct libtf_tagComposition
-{
-    libtf_CompositionState_t state;
-    /**
-     * @brief Only Available at CompositionUpdate
-     */
-    libtf_PreEdit preEdit;
-    /**
-     * @brief Only Available at CompositionUpdate
-     */
-    long selection[2];
-} libtf_Composition_t, *libtf_pComposition;
-LIBTF_EXPORT typedef void (*libtf_CallbackComposition)(libtf_Composition_t);
-LIBTF_EXPORT typedef void (*libtf_CallbackBoundingBox)(libtf_BoundingBox_t*);
-}
-
 namespace libtf {
     class CompositionHandler : public CComObjectRoot, public ITfContextOwnerCompositionSink, public ITfTextEditSink {
       protected:

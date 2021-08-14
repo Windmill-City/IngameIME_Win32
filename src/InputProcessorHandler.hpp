@@ -5,49 +5,6 @@
 #include <functional>
 #include <msctf.h>
 
-extern "C" {
-LIBTF_EXPORT typedef struct tagInputProcessorActivation
-{
-    /**
-     * @brief The type of this profile. This is one of these values.
-     * TF_PROFILETYPE_INPUTPROCESSOR - This is a text service.
-     * TF_PROFILETYPE_KEYBOARDLAYOUT - This is a keyboard layout.
-     */
-    DWORD dwProfileType;
-    /**
-     * @brief Specifies the language id of the profile.
-     */
-    LANGID langid;
-    /**
-     * @brief Specifies the CLSID of the text service.
-     * If dwProfileType is TF_PROFILETYPE_KEYBOARDLAYOUT, this is CLSID_NULL.
-     */
-    CLSID clsid;
-    /**
-     * @brief Specifies the category of this text service.
-     * This category is GUID_TFCAT_TIP_KEYBOARD, GUID_TFCAT_TIP_SPEECH, GUID_TFCAT_TIP_HANDWRITING or something in
-     * GUID_TFCAT_CATEGORY_OF_TIP. If dwProfileType is TF_PROFILETYPE_KEYBOARDLAYOUT, this is GUID_NULL.
-     */
-    GUID catid;
-    /**
-     * @brief Specifies the GUID to identify the profile.
-     * If dwProfileType is TF_PROFILETYPE_KEYBOARDLAYOUT, this is GUID_NULL.
-     */
-    GUID guidProfile;
-    /**
-     * @brief Specifies the keyboard layout handle of this profile.
-     * If dwProfileType is TF_PROFILETYPE_ INPUTPROCESSOR, this is NULL.
-     */
-    HKL hkl;
-    /**
-     * @brief TF_IPSINK_FLAG_ACTIVE - This is on if this profile is activated.
-     */
-    DWORD dwFlags;
-
-} libtf_InputProcessorActivation_t, libtf_pInputProcessorActivation;
-LIBTF_EXPORT typedef void (*libtf_CallbackInputProcessor)(libtf_InputProcessorActivation_t);
-};
-
 namespace libtf {
     class InputProcessorHandler : public CComObjectRoot, public ITfInputProcessorProfileActivationSink {
       protected:

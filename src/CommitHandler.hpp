@@ -5,11 +5,6 @@
 #include <functional>
 #include <msctf.h>
 
-extern "C" {
-LIBTF_EXPORT typedef BSTR libtf_Commit;
-LIBTF_EXPORT typedef void (*libtf_CallbackCommit)(libtf_Commit);
-}
-
 namespace libtf {
     class CommitHandler : public CComObjectRoot, public ITfEditSession {
       protected:
