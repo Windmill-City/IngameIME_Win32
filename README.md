@@ -33,7 +33,7 @@ Only need to include two header files, `libtf.h` and `libtfdef.h`
 
 - Obtain or set the active `Input Processor`
 
-- Watch the change of `Conversion` / `Sentence` Mode
+- Listen for status changes of `Conversion Mode` and `Sentence Mode`
 
 - Obtain the `PreEdit` text and the `Candidate` list of the `Composition`
 
