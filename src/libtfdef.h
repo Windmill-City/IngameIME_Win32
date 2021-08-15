@@ -65,6 +65,8 @@ LIBTF_EXPORT typedef struct libtf_tagCandidateList
     uint32_t curSelection;
     /**
      * @brief Array of Candidates
+     * 
+     * @note The memory of the Candidate will be free after return
      */
     libtf_Candidate* candidates;
 } libtf_CandidateList_t, *libtf_pCandidateList;
@@ -72,6 +74,9 @@ LIBTF_EXPORT typedef void (*libtf_CallbackCandidateList)(libtf_CandidateList_t);
 #pragma endregion
 
 #pragma region            Commit
+/**
+ * @note The memory of the Commit will be free after return
+ */
 LIBTF_EXPORT typedef BSTR libtf_Commit;
 LIBTF_EXPORT typedef void (*libtf_CallbackCommit)(libtf_Commit);
 #pragma endregion
@@ -83,6 +88,9 @@ LIBTF_EXPORT typedef enum libtf_CompositionState {
     libtf_CompositionEnd
 } libtf_CompositionState_t;
 LIBTF_EXPORT typedef RECT libtf_BoundingBox_t;
+/**
+ * @note The memory of the PreEdit will be free after return
+ */
 LIBTF_EXPORT typedef BSTR libtf_PreEdit;
 LIBTF_EXPORT typedef struct libtf_tagComposition
 {

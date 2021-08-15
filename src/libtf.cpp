@@ -203,10 +203,6 @@ HRESULT libtf_get_input_processor_desc(libtf_InputProcessorProfile_t profile, BS
 #pragma region Context
 /**
  * @brief Create input context for the calling thread
- *
- * @note the following method in the Context region should be called only from the thread who created the context,
- * if you are calling from another thread, your call will be handled at the creator thread of the context,
- * and the call will not return until the handling is finished, this may cause a dead lock!
  */
 HRESULT libtf_create_ctx(libtf_pInputContext* ctx)
 {
@@ -296,14 +292,6 @@ HRESULT libtf_set_sentence_mode(libtf_pInputContext ctx, libtf_SentenceMode mode
 }
 
 /**
- * @brief Get Sentence Mode of the context
- */
-HRESULT libtf_get_sentence_mode(libtf_pInputContext ctx, libtf_SentenceMode* mode)
-{
-    return ctx->ctx->m_sentenceHander->getSentenceMode(mode);
-}
-
-/**
  * @brief Get Conversion Mode of the context
  */
 HRESULT libtf_get_conversion_mode(libtf_pInputContext ctx, libtf_ConversionMode* mode)
@@ -312,19 +300,15 @@ HRESULT libtf_get_conversion_mode(libtf_pInputContext ctx, libtf_ConversionMode*
 }
 
 /**
- * @brief Set Conversion Mode of the context
+ * @brief Get Sentence Mode of the context
  */
-HRESULT libtf_set_conversion_mode(libtf_pInputContext, libtf_ConversionMode);
-
-/**
- * @brief Set Sentence Mode of the context
- */
-HRESULT libtf_set_sentence_mode(libtf_pInputContext, libtf_SentenceMode);
+HRESULT libtf_get_sentence_mode(libtf_pInputContext ctx, libtf_SentenceMode* mode)
+{
+    return ctx->ctx->m_sentenceHander->getSentenceMode(mode);
+}
 
 /**
  * @brief Set Full Screen mode of the context
- *
- * @note this call will not be handled in the creator thread of the context
  */
 HRESULT libtf_set_full_screen(libtf_pInputContext ctx, bool isFullScreen)
 {
@@ -334,8 +318,6 @@ HRESULT libtf_set_full_screen(libtf_pInputContext ctx, bool isFullScreen)
 
 /**
  * @brief Set if input method should show its Candidate Window of the context
- *
- * @note this call will not be handled in the creator thread of the context
  */
 HRESULT libtf_set_show_candidate_list_wnd(libtf_pInputContext ctx, bool show)
 {
@@ -345,8 +327,6 @@ HRESULT libtf_set_show_candidate_list_wnd(libtf_pInputContext ctx, bool show)
 
 /**
  * @brief Get Full Screen mode of the context
- *
- * @note this call will not be handled in the creator thread of the context
  */
 HRESULT libtf_get_full_screen(libtf_pInputContext ctx, bool* isFullScreen)
 {
@@ -356,8 +336,6 @@ HRESULT libtf_get_full_screen(libtf_pInputContext ctx, bool* isFullScreen)
 
 /**
  * @brief Get if input method should show its Candidate Window of the context
- *
- * @note this call will not be handled in the creator thread of the context
  */
 HRESULT libtf_get_show_candidate_list_wnd(libtf_pInputContext ctx, bool* show)
 {
@@ -366,9 +344,6 @@ HRESULT libtf_get_show_candidate_list_wnd(libtf_pInputContext ctx, bool* show)
 }
 #pragma endregion
 
-/**
- * @note these call will not be handled in the creator thread of the context
- */
 #pragma region setCallback
 /**
  * @brief Set Composition Callback of the context
