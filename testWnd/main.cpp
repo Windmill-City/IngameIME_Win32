@@ -95,7 +95,7 @@ void onComposition(libtf_Composition_t composition)
         case libtf_CompositionUpdate:
             printf("Composition Update\n");
             printf("PreEdit:%ls\n", composition.preEdit);
-            memory_dump(composition.preEdit, 32);
+            memory_dump(composition.preEdit, (SysStringLen(composition.preEdit) + 1) * sizeof(wchar_t));
             printf("Selection:%d, %d\n", composition.selection[0], composition.selection[1]);
             break;
         case libtf_CompositionEnd: printf("Composition End\n"); break;
@@ -106,6 +106,15 @@ void onCommit(libtf_Commit commit)
 {
     setlocale(LC_ALL, "");
     printf("Commit: %ls\n", commit);
+    /**
+     *       |<----Poiter start from here, not from the len
+     * |len |---Str---|NULL|
+     * |----|---Str---|0000|
+     * 
+     * len is uint32_t
+     * Str is in Unicode
+     */
+    memory_dump(commit - sizeof(int32_t) / sizeof(wchar_t), (SysStringLen(commit) + 1) * sizeof(wchar_t) + sizeof(int32_t));
 }
 void onCandidateList(libtf_CandidateList_t list)
 {
