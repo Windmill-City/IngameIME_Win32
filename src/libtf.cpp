@@ -52,11 +52,6 @@ HRESULT libtf_get_input_processors(libtf_InputProcessorProfile_t* profiles, uint
             if (number >= maxSize) break;
 
             memcpy(&profiles[number], &profile[0], sizeof(libtf_InputProcessorProfile_t));
-            memcpy(&profiles[number].clsid, &profile[0].clsid, sizeof(CLSID));
-            memcpy(&profiles[number].guidProfile, &profile[0].guidProfile, sizeof(GUID));
-            memcpy(&profiles[number].catid, &profile[0].catid, sizeof(GUID));
-            memcpy(&profiles[number].hklSubstitute, &profile[0].hklSubstitute, sizeof(HKL));
-            memcpy(&profiles[number].hkl, &profile[0].hkl, sizeof(HKL));
         }
 
         number++;
