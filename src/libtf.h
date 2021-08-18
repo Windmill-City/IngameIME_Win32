@@ -78,6 +78,20 @@ LIBTF_EXPORT HRESULT libtf_dispose_ctx(libtf_pInputContext);
 LIBTF_EXPORT HRESULT libtf_terminate_composition(libtf_pInputContext);
 
 /**
+ * @brief Set current selected Candidate for the Candidate List
+ * 
+ * @param index index of the Candidate
+ */
+LIBTF_EXPORT HRESULT libtf_set_candidate_list_sel(libtf_pInputContext, uint32_t index);
+
+/**
+ * @brief Finalize by specific Candidate for the Candidate List
+ * 
+ * @param index index of the Candidate
+ */
+LIBTF_EXPORT HRESULT libtf_final_candidate_list_sel(libtf_pInputContext, uint32_t index);
+
+/**
  * @brief Set input method state of the context
  *
  * @param bool true to enable the input method, false to disable it
