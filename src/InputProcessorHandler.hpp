@@ -59,7 +59,7 @@ namespace libtf {
                                               HKL      hkl,
                                               DWORD    dwFlags)
         {
-            sigInputProcessor({dwProfileType, langid, clsid, catid, guidProfile, hkl, dwFlags == TF_IPSINK_FLAG_ACTIVE});
+            sigInputProcessor({dwProfileType, langid, clsid, catid, guidProfile, hkl, (bool)(dwFlags & TF_IPSINK_FLAG_ACTIVE)});
 
             return S_OK;
         }
