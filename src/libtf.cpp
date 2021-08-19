@@ -16,6 +16,20 @@ typedef struct libtf_tagInputContext InputContext_t;
 
 #pragma region InputProcesser Profile
 /**
+ * @brief Copy data from tfProfile to libtf Profile
+ */
+void copyProfileData(TF_INPUTPROCESSORPROFILE tfProfile, libtf_InputProcessorProfile_t& profile)
+{
+    profile.profileType = tfProfile.dwProfileType;
+    profile.langId      = tfProfile.langid;
+    profile.hkl         = tfProfile.hkl;
+    profile.activated   = tfProfile.dwFlags & TF_IPP_FLAG_ACTIVE;
+    memcpy(&profile.clsid, &tfProfile.clsid, sizeof(GUID));
+    memcpy(&profile.catid, &tfProfile.catid, sizeof(GUID));
+    memcpy(&profile.guidProfile, &tfProfile.guidProfile, sizeof(GUID));
+}
+
+/**
  * @brief Get available input processor profies for the calling thread
  *
  * @param profiles Pointer to an array of libtf_InputProcessorProfile_t.
@@ -34,8 +48,8 @@ HRESULT libtf_get_input_processors(libtf_InputProcessorProfile_t* profiles, uint
     // Pass 0 to langid to enum all profiles
     CHECK_HR(inputProcessorMgr->EnumProfiles(0, &enumProfiles));
 
-    uint32_t                      number = 0;
-    libtf_InputProcessorProfile_t profile[1];
+    uint32_t                 number = 0;
+    TF_INPUTPROCESSORPROFILE profile[1];
     while (true) {
         ULONG fetch;
         CHECK_HR(enumProfiles->Next(1, profile, &fetch));
@@ -50,8 +64,7 @@ HRESULT libtf_get_input_processors(libtf_InputProcessorProfile_t* profiles, uint
         if (profiles) {
             // Reach max size
             if (number >= maxSize) break;
-
-            memcpy(&profiles[number], &profile[0], sizeof(libtf_InputProcessorProfile_t));
+            copyProfileData(profile[0], profiles[number]);
         }
 
         number++;
@@ -70,7 +83,10 @@ HRESULT libtf_get_active_input_processor(libtf_InputProcessorProfile_t* profile)
     CHECK_HR(createInputProcessorProfiles(&inputProcessorProfiles));
     CComQIPtr<ITfInputProcessorProfileMgr> inputProcessorMgr = inputProcessorProfiles;
 
-    CHECK_HR(inputProcessorMgr->GetActiveProfile(GUID_TFCAT_TIP_KEYBOARD, profile));
+    TF_INPUTPROCESSORPROFILE tfProfile;
+    CHECK_HR(inputProcessorMgr->GetActiveProfile(GUID_TFCAT_TIP_KEYBOARD, &tfProfile));
+
+    copyProfileData(tfProfile, *profile);
 
     return S_OK;
 }
@@ -84,8 +100,8 @@ HRESULT libtf_set_active_input_processor(libtf_InputProcessorProfile_t profile)
     CHECK_HR(createInputProcessorProfiles(&inputProcessorProfiles));
     CComQIPtr<ITfInputProcessorProfileMgr> inputProcessorMgr = inputProcessorProfiles;
 
-    CHECK_HR(inputProcessorMgr->ActivateProfile(profile.dwProfileType,
-                                                profile.langid,
+    CHECK_HR(inputProcessorMgr->ActivateProfile(profile.profileType,
+                                                profile.langId,
                                                 profile.clsid,
                                                 profile.guidProfile,
                                                 profile.hkl,
@@ -102,7 +118,7 @@ HRESULT libtf_set_active_input_processor(libtf_InputProcessorProfile_t profile)
  */
 HRESULT libtf_get_input_processor_locale(libtf_InputProcessorProfile_t profile, BSTR* locale)
 {
-    LCID    lcid = MAKELCID(profile.langid, SORT_DEFAULT);
+    LCID    lcid = MAKELCID(profile.langId, SORT_DEFAULT);
     wchar_t buf[85];
     GetLocaleInfoW(lcid, LOCALE_SNAME, buf, 85);
     *locale = SysAllocString(buf);
@@ -132,13 +148,13 @@ HRESULT libtf_get_locale_name(BSTR locale, BSTR* name)
  */
 HRESULT libtf_get_input_processor_desc(libtf_InputProcessorProfile_t profile, BSTR* desc)
 {
-    switch (profile.dwProfileType) {
+    switch (profile.profileType) {
         case TF_PROFILETYPE_INPUTPROCESSOR: {
             CComPtr<ITfInputProcessorProfiles> inputProcessorProfiles;
             CHECK_HR(createInputProcessorProfiles(&inputProcessorProfiles));
 
             CHECK_HR(inputProcessorProfiles->GetLanguageProfileDescription(
-                profile.clsid, profile.langid, profile.guidProfile, desc));
+                profile.clsid, profile.langId, profile.guidProfile, desc));
         } break;
         case TF_PROFILETYPE_KEYBOARDLAYOUT: {
             HKEY layouts;
@@ -151,7 +167,7 @@ HRESULT libtf_get_input_processor_desc(libtf_InputProcessorProfile_t profile, BS
             HRESULT hr;
             // the key of the keyboard layout is its langid
             char layoutKey[9];
-            snprintf(layoutKey, 9, "%08x", profile.langid);
+            snprintf(layoutKey, 9, "%08x", profile.langId);
             HKEY layout;
             if (NOT_ES(hr = RegOpenKeyExA(layouts, layoutKey, 0, KEY_READ, &layout))) goto CloseParentKey;
 

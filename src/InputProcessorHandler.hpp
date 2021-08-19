@@ -15,8 +15,8 @@ namespace libtf {
         /**
          * @brief Callback when Input Processor Activated or Deactivated
          */
-        typedef std::function<void(libtf_InputProcessorActivation_t)> signalInputProcessor;
-        signalInputProcessor sigInputProcessor = [](libtf_InputProcessorActivation_t) {};
+        typedef std::function<void(libtf_InputProcessorProfile_t)> signalInputProcessor;
+        signalInputProcessor sigInputProcessor = [](libtf_InputProcessorProfile_t) {};
 
         BEGIN_COM_MAP(InputProcessorHandler)
         COM_INTERFACE_ENTRY(ITfInputProcessorProfileActivationSink)
@@ -59,7 +59,7 @@ namespace libtf {
                                               HKL      hkl,
                                               DWORD    dwFlags)
         {
-            sigInputProcessor({dwProfileType, langid, clsid, catid, guidProfile, hkl, dwFlags});
+            sigInputProcessor({dwProfileType, langid, clsid, catid, guidProfile, hkl, dwFlags == TF_IPSINK_FLAG_ACTIVE});
 
             return S_OK;
         }

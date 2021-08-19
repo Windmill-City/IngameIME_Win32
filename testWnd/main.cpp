@@ -110,11 +110,12 @@ void onCommit(libtf_Commit commit, void* userData)
      *       |<----Poiter start from here, not from the len
      * |len |---Str---|NULL|
      * |----|---Str---|0000|
-     * 
+     *
      * len is uint32_t
      * Str is in Unicode
      */
-    memory_dump(commit - sizeof(int32_t) / sizeof(wchar_t), (SysStringLen(commit) + 1) * sizeof(wchar_t) + sizeof(int32_t));
+    memory_dump(commit - sizeof(int32_t) / sizeof(wchar_t),
+                (SysStringLen(commit) + 1) * sizeof(wchar_t) + sizeof(int32_t));
 }
 void onCandidateList(libtf_CandidateList_t list, void* userData)
 {
@@ -134,16 +135,16 @@ void onCandidateList(libtf_CandidateList_t list, void* userData)
         default: break;
     }
 }
-void onInputProcessor(libtf_InputProcessorActivation_t activation, void* userData)
+void onInputProcessor(libtf_InputProcessorProfile_t profile, void* userData)
 {
-    printf("%s\n", userData);
+    printf("%s\n", (char*)userData);
     printf("[%s] [%x-%x-%x-%llx] State:%d\n",
-           activation.dwProfileType & TF_PROFILETYPE_INPUTPROCESSOR ? "TIP" : "HKL",
-           activation.clsid.Data1,
-           activation.clsid.Data2,
-           activation.clsid.Data3,
-           *(unsigned long long*)activation.clsid.Data4,
-           activation.dwFlags & TF_IPSINK_FLAG_ACTIVE);
+           profile.profileType & TF_PROFILETYPE_INPUTPROCESSOR ? "TIP" : "HKL",
+           profile.clsid.Data1,
+           profile.clsid.Data2,
+           profile.clsid.Data3,
+           *(unsigned long long*)profile.clsid.Data4,
+           profile.activated);
 }
 #pragma endregion
 
@@ -152,13 +153,13 @@ void testGetCurInputProcessor()
     libtf_InputProcessorProfile_t curActiveInputProcessor;
     libtf_get_active_input_processor(&curActiveInputProcessor);
     printf("Cur Active:[%s][%x-%x-%x-%llx]Lang Id:%d, Active:%d\n",
-           curActiveInputProcessor.dwProfileType & TF_PROFILETYPE_INPUTPROCESSOR ? "TIP" : "HKL",
+           curActiveInputProcessor.profileType & TF_PROFILETYPE_INPUTPROCESSOR ? "TIP" : "HKL",
            curActiveInputProcessor.clsid.Data1,
            curActiveInputProcessor.clsid.Data2,
            curActiveInputProcessor.clsid.Data3,
            *(unsigned long long*)curActiveInputProcessor.clsid.Data4,
-           curActiveInputProcessor.langid,
-           curActiveInputProcessor.dwFlags & TF_IPP_FLAG_ACTIVE);
+           curActiveInputProcessor.langId,
+           curActiveInputProcessor.activated);
 }
 
 void testSetInputProcessor()
@@ -172,13 +173,13 @@ void testSetInputProcessor()
     for (size_t i = 0; i < fetched; i++) {
         printf("[%d][%s][%x-%x-%x-%llx]Lang Id:%d, Active:%d\n",
                (int)i,
-               profiles[i].dwProfileType & TF_PROFILETYPE_INPUTPROCESSOR ? "TIP" : "HKL",
+               profiles[i].profileType & TF_PROFILETYPE_INPUTPROCESSOR ? "TIP" : "HKL",
                profiles[i].clsid.Data1,
                profiles[i].clsid.Data2,
                profiles[i].clsid.Data3,
                *(unsigned long long*)profiles[i].clsid.Data4,
-               profiles[i].langid,
-               profiles[i].dwFlags & TF_IPP_FLAG_ACTIVE);
+               profiles[i].langId,
+               profiles[i].activated);
 
         setlocale(LC_ALL, "");
         BSTR locale;
@@ -193,10 +194,8 @@ void testSetInputProcessor()
         SysFreeString(desc);
 
         // If the input processor is not active, try to active it
-        if (!(profiles[i].dwFlags & TF_IPP_FLAG_ACTIVE)) {
-            testGetCurInputProcessor();
+        if (!profiles[i].activated) {
             libtf_set_active_input_processor(profiles[i]);
-            testGetCurInputProcessor();
         }
     }
 

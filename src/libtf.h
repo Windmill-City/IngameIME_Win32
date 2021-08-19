@@ -9,7 +9,6 @@ extern "C" {
 struct libtf_tagInputContext;
 
 LIBTF_EXPORT typedef struct libtf_tagInputContext*   libtf_pInputContext;
-LIBTF_EXPORT typedef struct TF_INPUTPROCESSORPROFILE libtf_InputProcessorProfile_t, *libtf_pInputProcessorProfile;
 
 #pragma region InputProcesser Profile
 /**

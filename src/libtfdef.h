@@ -119,18 +119,18 @@ LIBTF_EXPORT typedef void (*libtf_CallbackSentenceMode)(libtf_SentenceMode, void
 #pragma endregion
 
 #pragma region InputProcessor
-LIBTF_EXPORT typedef struct tagInputProcessorActivation
+LIBTF_EXPORT typedef struct tagInputProcessorProfile
 {
     /**
      * @brief The type of this profile. This is one of these values.
      * TF_PROFILETYPE_INPUTPROCESSOR - This is a text service.
      * TF_PROFILETYPE_KEYBOARDLAYOUT - This is a keyboard layout.
      */
-    DWORD dwProfileType;
+    DWORD profileType;
     /**
      * @brief Specifies the language id of the profile.
      */
-    LANGID langid;
+    LANGID langId;
     /**
      * @brief Specifies the CLSID of the text service.
      * If dwProfileType is TF_PROFILETYPE_KEYBOARDLAYOUT, this is CLSID_NULL.
@@ -153,12 +153,11 @@ LIBTF_EXPORT typedef struct tagInputProcessorActivation
      */
     HKL hkl;
     /**
-     * @brief TF_IPSINK_FLAG_ACTIVE - This is on if this profile is activated.
+     * @brief If the InputProcessor activated
      */
-    DWORD dwFlags;
-
-} libtf_InputProcessorActivation_t, libtf_pInputProcessorActivation;
-LIBTF_EXPORT typedef void (*libtf_CallbackInputProcessor)(libtf_InputProcessorActivation_t, void* userData);
+    bool activated;
+} libtf_InputProcessorProfile_t, *libtf_pInputProcessorProfile;
+LIBTF_EXPORT typedef void (*libtf_CallbackInputProcessor)(libtf_InputProcessorProfile_t, void* userData);
 #pragma endregion
 #ifdef __cplusplus
 }
