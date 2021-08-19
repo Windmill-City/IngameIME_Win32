@@ -111,12 +111,12 @@ LIBTF_EXPORT typedef void (*libtf_CallbackBoundingBox)(libtf_BoundingBox_t*, voi
 #pragma endregion
 
 #pragma region                     ConversionMode
-LIBTF_EXPORT typedef unsigned long libtf_ConversionMode;
+LIBTF_EXPORT typedef int32_t libtf_ConversionMode;
 LIBTF_EXPORT typedef void (*libtf_CallbackConversionMode)(libtf_ConversionMode, void* userData);
 #pragma endregion
 
 #pragma region                     SentenceMode
-LIBTF_EXPORT typedef unsigned long libtf_SentenceMode;
+LIBTF_EXPORT typedef int32_t libtf_SentenceMode;
 LIBTF_EXPORT typedef void (*libtf_CallbackSentenceMode)(libtf_SentenceMode, void* userData);
 #pragma endregion
 

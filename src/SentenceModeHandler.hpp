@@ -55,7 +55,7 @@ namespace libtf {
         {
             CComVariant val;
             CHECK_HR(m_sentenceMode->GetValue(&val));
-            *mode = val.ulVal;
+            *mode = val.intVal;
             return S_OK;
         }
 
@@ -65,7 +65,8 @@ namespace libtf {
         HRESULT setSentenceMode(libtf_SentenceMode mode)
         {
             CComVariant val;
-            val.ulVal = mode;
+            val.vt     = VT_I4;
+            val.intVal = mode;
             return m_sentenceMode->SetValue(m_clientId, &val);
         }
 
@@ -77,7 +78,7 @@ namespace libtf {
             if (IsEqualGUID(rguid, GUID_COMPARTMENT_KEYBOARD_INPUTMODE_SENTENCE)) {
                 CComVariant val;
                 CHECK_HR(m_sentenceMode->GetValue(&val));
-                sigSentenceMode(val.ulVal);
+                sigSentenceMode(val.intVal);
             }
             return S_OK;
         }

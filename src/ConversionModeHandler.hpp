@@ -53,7 +53,7 @@ namespace libtf {
         {
             CComVariant val;
             CHECK_HR(m_conversionMode->GetValue(&val));
-            *mode = val.ulVal;
+            *mode = val.intVal;
             return S_OK;
         }
 
@@ -63,7 +63,8 @@ namespace libtf {
         HRESULT setConversionMode(libtf_ConversionMode mode)
         {
             CComVariant val;
-            val.ulVal = mode;
+            val.vt    = VT_I4;
+            val.intVal = mode;
             return m_conversionMode->SetValue(m_clientId, &val);
         }
 
@@ -75,7 +76,7 @@ namespace libtf {
             if (IsEqualGUID(rguid, GUID_COMPARTMENT_KEYBOARD_INPUTMODE_CONVERSION)) {
                 CComVariant val;
                 CHECK_HR(m_conversionMode->GetValue(&val));
-                sigConversionMode(val.ulVal);
+                sigConversionMode(val.intVal);
             }
             return S_OK;
         }

@@ -33,6 +33,10 @@ void process_input(GLFWwindow* window)
             return;
         }
         cout << "IM State:" << !imState << endl;
+        if (FAILED(libtf_set_conversion_mode(ctx, TF_CONVERSIONMODE_ALPHANUMERIC))) {
+            cout << "Failed to set conversion mode!" << endl;
+            return;
+        }
     }
     if (glfwGetKey(window, GLFW_KEY_F5) == GLFW_RELEASE) { toggleDown = false; }
 #pragma endregion
@@ -195,7 +199,7 @@ void testSetInputProcessor()
 
         // If the input processor is not active, try to active it
         if (!profiles[i].activated) {
-            libtf_set_active_input_processor(profiles[i]);
+            // libtf_set_active_input_processor(profiles[i]);
         }
     }
 
