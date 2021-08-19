@@ -30,6 +30,8 @@
 
 #ifdef __cplusplus
 extern "C" {
+#else
+#    define bool _Bool
 #endif
 #pragma region CandidateList
 LIBTF_EXPORT typedef enum libtf_CandidateListState {
