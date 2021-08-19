@@ -16,6 +16,12 @@ add_executable(testWnd main.cpp)
 target_link_libraries(testWnd glfw ${GLFW_LIBRARIES})
 target_link_libraries(testWnd libtf)
 
+add_custom_command(
+        TARGET testWnd POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "$<TARGET_FILE_DIR:libtf>/libtf.dll"
+        "$<TARGET_FILE_DIR:testWnd>")
+
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
