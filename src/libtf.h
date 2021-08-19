@@ -166,37 +166,43 @@ LIBTF_EXPORT HRESULT libtf_get_show_candidate_list_wnd(libtf_pInputContext, bool
 /**
  * @brief Set Composition Callback of the context
  */
-LIBTF_EXPORT HRESULT libtf_set_composition_callback(libtf_pInputContext, libtf_CallbackComposition);
+LIBTF_EXPORT HRESULT libtf_set_composition_callback(libtf_pInputContext, libtf_CallbackComposition, void* userData);
 
 /**
  * @brief Set Commit Callback of the context
  */
-LIBTF_EXPORT HRESULT libtf_set_commit_callback(libtf_pInputContext, libtf_CallbackCommit);
+LIBTF_EXPORT HRESULT libtf_set_commit_callback(libtf_pInputContext, libtf_CallbackCommit, void* userData);
 
 /**
  * @brief Set PreEdit Bounding Box Callback of the context
  */
-LIBTF_EXPORT HRESULT libtf_set_bounding_box_callback(libtf_pInputContext, libtf_CallbackBoundingBox);
+LIBTF_EXPORT HRESULT libtf_set_bounding_box_callback(libtf_pInputContext, libtf_CallbackBoundingBox, void* userData);
 
 /**
  * @brief Set Candidate List Callback of the context
  */
-LIBTF_EXPORT HRESULT libtf_set_candidate_list_callback(libtf_pInputContext, libtf_CallbackCandidateList);
+LIBTF_EXPORT HRESULT libtf_set_candidate_list_callback(libtf_pInputContext,
+                                                       libtf_CallbackCandidateList,
+                                                       void* userData);
 
 /**
  * @brief Set Conversion mode Callback of the context
  */
-LIBTF_EXPORT HRESULT libtf_set_conversion_mode_callback(libtf_pInputContext, libtf_CallbackConversionMode);
+LIBTF_EXPORT HRESULT libtf_set_conversion_mode_callback(libtf_pInputContext,
+                                                        libtf_CallbackConversionMode,
+                                                        void* userData);
 
 /**
  * @brief Set Sentence mode Callback of the context
  */
-LIBTF_EXPORT HRESULT libtf_set_sentence_mode_callback(libtf_pInputContext, libtf_CallbackSentenceMode);
+LIBTF_EXPORT HRESULT libtf_set_sentence_mode_callback(libtf_pInputContext, libtf_CallbackSentenceMode, void* userData);
 
 /**
  * @brief Set Input Processor Callback of the context
  */
-LIBTF_EXPORT HRESULT libtf_set_input_processor_callback(libtf_pInputContext, libtf_CallbackInputProcessor);
+LIBTF_EXPORT HRESULT libtf_set_input_processor_callback(libtf_pInputContext,
+                                                        libtf_CallbackInputProcessor,
+                                                        void* userData);
 #pragma endregion
 #ifdef __cplusplus
 }

@@ -233,7 +233,8 @@ HRESULT libtf_terminate_composition(libtf_pInputContext ctx)
  *
  * @param index index of the Candidate
  */
-LIBTF_EXPORT HRESULT libtf_set_candidate_list_sel(libtf_pInputContext ctx, uint32_t index) {
+LIBTF_EXPORT HRESULT libtf_set_candidate_list_sel(libtf_pInputContext ctx, uint32_t index)
+{
     return ctx->ctx->m_candHandler->setSelection(index);
 }
 
@@ -242,7 +243,8 @@ LIBTF_EXPORT HRESULT libtf_set_candidate_list_sel(libtf_pInputContext ctx, uint3
  *
  * @param index index of the Candidate
  */
-LIBTF_EXPORT HRESULT libtf_final_candidate_list_sel(libtf_pInputContext ctx, uint32_t index) {
+LIBTF_EXPORT HRESULT libtf_final_candidate_list_sel(libtf_pInputContext ctx, uint32_t index)
+{
     return ctx->ctx->m_candHandler->setFinalize(index);
 }
 
@@ -361,63 +363,65 @@ HRESULT libtf_get_show_candidate_list_wnd(libtf_pInputContext ctx, bool* show)
 /**
  * @brief Set Composition Callback of the context
  */
-HRESULT libtf_set_composition_callback(libtf_pInputContext ctx, libtf_CallbackComposition callback)
+HRESULT libtf_set_composition_callback(libtf_pInputContext ctx, libtf_CallbackComposition callback, void* userData)
 {
-    ctx->ctx->m_compositionHandler->m_sigComposition = callback;
+    ctx->ctx->m_compositionHandler->m_sigComposition = std::bind(callback, std::placeholders::_1, userData);
     return S_OK;
 }
 
 /**
  * @brief Set Commit Callback of the context
  */
-HRESULT libtf_set_commit_callback(libtf_pInputContext ctx, libtf_CallbackCommit callback)
+HRESULT libtf_set_commit_callback(libtf_pInputContext ctx, libtf_CallbackCommit callback, void* userData)
 {
-    ctx->ctx->m_compositionHandler->m_commitHandler->m_sigCommit = callback;
+    ctx->ctx->m_compositionHandler->m_commitHandler->m_sigCommit = std::bind(callback, std::placeholders::_1, userData);
     return S_OK;
 }
 
 /**
  * @brief Set PreEdit Bounding Box Callback of the context
  */
-HRESULT libtf_set_bounding_box_callback(libtf_pInputContext ctx, libtf_CallbackBoundingBox callback)
+HRESULT libtf_set_bounding_box_callback(libtf_pInputContext ctx, libtf_CallbackBoundingBox callback, void* userData)
 {
-    ctx->ctx->m_compositionHandler->m_sigBoundingBox = callback;
+    ctx->ctx->m_compositionHandler->m_sigBoundingBox = std::bind(callback, std::placeholders::_1, userData);
     return S_OK;
 }
 
 /**
  * @brief Set Candidate List Callback of the context
  */
-HRESULT libtf_set_candidate_list_callback(libtf_pInputContext ctx, libtf_CallbackCandidateList callback)
+HRESULT libtf_set_candidate_list_callback(libtf_pInputContext ctx, libtf_CallbackCandidateList callback, void* userData)
 {
-    ctx->ctx->m_candHandler->m_sigCandidateList = callback;
+    ctx->ctx->m_candHandler->m_sigCandidateList = std::bind(callback, std::placeholders::_1, userData);
     return S_OK;
 }
 
 /**
  * @brief Set Conversion mode Callback of the context
  */
-HRESULT libtf_set_conversion_mode_callback(libtf_pInputContext ctx, libtf_CallbackConversionMode callback)
+HRESULT
+libtf_set_conversion_mode_callback(libtf_pInputContext ctx, libtf_CallbackConversionMode callback, void* userData)
 {
-    ctx->ctx->m_conversionHander->sigConversionMode = callback;
+    ctx->ctx->m_conversionHander->sigConversionMode = std::bind(callback, std::placeholders::_1, userData);
     return S_OK;
 }
 
 /**
  * @brief Set Sentence mode Callback of the context
  */
-HRESULT libtf_set_sentence_mode_callback(libtf_pInputContext ctx, libtf_CallbackSentenceMode callback)
+HRESULT libtf_set_sentence_mode_callback(libtf_pInputContext ctx, libtf_CallbackSentenceMode callback, void* userData)
 {
-    ctx->ctx->m_sentenceHander->sigSentenceMode = callback;
+    ctx->ctx->m_sentenceHander->sigSentenceMode = std::bind(callback, std::placeholders::_1, userData);
     return S_OK;
 }
 
 /**
  * @brief Set Input Processor Callback of the context
  */
-HRESULT libtf_set_input_processor_callback(libtf_pInputContext ctx, libtf_CallbackInputProcessor callback)
+HRESULT
+libtf_set_input_processor_callback(libtf_pInputContext ctx, libtf_CallbackInputProcessor callback, void* userData)
 {
-    ctx->ctx->m_inputProcessor->sigInputProcessor = callback;
+    ctx->ctx->m_inputProcessor->sigInputProcessor = std::bind(callback, std::placeholders::_1, userData);
     return S_OK;
 }
 #pragma endregion

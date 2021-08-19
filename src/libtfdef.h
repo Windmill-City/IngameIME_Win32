@@ -65,20 +65,20 @@ LIBTF_EXPORT typedef struct libtf_tagCandidateList
     uint32_t curSelection;
     /**
      * @brief Array of Candidates
-     * 
+     *
      * @note The memory of the Candidate will be free after return
      */
     libtf_Candidate* candidates;
 } libtf_CandidateList_t, *libtf_pCandidateList;
-LIBTF_EXPORT typedef void (*libtf_CallbackCandidateList)(libtf_CandidateList_t);
+LIBTF_EXPORT typedef void (*libtf_CallbackCandidateList)(libtf_CandidateList_t, void* userData);
 #pragma endregion
 
-#pragma region            Commit
+#pragma region Commit
 /**
  * @note The memory of the Commit will be free after return
  */
 LIBTF_EXPORT typedef BSTR libtf_Commit;
-LIBTF_EXPORT typedef void (*libtf_CallbackCommit)(libtf_Commit);
+LIBTF_EXPORT typedef void (*libtf_CallbackCommit)(libtf_Commit, void* userData);
 #pragma endregion
 
 #pragma region Composition
@@ -104,18 +104,18 @@ LIBTF_EXPORT typedef struct libtf_tagComposition
      */
     long selection[2];
 } libtf_Composition_t, *libtf_pComposition;
-LIBTF_EXPORT typedef void (*libtf_CallbackComposition)(libtf_Composition_t);
-LIBTF_EXPORT typedef void (*libtf_CallbackBoundingBox)(libtf_BoundingBox_t*);
+LIBTF_EXPORT typedef void (*libtf_CallbackComposition)(libtf_Composition_t, void* userData);
+LIBTF_EXPORT typedef void (*libtf_CallbackBoundingBox)(libtf_BoundingBox_t*, void* userData);
 #pragma endregion
 
 #pragma region                     ConversionMode
 LIBTF_EXPORT typedef unsigned long libtf_ConversionMode;
-LIBTF_EXPORT typedef void (*libtf_CallbackConversionMode)(libtf_ConversionMode);
+LIBTF_EXPORT typedef void (*libtf_CallbackConversionMode)(libtf_ConversionMode, void* userData);
 #pragma endregion
 
 #pragma region                     SentenceMode
 LIBTF_EXPORT typedef unsigned long libtf_SentenceMode;
-LIBTF_EXPORT typedef void (*libtf_CallbackSentenceMode)(libtf_SentenceMode);
+LIBTF_EXPORT typedef void (*libtf_CallbackSentenceMode)(libtf_SentenceMode, void* userData);
 #pragma endregion
 
 #pragma region InputProcessor
@@ -158,7 +158,7 @@ LIBTF_EXPORT typedef struct tagInputProcessorActivation
     DWORD dwFlags;
 
 } libtf_InputProcessorActivation_t, libtf_pInputProcessorActivation;
-LIBTF_EXPORT typedef void (*libtf_CallbackInputProcessor)(libtf_InputProcessorActivation_t);
+LIBTF_EXPORT typedef void (*libtf_CallbackInputProcessor)(libtf_InputProcessorActivation_t, void* userData);
 #pragma endregion
 #ifdef __cplusplus
 }

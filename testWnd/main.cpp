@@ -71,7 +71,7 @@ void memory_dump(void* ptr, int len)
 
 #pragma region libtf callbacks
 
-void onBoundingBox(libtf_BoundingBox_t* box)
+void onBoundingBox(libtf_BoundingBox_t* box, void* userData)
 {
     box->left   = 0;
     box->right  = 0;
@@ -79,15 +79,15 @@ void onBoundingBox(libtf_BoundingBox_t* box)
     box->bottom = 20;// Font height
     printf("Fetch Bounding Box:%d, %d,%d, %d\n", box->left, box->right, box->top, box->bottom);
 }
-void onConversionMode(libtf_ConversionMode mode)
+void onConversionMode(libtf_ConversionMode mode, void* userData)
 {
     printf("Conversion Mode:%d\n", mode);
 }
-void onSentenceMode(libtf_SentenceMode mode)
+void onSentenceMode(libtf_SentenceMode mode, void* userData)
 {
     printf("Sentence Mode:%d\n", mode);
 }
-void onComposition(libtf_Composition_t composition)
+void onComposition(libtf_Composition_t composition, void* userData)
 {
     setlocale(LC_ALL, "");
     switch (composition.state) {
@@ -102,7 +102,7 @@ void onComposition(libtf_Composition_t composition)
         default: break;
     }
 }
-void onCommit(libtf_Commit commit)
+void onCommit(libtf_Commit commit, void* userData)
 {
     setlocale(LC_ALL, "");
     printf("Commit: %ls\n", commit);
@@ -116,7 +116,7 @@ void onCommit(libtf_Commit commit)
      */
     memory_dump(commit - sizeof(int32_t) / sizeof(wchar_t), (SysStringLen(commit) + 1) * sizeof(wchar_t) + sizeof(int32_t));
 }
-void onCandidateList(libtf_CandidateList_t list)
+void onCandidateList(libtf_CandidateList_t list, void* userData)
 {
     setlocale(LC_ALL, "");
     switch (list.state) {
@@ -134,8 +134,9 @@ void onCandidateList(libtf_CandidateList_t list)
         default: break;
     }
 }
-void onInputProcessor(libtf_InputProcessorActivation_t activation)
+void onInputProcessor(libtf_InputProcessorActivation_t activation, void* userData)
 {
+    printf("%s\n", userData);
     printf("[%s] [%x-%x-%x-%llx] State:%d\n",
            activation.dwProfileType & TF_PROFILETYPE_INPUTPROCESSOR ? "TIP" : "HKL",
            activation.clsid.Data1,
@@ -234,13 +235,13 @@ int main()
         // Once the window get focus, you need to call libtf_set_focus_wnd
         glfwSetWindowFocusCallback(window, window_focus_callback);
 
-        libtf_set_conversion_mode_callback(ctx, onConversionMode);
-        libtf_set_sentence_mode_callback(ctx, onSentenceMode);
-        libtf_set_composition_callback(ctx, onComposition);
-        libtf_set_commit_callback(ctx, onCommit);
-        libtf_set_candidate_list_callback(ctx, onCandidateList);
-        libtf_set_bounding_box_callback(ctx, onBoundingBox);
-        libtf_set_input_processor_callback(ctx, onInputProcessor);
+        libtf_set_conversion_mode_callback(ctx, onConversionMode, NULL);
+        libtf_set_sentence_mode_callback(ctx, onSentenceMode, NULL);
+        libtf_set_composition_callback(ctx, onComposition, NULL);
+        libtf_set_commit_callback(ctx, onCommit, NULL);
+        libtf_set_candidate_list_callback(ctx, onCandidateList, NULL);
+        libtf_set_bounding_box_callback(ctx, onBoundingBox, NULL);
+        libtf_set_input_processor_callback(ctx, onInputProcessor, "UserData Test");
 #pragma endregion
 
         while (!glfwWindowShouldClose(window)) {
