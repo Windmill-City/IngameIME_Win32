@@ -63,6 +63,10 @@ LIBTF_EXPORT HRESULT libtf_get_input_processor_desc(libtf_InputProcessorProfile_
 #pragma region Context
 /**
  * @brief Create input context for the calling thread
+ *
+ * @note Context should be thread local, you can't use it in another thread, except the creator
+ * @note A thread can create at most one context
+ * @note Once disposed, you can't recreate once more on the same thread
  */
 LIBTF_EXPORT HRESULT libtf_create_ctx(libtf_pInputContext*);
 
