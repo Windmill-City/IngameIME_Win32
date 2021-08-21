@@ -54,7 +54,7 @@ add_library(libtf_shared SHARED src/libtf.cpp)
 add_library(libtf_static STATIC src/libtf.cpp)
 
 set_target_properties(libtf_shared PROPERTIES OUTPUT_NAME "libtf")
-set_target_properties(libtf_static PROPERTIES OUTPUT_NAME "libtf_s")
+set_target_properties(libtf_static PROPERTIES OUTPUT_NAME "libtf")
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
