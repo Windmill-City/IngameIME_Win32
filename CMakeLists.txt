@@ -44,10 +44,17 @@ include_directories(${HEADERS})
 link_directories(${SDK_LIB_DIR})
 source_group(${SOURCES})
 
+if(STATIC_VC_RUNTIME)
+    include(MSVCStaticRuntime)
+endif()
 add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
-add_library(libtf SHARED src/libtf.cpp)
+add_library(libtf_shared SHARED src/libtf.cpp)
+add_library(libtf_static STATIC src/libtf.cpp)
+
+set_target_properties(libtf_shared PROPERTIES OUTPUT_NAME "libtf")
+set_target_properties(libtf_static PROPERTIES OUTPUT_NAME "libtf")
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

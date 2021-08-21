@@ -11,10 +11,23 @@ A library for Text Service Framework
 - C++ ATL v142
 - Windows SDK(10.0.19041.0)
 
-Run Command
+### Setup Project
 
-```bash
-cmake --build ./build --config Release --target ALL_BUILD
+```sh
+cd <path-to-libtf-project>
+```
+
+```sh
+cmake -S ./ -B ./build/build64-static-rt -DSTATIC_VC_RUNTIME=1 -G "Visual Studio 16 2019" -A x64
+cmake -S ./ -B ./build/build32-static-rt -DSTATIC_VC_RUNTIME=1 -G "Visual Studio 16 2019" -A Win32
+cmake -S ./ -B ./build/build64 -DSTATIC_VC_RUNTIME=0 -G "Visual Studio 16 2019" -A x64
+cmake -S ./ -B ./build/build32 -DSTATIC_VC_RUNTIME=0 -G "Visual Studio 16 2019" -A Win32
+```
+
+Build
+
+```sh
+cmake --build ./build/build<64|32>[-static-rt] --config Release --target ALL_BUILD
 ```
 
 ## How to use?
