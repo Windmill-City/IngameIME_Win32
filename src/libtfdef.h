@@ -12,7 +12,7 @@
     }
 
 /**
- * @brief Check if ERROR_SUCCESS
+ * @brief Check if not ERROR_SUCCESS
  */
 #define NOT_ES(hresultItem) (ERROR_SUCCESS != (hresultItem))
 
@@ -40,7 +40,7 @@ LIBTF_EXPORT typedef enum libtf_CandidateListState {
     libtf_CandidateListEnd
 } libtf_CandidateListState_t;
 /**
- * @brief Candidate String format is Binary String
+ * @note In format of Binary String
  */
 LIBTF_EXPORT typedef BSTR libtf_Candidate;
 LIBTF_EXPORT typedef struct libtf_tagCandidateList
@@ -67,19 +67,23 @@ LIBTF_EXPORT typedef struct libtf_tagCandidateList
     uint32_t curSelection;
     /**
      * @brief Array of Candidates
-     *
-     * @note The memory of the Candidate will be free after return
      */
     libtf_Candidate* candidates;
 } libtf_CandidateList_t, *libtf_pCandidateList;
+/**
+ * @note The memory of the struct will be invalid after return
+ */
 LIBTF_EXPORT typedef void (*libtf_CallbackCandidateList)(libtf_CandidateList_t, void* userData);
 #pragma endregion
 
 #pragma region Commit
 /**
- * @note The memory of the Commit will be free after return
+ * @note In format of Binary String
  */
 LIBTF_EXPORT typedef BSTR libtf_Commit;
+/**
+ * @note The memory of the Commit will be invalid after return
+ */
 LIBTF_EXPORT typedef void (*libtf_CallbackCommit)(libtf_Commit, void* userData);
 #pragma endregion
 
@@ -89,9 +93,14 @@ LIBTF_EXPORT typedef enum libtf_CompositionState {
     libtf_CompositionUpdate,
     libtf_CompositionEnd
 } libtf_CompositionState_t;
+/**
+ * @brief the Bounding box of the PreEdit text in screen coordinate
+ * 
+ * Input method use this information to position its Candidate List Window
+ */
 LIBTF_EXPORT typedef RECT libtf_BoundingBox_t;
 /**
- * @note The memory of the PreEdit will be free after return
+ * @note In format of Binary String
  */
 LIBTF_EXPORT typedef BSTR libtf_PreEdit;
 LIBTF_EXPORT typedef struct libtf_tagComposition
@@ -106,17 +115,35 @@ LIBTF_EXPORT typedef struct libtf_tagComposition
      */
     long selection[2];
 } libtf_Composition_t, *libtf_pComposition;
+/**
+ * @note The memory of the struct will be invalid after return
+ */
 LIBTF_EXPORT typedef void (*libtf_CallbackComposition)(libtf_Composition_t, void* userData);
+/**
+ * @brief Return the Bounding Box of the PreEdit text in screen coordinate
+ * 
+ * Input method use this information to position its Candidate List Widnow
+ */
 LIBTF_EXPORT typedef void (*libtf_CallbackBoundingBox)(libtf_BoundingBox_t*, void* userData);
 #pragma endregion
 
 #pragma region                     ConversionMode
 LIBTF_EXPORT typedef int32_t libtf_ConversionMode;
+/**
+ * @brief Notify when the Conversion Mode has changed
+ * 
+ * @see https://docs.microsoft.com/en-us/windows/win32/tsf/flags-for-conversion-mode
+ */
 LIBTF_EXPORT typedef void (*libtf_CallbackConversionMode)(libtf_ConversionMode, void* userData);
 #pragma endregion
 
 #pragma region                     SentenceMode
 LIBTF_EXPORT typedef int32_t libtf_SentenceMode;
+/**
+ * @brief Notify when the Sentence Mode has changed
+ * 
+ * @see https://docs.microsoft.com/en-us/windows/win32/tsf/flags-for-conversion-mode
+ */
 LIBTF_EXPORT typedef void (*libtf_CallbackSentenceMode)(libtf_SentenceMode, void* userData);
 #pragma endregion
 
@@ -159,6 +186,11 @@ LIBTF_EXPORT typedef struct tagInputProcessorProfile
      */
     bool activated;
 } libtf_InputProcessorProfile_t, *libtf_pInputProcessorProfile;
+/**
+ * @brief Notify when InputProcessorProfile has changed
+ * 
+ * @note The memory of the struct will be invalid after return
+ */
 LIBTF_EXPORT typedef void (*libtf_CallbackInputProcessor)(libtf_InputProcessorProfile_t, void* userData);
 #pragma endregion
 #ifdef __cplusplus
