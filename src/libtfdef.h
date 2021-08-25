@@ -123,6 +123,14 @@ LIBTF_EXPORT typedef void (*libtf_CallbackComposition)(libtf_Composition_t, void
  * @brief Return the Bounding Box of the PreEdit text in screen coordinate
  * 
  * Input method use this information to position its Candidate List Widnow
+ * 
+ * @note It is possible that some input method doesn't provide PreEdit information in the Composition,
+ * as they draw it in the Candidate Window
+ * To position such Candidate Window in right place, the height of the box should not be zero,
+ * in case the Candidate Window overlap the textbox.
+ * Ex:{x,y, x+0, y+defaultFontHeight}
+ * 
+ * If there is no Composition, just return {0,0,0,0}
  */
 LIBTF_EXPORT typedef void (*libtf_CallbackBoundingBox)(libtf_BoundingBox_t*, void* userData);
 #pragma endregion
