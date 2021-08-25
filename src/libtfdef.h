@@ -41,6 +41,10 @@ LIBTF_EXPORT typedef enum libtf_CandidateListState {
 } libtf_CandidateListState_t;
 /**
  * @note In format of Binary String
+ *                             |<----Where the BSTR pointer points,
+ *                             | so you can treat it as normal wchar_t C String
+ * |-----------int32-----------|--UTF-16 zero-terminated C string--|--int16--|
+ * |Str Len(Not include the \0)|-------------Str data-------------|----\0---|
  */
 LIBTF_EXPORT typedef BSTR libtf_Candidate;
 LIBTF_EXPORT typedef struct libtf_tagCandidateList
@@ -72,6 +76,7 @@ LIBTF_EXPORT typedef struct libtf_tagCandidateList
 } libtf_CandidateList_t, *libtf_pCandidateList;
 /**
  * @note The memory of the struct will be invalid after return
+ * @note The libtf_Candidate Binary String Array and its content will be freed after return
  */
 LIBTF_EXPORT typedef void (*libtf_CallbackCandidateList)(libtf_CandidateList_t, void* userData);
 #pragma endregion
@@ -79,10 +84,14 @@ LIBTF_EXPORT typedef void (*libtf_CallbackCandidateList)(libtf_CandidateList_t, 
 #pragma region Commit
 /**
  * @note In format of Binary String
+ *                             |<----Where the BSTR pointer points,
+ *                             | so you can treat it as normal wchar_t C String
+ * |-----------int32-----------|--UTF-16 zero-terminated C string--|--int16--|
+ * |Str Len(Not include the \0)|-------------Str data-------------|----\0---|
  */
 LIBTF_EXPORT typedef BSTR libtf_Commit;
 /**
- * @note The memory of the Commit will be invalid after return
+ * @note The libtf_Commit Binary String will be freed after return
  */
 LIBTF_EXPORT typedef void (*libtf_CallbackCommit)(libtf_Commit, void* userData);
 #pragma endregion
@@ -101,6 +110,10 @@ LIBTF_EXPORT typedef enum libtf_CompositionState {
 LIBTF_EXPORT typedef RECT libtf_BoundingBox_t;
 /**
  * @note In format of Binary String
+ *                             |<----Where the BSTR pointer points,
+ *                             | so you can treat it as normal wchar_t C String
+ * |-----------int32-----------|--UTF-16 zero-terminated C string--|--int16--|
+ * |Str Len(Not include the \0)|-------------Str data-------------|----\0---|
  */
 LIBTF_EXPORT typedef BSTR libtf_PreEdit;
 LIBTF_EXPORT typedef struct libtf_tagComposition
@@ -117,6 +130,7 @@ LIBTF_EXPORT typedef struct libtf_tagComposition
 } libtf_Composition_t, *libtf_pComposition;
 /**
  * @note The memory of the struct will be invalid after return
+ * @note The libtf_PreEdit Binary String will be freed after return
  */
 LIBTF_EXPORT typedef void (*libtf_CallbackComposition)(libtf_Composition_t, void* userData);
 /**
