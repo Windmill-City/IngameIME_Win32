@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(libtf VERSION 0.1.0)
+project(libtf VERSION 3.0.0)
 
 if(NOT MSVC)
     message(FATAL_ERROR "Require MSVC to build!")
