@@ -4,22 +4,114 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "CMake Clean",
-            "type": "shell",
-            "command": "cmake --build ${workspaceFolder}/build --target clean",
-            "problemMatcher": []
-        },
-        {
             "label": "Clean Build Dir",
             "type": "shell",
             "command": "rm -r ${workspaceFolder}/build; mkdir ${workspaceFolder}/build",
             "problemMatcher": []
         },
         {
+            "label": "Setup target-x64-staticRT",
+            "type": "shell",
+            "command": "cmake -S ${workspaceFolder} -B ${workspaceFolder}/build/build64-static-rt -DSTATIC_VC_RUNTIME=1 -G 'Visual Studio 16 2019' -A x64",
+            "problemMatcher": []
+        },
+        {
+            "label": "Setup target-x86-staticRT",
+            "type": "shell",
+            "command": "cmake -S ${workspaceFolder} -B ${workspaceFolder}/build/build32-static-rt -DSTATIC_VC_RUNTIME=1 -G 'Visual Studio 16 2019' -A Win32",
+            "problemMatcher": []
+        },
+        {
+            "label": "Setup target-x64",
+            "type": "shell",
+            "command": "cmake -S ${workspaceFolder} -B ${workspaceFolder}/build/build64 -DSTATIC_VC_RUNTIME=0 -G 'Visual Studio 16 2019' -A x64",
+            "problemMatcher": []
+        },
+        {
+            "label": "Setup target-x86",
+            "type": "shell",
+            "command": "cmake -S ${workspaceFolder} -B ${workspaceFolder}/build/build32 -DSTATIC_VC_RUNTIME=0 -G 'Visual Studio 16 2019' -A Win32",
+            "problemMatcher": []
+        },
+        {
             "label": "Clean Build & ReBuild Project",
             "type": "shell",
             "command": "cmake -S ${workspaceFolder} -B ${workspaceFolder}/build",
-            "dependsOn":["Clean All"],
+            "dependsOn": [
+                "Clean Build Dir",
+                "Setup target-x64-staticRT",
+                "Setup target-x86-staticRT",
+                "Setup target-x64",
+                "Setup target-x86",
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Build target-x64-staticRT",
+            "type": "shell",
+            "command": "cmake --build ${workspaceFolder}/build/build64-static-rt --config Release --target ALL_BUILD",
+            "problemMatcher": []
+        },
+        {
+            "label": "Build target-x86-staticRT",
+            "type": "shell",
+            "command": "cmake --build ${workspaceFolder}/build/build32-static-rt --config Release --target ALL_BUILD",
+            "problemMatcher": []
+        },
+        {
+            "label": "Build target-x64",
+            "type": "shell",
+            "command": "cmake --build ${workspaceFolder}/build/build64 --config Release --target ALL_BUILD",
+            "problemMatcher": []
+        },
+        {
+            "label": "Build target-x86",
+            "type": "shell",
+            "command": "cmake --build ${workspaceFolder}/build/build32 --config Release --target ALL_BUILD",
+            "problemMatcher": []
+        },
+        {
+            "label": "Build All",
+            "dependsOn": [
+                "Build target-x64-staticRT",
+                "Build target-x86-staticRT",
+                "Build target-x64",
+                "Build target-x86",
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Pack target-x64-staticRT",
+            "type": "shell",
+            "command": "cmake --build ${workspaceFolder}/build/build64-static-rt --config Release --target package",
+            "problemMatcher": []
+        },
+        {
+            "label": "Pack target-x86-staticRT",
+            "type": "shell",
+            "command": "cmake --build ${workspaceFolder}/build/build32-static-rt --config Release --target package",
+            "problemMatcher": []
+        },
+        {
+            "label": "Pack target-x64",
+            "type": "shell",
+            "command": "cmake --build ${workspaceFolder}/build/build64 --config Release --target package",
+            "problemMatcher": []
+        },
+        {
+            "label": "Pack target-x86",
+            "type": "shell",
+            "command": "cmake --build ${workspaceFolder}/build/build32 --config Release --target package",
+            "problemMatcher": []
+        },
+        {
+            "label": "Pack All",
+            "dependsOn": [
+                "Pack target-x64-staticRT",
+                "Pack target-x86-staticRT",
+                "Pack target-x64",
+                "Pack target-x86",
+            ],
             "problemMatcher": []
         },
     ]

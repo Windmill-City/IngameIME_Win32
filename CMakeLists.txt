@@ -34,28 +34,36 @@ enable_testing()
 include(CleanDirectoryList)
 
 file(GLOB_RECURSE SOURCES ./src/**.cpp ./src/**.c)
-file(GLOB_RECURSE HEADERS LIST_DIRECTORIES true ./src/**)
+file(GLOB_RECURSE HEADERS LIST_DIRECTORIES true ./src/** )
 clean_directory_list(HEADERS ${PROJECT_SOURCE_DIR}/src ${SDK_INCLUDE_DIR})
 
 message(STATUS "Source Files:${SOURCES}")
 message(STATUS "Header Dirs:${HEADERS}")
 
-include_directories(${HEADERS})
-link_directories(${SDK_LIB_DIR})
-source_group(${SOURCES})
+set(STATIC_VC_RUNTIME 0)
 
+# Compiler Option
 if(STATIC_VC_RUNTIME)
     include(MSVCStaticRuntime)
 endif()
 add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
+# Target
 add_library(libtf_shared SHARED src/libtf.cpp)
-add_library(libtf_static STATIC src/libtf.cpp)
+target_include_directories(libtf_shared PUBLIC ${HEADERS})
+target_link_directories(libtf_shared PRIVATE ${SDK_LIB_DIR})
+target_sources(libtf_shared PRIVATE ${SOURCES})
 
 set_target_properties(libtf_shared PROPERTIES OUTPUT_NAME "libtf")
-set_target_properties(libtf_static PROPERTIES OUTPUT_NAME "libtf")
 
-set(CPACK_PROJECT_NAME ${PROJECT_NAME})
-set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
+# Install
+set(CMAKE_INSTALL_PREFIX ./install)
+install(TARGETS libtf_shared)
+install(DIRECTORY src/include/ TYPE INCLUDE)
+
+# Package
+set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
+set(CPACK_PACKAGE_VENDOR "Windmill_City")
+set(CPACK_GENERATOR "ZIP")
 include(CPack)
