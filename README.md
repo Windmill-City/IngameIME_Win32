@@ -6,10 +6,10 @@ A library for Text Service Framework
 
 ### Environment
 
-- Visual Studio Community 2019 - 16.11.0
-- MSVC v142
-- C++ ATL v142
-- Windows SDK(10.0.19041.0)
+* Visual Studio Community 2019 - 16.11.0
+* MSVC v142
+* C++ ATL v142
+* Windows SDK(10.0.19041.0)
 
 ### Setup Project
 
@@ -32,22 +32,18 @@ cmake --build ./build/build<64|32>[-static-rt] --config Release --target ALL_BUI
 
 ## How to use?
 
-This is a library that can be used in a `Pure C Environment`
+This library is a C++ library with a C wrapper
 
-Only need to include two header files, `libtf.h` and `libtfdef.h`
+To use it in a C environment, you need to add `libtfdef.h` and `libtf.h` to your include path, and put `libtf.dll` at your program's root path
 
 ## What can you do with it?
 
-- Control open status of the Input Method
+* Activate/Deactivate Input Method
 
-- Obtain System available Input Methods as well as Keyboard Layouts，which also called `Input Processor`
+* Get available InputMethods and KeyboardLayouts in system，which are also called `InputProcessor`s
 
-- Obtain the localized name of the `Input Processor` as well as the display name of the `locale` it associate to
+* Get the profile of the `InputProcessor`, which contains its name and the locale of the language this processor for
 
-- Obtain or set the active `Input Processor`
+* Get and Set active `InputProcessor`
 
-- Listen for status changes of `Conversion Mode` and `Sentence Mode`
-
-- Obtain the `PreEdit` text and the `Candidate` list of the `Composition`
-
-- Hide the Candidate Window of the Input Method and draw it yourself
+* Get `PreEdit` and `CandidateList` infomation during the `Composition`
