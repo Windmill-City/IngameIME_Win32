@@ -47,3 +47,7 @@ To use it in a C environment, you need to add `libtfdef.h` and `libtf.h` to your
 * Get and Set active `InputProcessor`
 
 * Get `PreEdit` and `CandidateList` infomation during the `Composition`
+
+## Library Structure
+
+![Library Structure Graph](https://github.com/Windmill-City/libtf/blob/master/docs/IngameIME-TextServiceFramework.png?raw=true)
