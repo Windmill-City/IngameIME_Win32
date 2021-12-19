@@ -64,10 +64,9 @@ namespace libtf {
             // Get Candidate Strings
             for (uint32_t i = m_PageStart; i < pageEnd; i++) {
                 BEGIN_HRESULT_SCOPE();
-                BSTR candidate;
+                CComBSTR candidate;
                 CHECK_HR(ele->GetString(i, &candidate));
-                m_Candidates.push_back(candidate);
-                SysFreeString(candidate);
+                m_Candidates.push_back(candidate.m_str);
                 continue;
                 END_HRESULT_SCOPE();
                 // If error occurs just put empty string in it

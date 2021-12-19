@@ -153,12 +153,11 @@ namespace libtf {
                     CComPtr<ITfInputProcessorProfiles> inputProcessorProfiles;
                     CHECK_HR(createInputProcessorProfiles(&inputProcessorProfiles));
 
-                    BSTR name;
+                    CComBSTR name;
                     CHECK_HR(inputProcessorProfiles->GetLanguageProfileDescription(
                         profile.clsid, profile.langid, profile.guidProfile, &name));
 
-                    result = std::wstring(name);
-                    SysFreeString(name);
+                    result = std::wstring(name.m_str);
 
                     END_HRESULT_SCOPE();
                 } break;
