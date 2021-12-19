@@ -50,4 +50,4 @@ To use it in a C environment, you need to add `libtfdef.h` and `libtf.h` to your
 
 ## Library Structure
 
-![Library Structure Graph](https://github.com/Windmill-City/libtf/blob/master/docs/IngameIME-TextServiceFramework.png?raw=true)
+![Library Structure Graph](https://github.com/Windmill-City/libtf/blob/master/docs/IngameIME-TextServiceFramework.svg?raw=true)
