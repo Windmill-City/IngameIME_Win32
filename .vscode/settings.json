@@ -79,6 +79,7 @@
         "future": "cpp",
         "condition_variable": "cpp",
         "deque": "cpp",
-        "mutex": "cpp"
+        "mutex": "cpp",
+        "numeric": "cpp"
     }
 }

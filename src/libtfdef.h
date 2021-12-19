@@ -5,215 +5,177 @@
 
 #define LIBTF_EXPORT __declspec(dllexport)
 
+#define BEGIN_HRESULT_SCOPE()                                                                                          \
+    try {                                                                                                              \
+        do {
+#define END_HRESULT_SCOPE()                                                                                            \
+    }                                                                                                                  \
+    while (0)                                                                                                          \
+        ;                                                                                                              \
+    }                                                                                                                  \
+    catch (std::bad_alloc)                                                                                             \
+    {                                                                                                                  \
+        hr = E_OUTOFMEMORY;                                                                                            \
+    }
+#define BEGIN_HRESULT_AS(x)                                                                                            \
+    HRESULT hr = x;                                                                                                    \
+    BEGIN_HRESULT_SCOPE();
+#define END_HRESULT()                                                                                                  \
+    END_HRESULT_SCOPE();                                                                                               \
+    return hr;
+#define BEGIN_HRESULT() BEGIN_HRESULT_AS(S_OK)
 #define CHECK_HR(hresultItem)                                                                                          \
-    {                                                                                                                  \
-        HRESULT _hr = hresultItem;                                                                                     \
-        if (FAILED(_hr)) return _hr;                                                                                   \
-    }
-
-/**
- * @brief Check if not ERROR_SUCCESS
- */
-#define NOT_ES(hresultItem) (ERROR_SUCCESS != (hresultItem))
-
-/**
- * @brief Check if ERROR_SUCCESS
- */
+    if (FAILED(hr = hresultItem)) break;
 #define CHECK_ES(hresultItem)                                                                                          \
-    {                                                                                                                  \
-        HRESULT _hr = hresultItem;                                                                                     \
-        if (NOT_ES(_hr)) return _hr;                                                                                   \
-    }
-
-#define CHECK_OOM(ptr)                                                                                                 \
-    if (!(ptr)) return E_OUTOFMEMORY;
+    if (ERROR_SUCCESS != (hr = hresultItem)) break;
 
 #ifdef __cplusplus
 extern "C" {
 #else
 #    define bool _Bool
 #endif
+#pragma region                                  InputContext
+LIBTF_EXPORT typedef struct libtf_InputContext* libtf_pInputContext;
+#pragma endregion
 #pragma region CandidateList
 LIBTF_EXPORT typedef enum libtf_CandidateListState {
     libtf_CandidateListBegin,
     libtf_CandidateListUpdate,
     libtf_CandidateListEnd
 } libtf_CandidateListState_t;
-/**
- * @note In format of Binary String
- *                             |<----Where the BSTR pointer points,
- *                             | so you can treat it as normal wchar_t C String
- * |-----------int32-----------|--UTF-16 zero-terminated C string--|--int16--|
- * |Str Len(Not include the \0)|-------------Str data-------------|----\0---|
- */
-LIBTF_EXPORT typedef BSTR libtf_Candidate;
-LIBTF_EXPORT typedef struct libtf_tagCandidateList
+
+LIBTF_EXPORT typedef struct libtf_CandidateListContext
 {
     /**
-     * @brief The property below only available at CandidateListUpdate
+     * @brief Which candidate string has been selected
      */
-    libtf_CandidateListState_t state;
+    uint32_t m_Selection;
     /**
-     * @brief Total count of the Candidates
+     * @brief Size of m_Candidates
      */
-    uint32_t totalCount;
+    uint32_t m_PageSize;
     /**
-     * @brief At which index is current page start(inclusive)
+     * @brief Zero-terminated wchar strings
      */
-    uint32_t pageStart;
-    /**
-     * @brief At which index is current page end(inclusive)
-     */
-    uint32_t pageEnd;
-    /**
-     * @brief At which index is current selected Candidate
-     */
-    uint32_t curSelection;
-    /**
-     * @brief Array of Candidates
-     */
-    libtf_Candidate* candidates;
-} libtf_CandidateList_t, *libtf_pCandidateList;
-/**
- * @note The memory of the struct will be invalid after return
- * @note The libtf_Candidate Binary String Array and its content will be freed after return
- */
-LIBTF_EXPORT typedef void (*libtf_CallbackCandidateList)(libtf_CandidateList_t, void* userData);
+    wchar_t* m_Candidates[0];
+} libtf_CandidateListContext_t, *libtf_pCandidateListContext;
+LIBTF_EXPORT typedef void (*libtf_CandidateListCallback)(libtf_CandidateListState_t         state,
+                                                         const libtf_CandidateListContext_t ctx,
+                                                         void*                              userData);
 #pragma endregion
-
-#pragma region Commit
-/**
- * @note In format of Binary String
- *                             |<----Where the BSTR pointer points,
- *                             | so you can treat it as normal wchar_t C String
- * |-----------int32-----------|--UTF-16 zero-terminated C string--|--int16--|
- * |Str Len(Not include the \0)|-------------Str data-------------|----\0---|
- */
-LIBTF_EXPORT typedef BSTR libtf_Commit;
-/**
- * @note The libtf_Commit Binary String will be freed after return
- */
-LIBTF_EXPORT typedef void (*libtf_CallbackCommit)(libtf_Commit, void* userData);
-#pragma endregion
-
 #pragma region Composition
 LIBTF_EXPORT typedef enum libtf_CompositionState {
     libtf_CompositionBegin,
     libtf_CompositionUpdate,
     libtf_CompositionEnd
 } libtf_CompositionState_t;
-/**
- * @brief the Bounding box of the PreEdit text in screen coordinate
- * 
- * Input method use this information to position its Candidate List Window
- */
-LIBTF_EXPORT typedef RECT libtf_BoundingBox_t;
-/**
- * @note In format of Binary String
- *                             |<----Where the BSTR pointer points,
- *                             | so you can treat it as normal wchar_t C String
- * |-----------int32-----------|--UTF-16 zero-terminated C string--|--int16--|
- * |Str Len(Not include the \0)|-------------Str data-------------|----\0---|
- */
-LIBTF_EXPORT typedef BSTR libtf_PreEdit;
-LIBTF_EXPORT typedef struct libtf_tagComposition
+LIBTF_EXPORT typedef struct libtf_PreEditContext
 {
-    libtf_CompositionState_t state;
+  public:
     /**
-     * @brief Only Available at CompositionUpdate
+     * @brief Start index of the selection(inclusive)
      */
-    libtf_PreEdit preEdit;
+    uint32_t m_SelStart;
     /**
-     * @brief Only Available at CompositionUpdate
+     * @brief End index of the selection(exclusive)
      */
-    long selection[2];
-} libtf_Composition_t, *libtf_pComposition;
+    uint32_t m_SelEnd;
+    /**
+     * @brief Zero-terminated string
+     */
+    wchar_t m_Content[0];
+} libtf_PreEditContext_t, *libtf_pPreEditContext;
+LIBTF_EXPORT typedef void (*libtf_PreEditCallback)(libtf_CompositionState_t     state,
+                                                   const libtf_PreEditContext_t ctx,
+                                                   void*                        userData);
 /**
- * @note The memory of the struct will be invalid after return
- * @note The libtf_PreEdit Binary String will be freed after return
+ * @brief Return the boundary rectangle of the preedit, in window coordinate
+ *
+ * @note If the length of preedit is 0 (as it would be drawn by input method), the rectangle
+ * coincides with the insertion point, and its width is 0.
  */
-LIBTF_EXPORT typedef void (*libtf_CallbackComposition)(libtf_Composition_t, void* userData);
+LIBTF_EXPORT typedef void (*libtf_PreEditRectCallback)(const RECT* rect, void* userData);
 /**
- * @brief Return the Bounding Box of the PreEdit text in screen coordinate
- * 
- * Input method use this information to position its Candidate List Widnow
- * 
- * @note It is possible that some input method doesn't provide PreEdit information in the Composition,
- * as they draw it in the Candidate Window
- * To position such Candidate Window in right place, the height of the box should not be zero,
- * in case the Candidate Window overlap the textbox.
- * Ex:{x,y, x+0, y+defaultFontHeight}
- * 
- * If there is no Composition, just return {0,0,0,0}
+ * @brief Receives commit string from input method
+ *
+ * @param commit Zero-terminated string
  */
-LIBTF_EXPORT typedef void (*libtf_CallbackBoundingBox)(libtf_BoundingBox_t*, void* userData);
+LIBTF_EXPORT typedef void (*libtf_CommitCallback)(const wchar_t* commit, void* userData);
 #pragma endregion
-
-#pragma region                     ConversionMode
-LIBTF_EXPORT typedef int32_t libtf_ConversionMode;
-/**
- * @brief Notify when the Conversion Mode has changed
- * 
- * @see https://docs.microsoft.com/en-us/windows/win32/tsf/flags-for-conversion-mode
- */
-LIBTF_EXPORT typedef void (*libtf_CallbackConversionMode)(libtf_ConversionMode, void* userData);
-#pragma endregion
-
-#pragma region                     SentenceMode
-LIBTF_EXPORT typedef int32_t libtf_SentenceMode;
-/**
- * @brief Notify when the Sentence Mode has changed
- * 
- * @see https://docs.microsoft.com/en-us/windows/win32/tsf/flags-for-conversion-mode
- */
-LIBTF_EXPORT typedef void (*libtf_CallbackSentenceMode)(libtf_SentenceMode, void* userData);
-#pragma endregion
-
 #pragma region InputProcessor
-LIBTF_EXPORT typedef struct tagInputProcessorProfile
+LIBTF_EXPORT typedef enum libtf_InputProcessorType {
+    libtf_KeyboardLayout,
+    libtf_TextService
+} libtf_InputProcessorType_t;
+LIBTF_EXPORT typedef void* libtf_HInputProcessor;
+LIBTF_EXPORT typedef struct libtf_InputProcessorProfile
 {
     /**
-     * @brief The type of this profile. This is one of these values.
-     * TF_PROFILETYPE_INPUTPROCESSOR - This is a text service.
-     * TF_PROFILETYPE_KEYBOARDLAYOUT - This is a keyboard layout.
+     * @brief Type of the InputProcessor
      */
-    DWORD profileType;
+    libtf_InputProcessorType_t m_Type;
     /**
-     * @brief Specifies the language id of the profile.
+     * @brief Locale string of the InputProcessor
+     *
+     * Zero-terminated string
      */
-    LANGID langId;
+    wchar_t* m_Locale;
     /**
-     * @brief Specifies the CLSID of the text service.
-     * If dwProfileType is TF_PROFILETYPE_KEYBOARDLAYOUT, this is CLSID_NULL.
+     * @brief Localized name of the locale
+     *
+     * Zero-terminated string
      */
-    CLSID clsid;
+    wchar_t* m_LocaleName;
     /**
-     * @brief Specifies the category of this text service.
-     * This category is GUID_TFCAT_TIP_KEYBOARD, GUID_TFCAT_TIP_SPEECH, GUID_TFCAT_TIP_HANDWRITING or something in
-     * GUID_TFCAT_CATEGORY_OF_TIP. If dwProfileType is TF_PROFILETYPE_KEYBOARDLAYOUT, this is GUID_NULL.
+     * @brief Localized name of the InputProcessor
+     *
+     * Zero-terminated string
      */
-    GUID catid;
-    /**
-     * @brief Specifies the GUID to identify the profile.
-     * If dwProfileType is TF_PROFILETYPE_KEYBOARDLAYOUT, this is GUID_NULL.
-     */
-    GUID guidProfile;
-    /**
-     * @brief Specifies the keyboard layout handle of this profile.
-     * If dwProfileType is TF_PROFILETYPE_ INPUTPROCESSOR, this is NULL.
-     */
-    HKL hkl;
-    /**
-     * @brief If the InputProcessor activated
-     */
-    bool activated;
+    wchar_t* m_InputProcessorName;
 } libtf_InputProcessorProfile_t, *libtf_pInputProcessorProfile;
-/**
- * @brief Notify when InputProcessorProfile has changed
- * 
- * @note The memory of the struct will be invalid after return
- */
-LIBTF_EXPORT typedef void (*libtf_CallbackInputProcessor)(libtf_InputProcessorProfile_t, void* userData);
+LIBTF_EXPORT typedef enum libtf_InputProcessorState {
+    /**
+     * @brief When active input processor change
+     *
+     * @note the InputMode will also change
+     */
+    libtf_InputProcessorFullUpdate,
+    /**
+     * @brief When only the input mode has changes
+     */
+    libtf_InputProcessorInputModeUpdate
+} libtf_InputProcessorState_t;
+LIBTF_EXPORT typedef struct libtf_InputProcessorContext
+{
+    /**
+     * @brief Handle of the active input processor
+     */
+    libtf_HInputProcessor m_InputProcessor;
+    /**
+     * @brief Size of m_InputModes
+     */
+    uint32_t m_InputModeSize;
+    /**
+     * @brief InputModes of the InputProcessor
+     *
+     * InputProcessor have different InputModes at different states
+     * eg: KeyboardLayout, which has only one state -> 'AlphaNumeric'
+     * eg: TextService, in East-Asia, has the following state:
+     * {Native, AlphaNumeric}, {HalfShape, FullShape}
+     * TextService, in Japan, has extra state:
+     * {Hiragana, Katakana, Roman}
+     * In the brace, are mutually exclusive InputModes
+     */
+    wchar_t* m_InputModes[0];
+} libtf_InputProcessorContext_t, *libtf_pInputProcessorContext;
+LIBTF_EXPORT typedef void (*libtf_InputProcessorCallback)(libtf_InputProcessorState_t         state,
+                                                          const libtf_InputProcessorContext_t ctx,
+                                                          void*                               userData);
+LIBTF_EXPORT typedef struct libtf_InputProcessors
+{
+    uint32_t              m_InputProcessorsSize;
+    libtf_HInputProcessor m_InputProcessors[0];
+} libtf_InputProcessors_t, *libtf_pInputProcessors;
 #pragma endregion
 #ifdef __cplusplus
 }

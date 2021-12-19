@@ -3,210 +3,179 @@
 
 #ifdef __cplusplus
 extern "C" {
-#else
-#    define bool _Bool
 #endif
-struct libtf_tagInputContext;
 
-LIBTF_EXPORT typedef struct libtf_tagInputContext*   libtf_pInputContext;
-
-#pragma region InputProcesser Profile
+#pragma region InputContext
 /**
- * @brief Get available input processor profies for the calling thread
+ * @brief Create input context for specific window
  *
- * @param profiles Pointer to an array of libtf_InputProcessorProfile_t.
- * This array must be at least maxSize elements in size
- * @param maxSize the max size of the profiles array
- * @param fetched if profiles is NULL, return the max count can obtain,
- * otherwise, return the count of elements actually obtained
+ * @param hWnd handle of the window to create the context
+ * @return UI_E_WRONG_THREAD if the calling thread isn't the thread that create the window
  */
-LIBTF_EXPORT HRESULT libtf_get_input_processors(libtf_InputProcessorProfile_t* profiles,
-                                                uint32_t                       maxSize,
-                                                uint32_t*                      fetched);
-
+LIBTF_EXPORT HRESULT libtf_create_ctx(libtf_pInputContext* ctx, const HWND hWnd);
 /**
- * @brief Get active input processor profie for the calling thread
- */
-LIBTF_EXPORT HRESULT libtf_get_active_input_processor(libtf_InputProcessorProfile_t*);
-
-/**
- * @brief Set active input processor profie for the calling thread
- */
-LIBTF_EXPORT HRESULT libtf_set_active_input_processor(libtf_InputProcessorProfile_t);
-
-/**
- * @brief Get the locale of the input processor
+ * @brief Cleanup input context
  *
- * @param BSTR* Pointer to a BSTR value that receives the locale string. The caller is responsible for freeing
- * this memory using SysFreeString when it is no longer required.
+ * @return UI_E_WRONG_THREAD if the calling thread isn't the thread that create the context
  */
-LIBTF_EXPORT HRESULT libtf_get_input_processor_locale(libtf_InputProcessorProfile_t, BSTR*);
-
+LIBTF_EXPORT HRESULT libtf_destroy_ctx(libtf_pInputContext ctx);
 /**
- * @brief Get the localized name of the locale
+ * @brief Set if context activated
  *
- * @param BSTR locale
- * @param BSTR* Pointer to a BSTR value that receives the name string. The caller is responsible for freeing
- * this memory using SysFreeString when it is no longer required.
+ * @param activated set to true to activate input method
+ * @return UI_E_WRONG_THREAD if the calling thread isn't the thread that create the context
  */
-LIBTF_EXPORT HRESULT libtf_get_locale_name(BSTR, BSTR*);
-
+LIBTF_EXPORT HRESULT libtf_set_activated(libtf_pInputContext ctx, const bool activated);
 /**
- * @brief Get the localized name of the input processor
+ * @brief Get context activate state
  *
- * @param BSTR* Pointer to a BSTR value that receives the description string. The caller is responsible for freeing this
- * memory using SysFreeString when it is no longer required.
+ * @param activated receive context activate state
+ * @return E_INVALIDARG if activated is NULL
  */
-LIBTF_EXPORT HRESULT libtf_get_input_processor_desc(libtf_InputProcessorProfile_t, BSTR*);
+LIBTF_EXPORT HRESULT libtf_get_activated(const libtf_pInputContext ctx, bool* activated);
+#pragma endregion
+#pragma region FullScreenHandler
+/**
+ * @brief Set if the game is in fullScreen mode
+ *
+ * @param fullScreen is game window in fullScreen mode?
+ * @return HRESULT
+ */
+LIBTF_EXPORT HRESULT libtf_set_fullscreen(libtf_pInputContext ctx, const bool fullscreen);
+/**
+ * @brief Get context fullScreen state
+ *
+ * @param fullScreen receive fullScreen state
+ * @return E_INVALIDARG if fullScreen is NULL
+ */
+LIBTF_EXPORT HRESULT libtf_get_fullscreen(const libtf_pInputContext ctx, bool* fullscreen);
+#pragma endregion
+#pragma region CandidateListHandler
+/**
+ * @brief Set CandidateList callback to receive candidate list data in fullscreen mode
+ *
+ * @param usetData Previous userData will send out here
+ * @return Previous callback, Nullable
+ */
+LIBTF_EXPORT libtf_CandidateListCallback libtf_candidate_list_set_callback(libtf_pInputContext         ctx,
+                                                                           libtf_CandidateListCallback callback,
+                                                                           void*                       userData);
+/**
+ * @brief Set currently selected Candidate
+ * When user press Space key, input method will commit with currently selected Candidate String
+ *
+ * @param index Candidate's index
+ * @return HRESULT
+ */
+LIBTF_EXPORT HRESULT libtf_candidate_list_set_sel(const libtf_pInputContext ctx, uint32_t index);
+/**
+ * @brief Force input method to commit with currently selected Candidate String
+ *
+ * @return HRESULT
+ */
+LIBTF_EXPORT HRESULT libtf_candidate_list_finalize(const libtf_pInputContext ctx);
+#pragma endregion
+#pragma region CompositionHandler
+/**
+ * @brief Terminate active composition
+ *
+ * @return UI_E_WRONG_THREAD if the calling thread isn't the thread that create the context
+ */
+LIBTF_EXPORT HRESULT libtf_composition_terminate(const libtf_pInputContext ctx);
+#pragma endregion
+#pragma region PreEditHandler
+/**
+ * @brief Set PreEdit callback to receive preedit and compostion state
+ *
+ * @param usetData Previous userData will send out here
+ * @return Previous callback, Nullable
+ */
+LIBTF_EXPORT libtf_PreEditCallback libtf_preedit_set_callback(libtf_pInputContext   ctx,
+                                                              libtf_PreEditCallback callback,
+                                                              void*                 userData);
+/**
+ * @brief Set PreEdit Rect callback to position input method's candidatelist window
+ *
+ * @param usetData Previous userData will send out here
+ * @return Previous callback, Nullable
+ *
+ * @note If the length of preedit is 0 (as it would be drawn by input method), the rectangle
+ * coincides with the insertion point, and its width is 0.
+ */
+LIBTF_EXPORT libtf_PreEditRectCallback libtf_preedit_rect_set_callback(libtf_pInputContext       ctx,
+                                                                       libtf_PreEditRectCallback callback,
+                                                                       void*                     userData);
+#pragma endregion
+#pragma region CommitHandler
+/**
+ * @brief Set Commit callback to receive commit string
+ *
+ * @param usetData Previous userData will send out here
+ * @return Previous callback, Nullable
+ */
+LIBTF_EXPORT libtf_CommitCallback libtf_commit_set_callback(libtf_pInputContext  ctx,
+                                                            libtf_CommitCallback callback,
+                                                            void*                userData);
+#pragma endregion
+#pragma region InputProcessor
+/**
+ * @brief Set InputProcessor callback to receive InputProcessor relevent event
+ *
+ * @param usetData Previous userData will send out here
+ * @return Previous callback, Nullable
+ */
+LIBTF_EXPORT libtf_InputProcessorCallback libtf_inputprocessor_set_callback(libtf_pInputContext          ctx,
+                                                                            libtf_InputProcessorCallback callback,
+                                                                            void*                        userData);
+/**
+ * @brief Get active InputProcessor context
+ *
+ * @return NULL if out of memory
+ * @note You need to free it using libtf_inputprocessor_free_ctx
+ */
+LIBTF_EXPORT libtf_pInputProcessorContext libtf_inputprocessor_get_ctx(const libtf_pInputContext ctx);
+/**
+ * @brief Free InputProcessor context
+ */
+LIBTF_EXPORT void libtf_inputprocessor_free_ctx(libtf_pInputProcessorContext ctx);
+/**
+ * @brief Apply new InputMode to active InputProcessor
+ *
+ * @param newMode New InputMode, Zero-terminated string
+ * @return UI_E_WRONG_THREAD if the calling thread isn't the thread that create the context
+ */
+LIBTF_EXPORT HRESULT libtf_inputprocessor_apply_inputmode(libtf_pInputContext ctx, const wchar_t* newMode);
+/**
+ * @brief Get InputProcessors available
+ *
+ * @return Empty list if the calling thread is not a UI Thread
+ * @return NULL if out of memory
+ * @note You need to free it using libtf_free_inputprocessors
+ */
+LIBTF_EXPORT libtf_pInputProcessors libtf_get_inputprocessors();
+/**
+ * @brief Free the libtf_InputProcessors object
+ */
+LIBTF_EXPORT void libtf_free_inputprocessors(libtf_pInputProcessors processors);
+/**
+ * @brief Get detailed infomation of the InputProcessor
+ *
+ * @return NULL if out of memory
+ * @note You need to free it using libtf_inputprocessor_free_profile
+ */
+LIBTF_EXPORT libtf_pInputProcessorProfile libtf_inputprocessor_get_profile(const libtf_HInputProcessor hInputProcessor);
+/**
+ * @brief Free the libtf_InputProcessorProfile
+ */
+LIBTF_EXPORT void libtf_inputprocessor_free_profile(libtf_pInputProcessorProfile profile);
+/**
+ * @brief Set active InputProcessor for calling thread
+ *
+ * @return UI_E_WRONG_THREAD if the calling thread is not a UI Thread
+ */
+LIBTF_EXPORT HRESULT libtf_inputprocessor_set_activated(const libtf_HInputProcessor hInputProcessor);
 #pragma endregion
 
-#pragma region Context
-/**
- * @brief Create input context for the calling thread
- *
- * @note Context should be thread local, you can't use it in another thread, except the creator
- * @note A thread can create at most one context
- * @note Once disposed, you can't recreate once more on the same thread
- */
-LIBTF_EXPORT HRESULT libtf_create_ctx(libtf_pInputContext*);
-
-/**
- * @brief Dispose the input context, the pointer to the context will be invailed
- */
-LIBTF_EXPORT HRESULT libtf_dispose_ctx(libtf_pInputContext);
-
-/**
- * @brief Terminate active composition of the context
- */
-LIBTF_EXPORT HRESULT libtf_terminate_composition(libtf_pInputContext);
-
-/**
- * @brief Set current selected Candidate for the Candidate List
- * 
- * @param index index of the Candidate
- */
-LIBTF_EXPORT HRESULT libtf_set_candidate_list_sel(libtf_pInputContext, uint32_t index);
-
-/**
- * @brief Finalize by specific Candidate for the Candidate List
- * 
- * @param index index of the Candidate
- */
-LIBTF_EXPORT HRESULT libtf_final_candidate_list_sel(libtf_pInputContext, uint32_t index);
-
-/**
- * @brief Set input method state of the context
- *
- * @param bool true to enable the input method, false to disable it
- */
-LIBTF_EXPORT HRESULT libtf_set_im_state(libtf_pInputContext, bool);
-
-/**
- * @brief Get input method(IM) state of the context
- *
- * @param bool returns true if IM is enabled, false otherwise
- */
-LIBTF_EXPORT HRESULT libtf_get_im_state(libtf_pInputContext, bool*);
-
-/**
- * @brief This method should be called from the WndProc of the ui-thread, of whom is the creator of this
- * context
- *
- * @param hWnd The window who receives the message
- * @param message can be one of WM_SETFOCUS/WM_KILLFOCUS
- */
-LIBTF_EXPORT HRESULT libtf_on_focus_msg(libtf_pInputContext, HWND hWnd, UINT message);
-
-/**
- * @brief Get current focused window of the context
- *
- * @param HWND* current focused window, this can be NULL if no window get focused
- */
-LIBTF_EXPORT HRESULT libtf_get_focus_wnd(libtf_pInputContext, HWND*);
-
-/**
- * @brief Set Conversion Mode of the context
- */
-LIBTF_EXPORT HRESULT libtf_set_conversion_mode(libtf_pInputContext, libtf_ConversionMode);
-
-/**
- * @brief Set Sentence Mode of the context
- */
-LIBTF_EXPORT HRESULT libtf_set_sentence_mode(libtf_pInputContext, libtf_SentenceMode);
-
-/**
- * @brief Get Conversion Mode of the context
- */
-LIBTF_EXPORT HRESULT libtf_get_conversion_mode(libtf_pInputContext, libtf_ConversionMode*);
-
-/**
- * @brief Get Sentence Mode of the context
- */
-LIBTF_EXPORT HRESULT libtf_get_sentence_mode(libtf_pInputContext, libtf_SentenceMode*);
-
-/**
- * @brief Set Full Screen mode of the context
- */
-LIBTF_EXPORT HRESULT libtf_set_full_screen(libtf_pInputContext, bool);
-
-/**
- * @brief Set if input method should show its Candidate Window of the context
- */
-LIBTF_EXPORT HRESULT libtf_set_show_candidate_list_wnd(libtf_pInputContext, bool);
-
-/**
- * @brief Get Full Screen mode of the context
- */
-LIBTF_EXPORT HRESULT libtf_get_full_screen(libtf_pInputContext, bool*);
-
-/**
- * @brief Get if input method should show its Candidate Window of the context
- */
-LIBTF_EXPORT HRESULT libtf_get_show_candidate_list_wnd(libtf_pInputContext, bool*);
-#pragma endregion
-
-#pragma region setCallback
-/**
- * @brief Set Composition Callback of the context
- */
-LIBTF_EXPORT HRESULT libtf_set_composition_callback(libtf_pInputContext, libtf_CallbackComposition, void* userData);
-
-/**
- * @brief Set Commit Callback of the context
- */
-LIBTF_EXPORT HRESULT libtf_set_commit_callback(libtf_pInputContext, libtf_CallbackCommit, void* userData);
-
-/**
- * @brief Set PreEdit Bounding Box Callback of the context
- */
-LIBTF_EXPORT HRESULT libtf_set_bounding_box_callback(libtf_pInputContext, libtf_CallbackBoundingBox, void* userData);
-
-/**
- * @brief Set Candidate List Callback of the context
- */
-LIBTF_EXPORT HRESULT libtf_set_candidate_list_callback(libtf_pInputContext,
-                                                       libtf_CallbackCandidateList,
-                                                       void* userData);
-
-/**
- * @brief Set Conversion mode Callback of the context
- */
-LIBTF_EXPORT HRESULT libtf_set_conversion_mode_callback(libtf_pInputContext,
-                                                        libtf_CallbackConversionMode,
-                                                        void* userData);
-
-/**
- * @brief Set Sentence mode Callback of the context
- */
-LIBTF_EXPORT HRESULT libtf_set_sentence_mode_callback(libtf_pInputContext, libtf_CallbackSentenceMode, void* userData);
-
-/**
- * @brief Set Input Processor Callback of the context
- */
-LIBTF_EXPORT HRESULT libtf_set_input_processor_callback(libtf_pInputContext,
-                                                        libtf_CallbackInputProcessor,
-                                                        void* userData);
-#pragma endregion
 #ifdef __cplusplus
 }
 #endif

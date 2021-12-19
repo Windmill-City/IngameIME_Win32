@@ -1,253 +1,148 @@
 #pragma once
-#include "libtfdef.h"
+
+#include <functional>
+#include <list>
+#include <memory>
+
 #include <atlbase.h>
 #include <atlcom.h>
-#include <functional>
-#include <memory>
+
 #include <msctf.h>
 
+#include "libtfdef.h"
+
+#include "ICallback.hpp"
+
 namespace libtf {
-    /**
-     * @brief Default way to get CandidateList from ITfCandidateListUIElement
-     */
-    typedef class CandidateListProvider {
-        typedef CComPtr<ITfCandidateListUIElement> CandUIEle;
+    class CandidateListContext {
+        CComQIPtr<ITfCandidateListUIElementBehavior> m_Behavior;
+        uint32_t                                     m_PageStart;
 
       public:
         /**
-         * @brief Get the total count of the candidate list
+         * @brief Which candidate string has been selected
          */
-        virtual HRESULT getTotalCount(CandUIEle candEle, uint32_t& totalCount)
-        {
-            return candEle->GetCount(&totalCount);
-        }
-
+        uint32_t m_Selection;
         /**
-         * @brief Get the Page Start and End
+         * @brief Size of m_Candidates
          */
-        virtual HRESULT getPageStartAndEnd(CandUIEle candEle, uint32_t& start, uint32_t& end)
+        uint32_t                m_PageSize;
+        std::list<std::wstring> m_Candidates;
+
+      public:
+        HRESULT ctor(CComPtr<ITfCandidateListUIElement> ele)
         {
+            BEGIN_HRESULT();
+
+            m_Behavior = ele;
+
+            // Total count of Candidates
             uint32_t totalCount;
-            CHECK_HR(getTotalCount(candEle, totalCount));
+            CHECK_HR(ele->GetCount(&totalCount));
 
-            // Page Total Count
+            // How many pages?
             uint32_t pageCount;
-            CHECK_HR(candEle->GetPageIndex(NULL, 0, &pageCount));
+            CHECK_HR(ele->GetPageIndex(NULL, 0, &pageCount));
 
-            // Page start indexes' Array
-            uint32_t* pageStarts = new uint32_t[pageCount];
-            CHECK_OOM(pageStarts);
-            CHECK_HR(candEle->GetPageIndex(pageStarts, pageCount, &pageCount));
+            // Array of pages' start index
+            auto pageStarts = std::make_unique<uint32_t[]>(pageCount);
+            CHECK_HR(ele->GetPageIndex(pageStarts.get(), pageCount, &pageCount));
 
             // Current page's index in pageStarts
             uint32_t curPage;
-            CHECK_HR(candEle->GetCurrentPage(&curPage));
+            CHECK_HR(ele->GetCurrentPage(&curPage));
 
-            bool isLastPage = curPage == pageCount - 1;
-            start           = pageStarts[curPage];
-            end             = isLastPage ? totalCount - 1 : pageStarts[curPage + 1] - 1;
-            delete[] pageStarts;
+            m_PageStart      = pageStarts[curPage];
+            uint32_t pageEnd = curPage == pageCount - 1 ? totalCount : pageStarts[curPage + 1];
+            m_PageSize       = pageEnd - m_PageStart;
 
-            return S_OK;
-        }
+            // Currently Selected Candidate's absolute index
+            CHECK_HR(ele->GetSelection(&m_Selection));
+            // Absolute index to relative index
+            m_Selection -= m_PageStart;
 
-        /**
-         * @brief Get current selected Candidate's index
-         */
-        virtual HRESULT getCurSelection(CandUIEle candEle, uint32_t& index)
-        {
-            return candEle->GetSelection(&index);
-        }
-
-        /**
-         * @brief Get Candidate by its index
-         */
-        virtual HRESULT getCandidate(CandUIEle candEle, size_t index, libtf_Candidate* cand)
-        {
-            CHECK_HR(candEle->GetString((UINT)index, cand));
-            return S_OK;
-        }
-
-        virtual HRESULT getCandidateList(CandUIEle candEle, libtf_pCandidateList list)
-        {
-            CHECK_HR(getTotalCount(candEle, list->totalCount));
-            CHECK_HR(getPageStartAndEnd(candEle, list->pageStart, list->pageEnd));
-            CHECK_HR(getCurSelection(candEle, list->curSelection));
-
-            list->candidates = new libtf_Candidate[list->totalCount];
-            CHECK_OOM(list->candidates);
-
-            HRESULT hr;
-            for (size_t i = 0; i < list->totalCount; i++) {
-                if (FAILED(hr = getCandidate(candEle, i, &list->candidates[i]))) {
-                    // Cleanup
-                    for (size_t k = 0; k < i; k++) { SysFreeString(list->candidates[k]); }
-                    delete[] list->candidates;
-                    return hr;
-                }
+            // Get Candidate Strings
+            for (uint32_t i = m_PageStart; i < pageEnd; i++) {
+                BEGIN_HRESULT_SCOPE();
+                BSTR candidate;
+                CHECK_HR(ele->GetString(i, &candidate));
+                m_Candidates.push_back(candidate);
+                SysFreeString(candidate);
+                continue;
+                END_HRESULT_SCOPE();
+                // If error occurs just put empty string in it
+                m_Candidates.push_back(L"");
             }
-            return S_OK;
-        }
-    } CandidateListProvider_t, *pCandidateListProvider;
 
-    /**
-     * @brief Get data from input method's CandidateList UIElement
-     */
-    class CandidateListHandler : public CComObjectRoot, public ITfUIElementSink {
-      protected:
-        CComPtr<ITfUIElementMgr>           m_uiElementMgr;
-        DWORD                              m_uiSinkCookie = TF_INVALID_COOKIE;
-        CComPtr<ITfCandidateListUIElement> m_curCandEle;
-
-        /**
-         * @brief Get the Candidate List UI Element object
-         *
-         * @param dwUIElementId uiElement id
-         * @return CComPtr<ITfCandidateListUIElement>
-         */
-        CComPtr<ITfCandidateListUIElement> getCandidateListUIElement(DWORD dwUIElementId)
-        {
-            CComPtr<ITfUIElement>                uiElement;
-            CComQIPtr<ITfCandidateListUIElement> candidateList;
-            if (FAILED(m_uiElementMgr->GetUIElement(dwUIElementId, &uiElement))) { return candidateList; }
-            candidateList = uiElement;
-            return candidateList;
+            END_HRESULT();
         }
 
       public:
         /**
-         * @brief Set if input method should(IM) show its candidate list window
+         * @brief Set currently selected Candidate
+         * When user press Space key, input method will commit with currently selected Candidate String
          *
-         * Set to false to get candidate data from IM
-         */
-        bool m_show = true;
-
-        /**
-         * @brief Callback when Candidate List updates
-         */
-        typedef std::function<void(libtf_CandidateList_t)> signalCandidateList;
-        signalCandidateList                                m_sigCandidateList = [](libtf_CandidateList_t) {};
-
-        /**
-         * @brief Specific provider for different input method
-         */
-        std::unique_ptr<CandidateListProvider> provider = std::make_unique<CandidateListProvider_t>();
-
-        BEGIN_COM_MAP(CandidateListHandler)
-        COM_INTERFACE_ENTRY(ITfUIElementSink)
-        END_COM_MAP()
-
-        /**
-         * @brief Initialize the handler
-         *
-         * @param uiElementMgr Query interface from ITfThreadMgr
+         * @param index Candidate's index
          * @return HRESULT
          */
-        HRESULT initialize(CComPtr<ITfUIElementMgr> uiElementMgr)
+        HRESULT select(uint32_t index) const
         {
-            m_uiElementMgr           = uiElementMgr;
-            CComQIPtr<ITfSource> evt = m_uiElementMgr;
-            return evt->AdviseSink(IID_ITfUIElementSink, this, &m_uiSinkCookie);
+            // Relative index to absolute index
+            index += m_PageStart;
+            return m_Behavior->SetSelection(index);
         }
 
         /**
-         * @brief Dispose the handler
+         * @brief Force input method to commit with currently selected Candidate String
          *
          * @return HRESULT
          */
-        HRESULT dispose()
+        HRESULT finalize() const
         {
-            CComQIPtr<ITfSource> evtSource = m_uiElementMgr;
-            return evtSource->UnadviseSink(m_uiSinkCookie);
-        }
-
-        /**
-         * @brief Set current selected Candidate
-         * When user pressing Space key, input method will commit current selected Candidate
-         *
-         * @param index Candidate index
-         * @return HRESULT
-         */
-        HRESULT setSelection(uint32_t index)
-        {
-            CComQIPtr<ITfCandidateListUIElementBehavior> candBehavior;
-            if (candBehavior = m_curCandEle) {
-                CHECK_HR(candBehavior->SetSelection(index));
-                return S_OK;
-            }
-            return E_FAIL;
-        }
-
-        /**
-         * @brief Finalize with specific Candidate
-         * Let input method commit with specific Candidate
-         *
-         * @param index Candidate index
-         * @return HRESULT
-         */
-        HRESULT setFinalize(uint32_t index)
-        {
-            CComQIPtr<ITfCandidateListUIElementBehavior> candBehavior;
-            if (candBehavior = m_curCandEle) {
-                CHECK_HR(candBehavior->SetSelection(index));
-                CHECK_HR(candBehavior->Finalize());
-                return S_OK;
-            }
-            return E_FAIL;
-        }
-
-        /**
-         * @brief Decide if input method should show its candidate window
-         *
-         * @param pbShow should show?
-         */
-        HRESULT STDMETHODCALLTYPE BeginUIElement(DWORD dwUIElementId, BOOL* pbShow) override
-        {
-            // It's possible that other uiElement Begins while handling Candidate List
-            // to avoid wrongly overwrite, we use a local var here
-            auto uiElement = getCandidateListUIElement(dwUIElementId);
-            if (uiElement) {
-                m_curCandEle = uiElement;
-
-                *pbShow = m_show;
-
-                m_sigCandidateList({libtf_CandidateListBegin});
-            }
-            return S_OK;
-        }
-
-        /**
-         * @brief Get Candidates from input method
-         */
-        HRESULT STDMETHODCALLTYPE UpdateUIElement(DWORD dwUIElementId) override
-        {
-            if (m_curCandEle == getCandidateListUIElement(dwUIElementId)) {
-                libtf_CandidateList_t list = {libtf_CandidateListUpdate};
-                CHECK_HR(provider->getCandidateList(m_curCandEle, &list));
-
-                m_sigCandidateList(list);
-
-                // Cleanup
-                for (size_t i = 0; i < list.totalCount; i++) { SysFreeString(list.candidates[i]); }
-                delete[] list.candidates;
-            }
-            return S_OK;
-        }
-
-        /**
-         * @brief Candidate list End
-         */
-        HRESULT STDMETHODCALLTYPE EndUIElement(DWORD dwUIElementId) override
-        {
-            if (m_curCandEle == getCandidateListUIElement(dwUIElementId)) {
-                // Always Release CandUIEle
-                m_curCandEle.Release();
-
-                m_sigCandidateList({libtf_CandidateListEnd});
-            }
-            return S_OK;
+            return m_Behavior->Finalize();
         }
     };
 
-    typedef CComObjectNoLock<CandidateListHandler> CCandidateListHandler;
+    /**
+     * @brief Handle events while input method's candidate list window is hidden
+     */
+    class CandidateListHandler
+        : public ICallback<const libtf_CandidateListState, std::shared_ptr<const CandidateListContext>> {
+        CComPtr<ITfCandidateListUIElement> m_UIElement;
+
+      public:
+        std::shared_ptr<const CandidateListContext> m_Context;
+
+      public:
+        HRESULT BeginUIElement(CComPtr<ITfCandidateListUIElement> ele)
+        {
+            m_UIElement = ele;
+
+            runCallback(libtf_CandidateListBegin, NULL);
+
+            return S_OK;
+        }
+
+        HRESULT UpdateUIElement()
+        {
+            BEGIN_HRESULT();
+
+            auto ctx = std::make_shared<CandidateListContext>();
+            CHECK_HR(ctx->ctor(m_UIElement));
+            m_Context = ctx;
+
+            runCallback(libtf_CandidateListUpdate, std::move(ctx));
+
+            END_HRESULT();
+        }
+
+        HRESULT EndUIElement()
+        {
+            runCallback(libtf_CandidateListEnd, NULL);
+
+            m_Context.reset();
+
+            return S_OK;
+        }
+    };
 }// namespace libtf
