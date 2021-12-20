@@ -58,7 +58,7 @@ LIBTF_EXPORT typedef struct libtf_CandidateListContext
      * @brief Zero-terminated wchar strings
      */
 #pragma warning(push)
-#pragma warning(disable:4200)
+#pragma warning(disable : 4200)
     wchar_t* m_Candidates[0];
 #pragma warning(pop)
 } libtf_CandidateListContext_t, *libtf_pCandidateListContext;
@@ -100,7 +100,7 @@ LIBTF_EXPORT typedef void (*libtf_PreEditCallback)(libtf_CompositionState_t     
  * @note If the length of preedit is 0 (as it would be drawn by input method), the rectangle
  * coincides with the insertion point, and its width is 0.
  */
-LIBTF_EXPORT typedef void (*libtf_PreEditRectCallback)(const RECT* rect, void* userData);
+LIBTF_EXPORT typedef void (*libtf_PreEditRectCallback)(RECT* rect, void* userData);
 /**
  * @brief Receives commit string from input method
  *
@@ -182,7 +182,7 @@ LIBTF_EXPORT typedef void (*libtf_InputProcessorCallback)(libtf_InputProcessorSt
                                                           void*                               userData);
 LIBTF_EXPORT typedef struct libtf_InputProcessors
 {
-    uint32_t              m_InputProcessorsSize;
+    uint32_t m_InputProcessorsSize;
 #pragma warning(push)
 #pragma warning(disable : 4200)
     libtf_HInputProcessor m_InputProcessors[0];
