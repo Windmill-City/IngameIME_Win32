@@ -156,7 +156,7 @@ LIBTF_EXPORT libtf_CandidateListCallback libtf_candidate_list_set_callback(libtf
 
                 auto size = (it.length() + 1) * sizeof(wchar_t);
                 // Copy string data
-                memcpy(pCandidates, it.c_str(), size);
+                memcpy(&pCandidates, it.c_str(), size);
                 pCandidates += size;
             }
 
@@ -247,7 +247,7 @@ LIBTF_EXPORT libtf_PreEditCallback libtf_preedit_set_callback(libtf_pInputContex
 
             auto size = (ctx->m_Content.length() + 1) * sizeof(wchar_t);
             // Copy string data
-            memcpy(pContent, ctx->m_Content.c_str(), size);
+            memcpy(&pContent, ctx->m_Content.c_str(), size);
 
             callback(state, *libtf_ctx, userData);
         });
@@ -338,7 +338,7 @@ inputprocessor_get_ctx(const std::shared_ptr<const libtf::InputProcessorContext>
 
         auto size = (it.length() + 1) * sizeof(wchar_t);
         // Copy string data
-        memcpy(pInputModes, it.c_str(), size);
+        memcpy(&pInputModes, it.c_str(), size);
         pInputModes += size;
     }
 
@@ -471,21 +471,21 @@ LIBTF_EXPORT libtf_pInputProcessorProfile libtf_inputprocessor_get_profile(const
     libtf_profile->m_Locale = pString;
 
     int size = (int)(sizeof(wchar_t) * (processor->m_Locale.length() + 1));
-    memcpy(pString, processor->m_Locale.c_str(), size);
+    memcpy(&pString, processor->m_Locale.c_str(), size);
     pString += size;
 
     // Locale Name
     libtf_profile->m_LocaleName = pString;
 
     size = (int)(sizeof(wchar_t) * (processor->m_LocaleName.length() + 1));
-    memcpy(pString, processor->m_LocaleName.c_str(), size);
+    memcpy(&pString, processor->m_LocaleName.c_str(), size);
     pString += size;
 
     // ProcessorName
     libtf_profile->m_InputProcessorName = pString;
 
     size = (int)(sizeof(wchar_t) * (processor->m_InputProcessorName.length() + 1));
-    memcpy(pString, processor->m_InputProcessorName.c_str(), size);
+    memcpy(&pString, processor->m_InputProcessorName.c_str(), size);
 
     return libtf_profile;
 }
