@@ -526,6 +526,14 @@ namespace libtf {
          * In the brace are mutually exclusive InputModes
          */
         std::list<std::wstring> m_InputModes;
+
+      public:
+        InputProcessorContext(std::shared_ptr<const InputProcessor> processor, std::list<std::wstring> inputModes)
+        {
+            m_InputProcessor = processor;
+            m_InputModes     = inputModes;
+            m_InputModeSize  = (uint32_t)m_InputModes.size();
+        }
     };
 
     class InputProcessorHandler
@@ -567,11 +575,10 @@ namespace libtf {
             int mode;
             CHECK_HR(m_InputModeHandler->getConversionMode(mode));
 
-            auto ctx = std::make_shared<InputProcessorContext>();
+            auto processor  = InputProcessor::create(profile);
+            auto inputModes = processor->getInputModes(mode);
 
-            ctx->m_InputProcessor = InputProcessor::create(profile);
-            ctx->m_InputModes     = ctx->m_InputProcessor->getInputModes(mode);
-
+            auto ctx  = std::make_shared<InputProcessorContext>(processor, inputModes);
             m_Context = ctx;
 #pragma endregion
 
@@ -581,11 +588,9 @@ namespace libtf {
 
 #pragma region InputMode Callback
             m_InputModeHandler->setCallback([&](int mode) {
-                auto ctx              = std::make_shared<InputProcessorContext>();
-                ctx->m_InputProcessor = m_Context->m_InputProcessor;
-                ctx->m_InputModes     = ctx->m_InputProcessor->getInputModes(mode);
-
-                m_Context = ctx;
+                auto inputModes = m_Context->m_InputProcessor->getInputModes(mode);
+                auto ctx        = std::make_shared<InputProcessorContext>(m_Context->m_InputProcessor, inputModes);
+                m_Context       = ctx;
 
                 runCallback(libtf_InputProcessorInputModeUpdate, std::move(ctx));
             });
@@ -658,13 +663,13 @@ namespace libtf {
             profile.guidProfile   = guidProfile;
             profile.hkl           = hkl;
 
-            auto ctx              = std::make_shared<InputProcessorContext>();
-            ctx->m_InputProcessor = InputProcessor::create(profile);
-
             int mode;
             CHECK_HR(m_InputModeHandler->getConversionMode(mode));
-            ctx->m_InputModes = ctx->m_InputProcessor->getInputModes(mode);
 
+            auto processor  = InputProcessor::create(profile);
+            auto inputModes = processor->getInputModes(mode);
+
+            auto ctx  = std::make_shared<InputProcessorContext>(processor, inputModes);
             m_Context = ctx;
 
             runCallback(libtf_InputProcessorFullUpdate, std::move(ctx));
