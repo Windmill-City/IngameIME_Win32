@@ -54,8 +54,7 @@ namespace libtf {
 
             // This EditCookie is useless
             TfEditCookie ec;
-            CHECK_HR(m_DocumentMgr->CreateContext(
-                m_ClientId, 0, (ITfContextOwnerCompositionSink*)m_CompositionHandler, &m_Context, &ec));
+            CHECK_HR(m_DocumentMgr->CreateContext(m_ClientId, 0, m_CompositionHandler.p, &m_Context, &ec));
             CHECK_HR(m_DocumentMgr->Push(m_Context));
 
             CComQIPtr<ITfSource> source = m_Context;
