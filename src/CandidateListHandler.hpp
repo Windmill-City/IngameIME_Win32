@@ -126,6 +126,9 @@ namespace libtf {
         {
             BEGIN_HRESULT();
 
+            // No active candidatelist
+            if(!m_UIElement) return S_OK;
+
             auto ctx = std::make_shared<CandidateListContext>();
             CHECK_HR(ctx->ctor(m_UIElement));
             m_Context = ctx;
@@ -137,6 +140,9 @@ namespace libtf {
 
         HRESULT EndUIElement()
         {
+            // No active candidatelist
+            if (!m_UIElement) return S_OK;
+
             runCallback(libtf_CandidateListEnd, NULL);
 
             m_Context.reset();
