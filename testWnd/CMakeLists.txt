@@ -7,14 +7,13 @@ enable_testing()
 add_subdirectory(../ ./libtf)
 add_subdirectory(glfw ./glfw)
 
-include_directories(../src/ ./glfw/include)
-
 add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
 add_executable(testWnd main.cpp)
-target_link_libraries(testWnd glfw ${GLFW_LIBRARIES})
-target_link_libraries(testWnd libtf_shared)
+target_include_directories(testWnd PUBLIC ../src/include ./glfw/include)
+target_link_libraries(testWnd PRIVATE glfw ${GLFW_LIBRARIES})
+target_link_libraries(testWnd PRIVATE libtf_shared)
 
 add_custom_command(
         TARGET testWnd POST_BUILD
