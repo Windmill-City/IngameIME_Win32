@@ -18,7 +18,7 @@ LIBTF_EXPORT HRESULT libtf_create_ctx(libtf_pInputContext* ctx, const HWND hWnd)
  *
  * @return UI_E_WRONG_THREAD if the calling thread isn't the thread that create the context
  */
-LIBTF_EXPORT HRESULT libtf_destroy_ctx(libtf_pInputContext ctx);
+LIBTF_EXPORT HRESULT libtf_destroy_ctx(libtf_pInputContext* ctx);
 /**
  * @brief Set if context activated
  *

@@ -57,7 +57,10 @@ LIBTF_EXPORT typedef struct libtf_CandidateListContext
     /**
      * @brief Zero-terminated wchar strings
      */
+#pragma warning(push)
+#pragma warning(disable:4200)
     wchar_t* m_Candidates[0];
+#pragma warning(pop)
 } libtf_CandidateListContext_t, *libtf_pCandidateListContext;
 LIBTF_EXPORT typedef void (*libtf_CandidateListCallback)(libtf_CandidateListState_t         state,
                                                          const libtf_CandidateListContext_t ctx,
@@ -83,7 +86,10 @@ LIBTF_EXPORT typedef struct libtf_PreEditContext
     /**
      * @brief Zero-terminated string
      */
+#pragma warning(push)
+#pragma warning(disable : 4200)
     wchar_t m_Content[0];
+#pragma warning(pop)
 } libtf_PreEditContext_t, *libtf_pPreEditContext;
 LIBTF_EXPORT typedef void (*libtf_PreEditCallback)(libtf_CompositionState_t     state,
                                                    const libtf_PreEditContext_t ctx,
@@ -166,7 +172,10 @@ LIBTF_EXPORT typedef struct libtf_InputProcessorContext
      * {Hiragana, Katakana, Roman}
      * In the brace, are mutually exclusive InputModes
      */
+#pragma warning(push)
+#pragma warning(disable : 4200)
     wchar_t* m_InputModes[0];
+#pragma warning(pop)
 } libtf_InputProcessorContext_t, *libtf_pInputProcessorContext;
 LIBTF_EXPORT typedef void (*libtf_InputProcessorCallback)(libtf_InputProcessorState_t         state,
                                                           const libtf_InputProcessorContext_t ctx,
@@ -174,7 +183,10 @@ LIBTF_EXPORT typedef void (*libtf_InputProcessorCallback)(libtf_InputProcessorSt
 LIBTF_EXPORT typedef struct libtf_InputProcessors
 {
     uint32_t              m_InputProcessorsSize;
+#pragma warning(push)
+#pragma warning(disable : 4200)
     libtf_HInputProcessor m_InputProcessors[0];
+#pragma warning(pop)
 } libtf_InputProcessors_t, *libtf_pInputProcessors;
 #pragma endregion
 #ifdef __cplusplus

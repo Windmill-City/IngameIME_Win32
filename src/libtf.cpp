@@ -135,7 +135,7 @@ LIBTF_EXPORT libtf_CandidateListCallback libtf_candidate_list_set_callback(libtf
             auto strTotalLen = std::accumulate(ctx->m_Candidates.begin(),
                                                ctx->m_Candidates.end(),
                                                ctx->m_PageSize,// Number of \0
-                                               [](auto&& sum, auto&& it) { return sum + it.length(); });
+                                               [](auto&& sum, auto&& it) { return sum + (uint32_t)it.length(); });
             auto libtf_ctx   = std::unique_ptr<libtf_CandidateListContext_t, decltype(&::free)>(
                 (libtf_pCandidateListContext)malloc(sizeof(libtf_CandidateListContext_t) +
                                                     sizeof(wchar_t*) * ctx->m_PageSize + sizeof(wchar_t) * strTotalLen),
@@ -318,7 +318,7 @@ inputprocessor_get_ctx(const std::shared_ptr<const libtf::InputProcessorContext>
     auto strTotalLen = std::accumulate(processorCtx->m_InputModes.begin(),
                                        processorCtx->m_InputModes.end(),
                                        processorCtx->m_InputModeSize,// Number of \0
-                                       [](auto&& sum, auto&& it) { return sum + it.length(); });
+                                       [](auto&& sum, auto&& it) { return sum + (uint32_t)it.length(); });
     auto libtf_ctx   = (libtf_pInputProcessorContext)malloc(sizeof(libtf_InputProcessorContext_t) +
                                                           sizeof(wchar_t*) * processorCtx->m_InputModeSize +
                                                           sizeof(wchar_t) * strTotalLen);
@@ -422,7 +422,7 @@ LIBTF_EXPORT libtf_pInputProcessors libtf_get_inputprocessors()
 
         if (!libtf_processors) return NULL;
 
-        libtf_processors->m_InputProcessorsSize = processors.size();
+        libtf_processors->m_InputProcessorsSize = (int)processors.size();
 
         int i = 0;
         for (auto&& it : processors) { libtf_processors->m_InputProcessors[i++] = (void*)it.get(); }
@@ -470,21 +470,21 @@ LIBTF_EXPORT libtf_pInputProcessorProfile libtf_inputprocessor_get_profile(const
     // Locale
     libtf_profile->m_Locale = pString;
 
-    int size = sizeof(wchar_t) * (processor->m_Locale.length() + 1);
+    int size = (int)(sizeof(wchar_t) * (processor->m_Locale.length() + 1));
     memcpy(pString, processor->m_Locale.c_str(), size);
     pString += size;
 
     // Locale Name
     libtf_profile->m_LocaleName = pString;
 
-    size = sizeof(wchar_t) * (processor->m_LocaleName.length() + 1);
+    size = (int)(sizeof(wchar_t) * (processor->m_LocaleName.length() + 1));
     memcpy(pString, processor->m_LocaleName.c_str(), size);
     pString += size;
 
     // ProcessorName
     libtf_profile->m_InputProcessorName = pString;
 
-    size = sizeof(wchar_t) * (processor->m_InputProcessorName.length() + 1);
+    size = (int)(sizeof(wchar_t) * (processor->m_InputProcessorName.length() + 1));
     memcpy(pString, processor->m_InputProcessorName.c_str(), size);
 
     return libtf_profile;
