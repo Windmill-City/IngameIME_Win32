@@ -97,7 +97,7 @@ namespace libtf {
      * @note If the length of preedit is 0 (as it would be drawn by input method), the rectangle
      * coincides with the insertion point, and its width is 0.
      */
-    typedef ICallback<const RECT*> PreEditRectCallback;
+    typedef ICallback<RECT*> PreEditRectCallback;
     class PreEditHandler : public CComObjectRoot,
                            public ITfTextEditSink,
                            public PreEditContextCallback,
