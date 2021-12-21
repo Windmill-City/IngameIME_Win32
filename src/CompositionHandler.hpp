@@ -163,9 +163,11 @@ namespace libtf {
             CHECK_HR(m_CompositionView->GetRange(&preEditRange));
 
             // Get preedit length
-            ULONG preEditLength;
-            CHECK_HR(preEditRange->GetText(ec, 0, NULL, 0, &preEditLength));
-            auto bufPreEdit = std::make_unique<WCHAR[]>(preEditLength);
+            CComQIPtr<ITfRangeACP> rangeAcp = preEditRange;
+            LONG                   acpStart, len;
+            CHECK_HR(rangeAcp->GetExtent(&acpStart, &len));
+            ULONG preEditLength = len;
+            auto  bufPreEdit    = std::make_unique<WCHAR[]>(preEditLength);
             // Get preedit text
             CHECK_HR(preEditRange->GetText(ec, 0, bufPreEdit.get(), preEditLength, &preEditLength));
 
@@ -175,9 +177,8 @@ namespace libtf {
             CComPtr<ITfRange> selRange;
             CHECK_HR(m_Context->GetSelection(ec, TF_DEFAULT_SELECTION, 1, sel, &fetched));
             selRange.Attach(sel[0].range);
-            CComQIPtr<ITfRangeACP> selRangeAcp = selRange;
-            LONG                   acpStart, len;
-            CHECK_HR(selRangeAcp->GetExtent(&acpStart, &len));
+            rangeAcp = selRange;
+            CHECK_HR(rangeAcp->GetExtent(&acpStart, &len));
 
             PreEditContextCallback::runCallback(
                 libtf_CompositionUpdate,
