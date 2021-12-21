@@ -16,7 +16,7 @@ namespace libtf {
     class InputModeHandler : public CComObjectRoot,
                              public ITfCompartmentEventSink,
                              public IThreadAssociate,
-                             public ICallback<int> {
+                             public ICallback<const int> {
         CComQIPtr<ITfCompartmentMgr> m_CompartmentMgr;
         CComPtr<ITfCompartment>      m_ConversionMode;
         DWORD                        m_ConversionModeCookie = TF_INVALID_COOKIE;

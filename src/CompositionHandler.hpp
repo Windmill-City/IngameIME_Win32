@@ -90,7 +90,7 @@ namespace libtf {
             m_Content  = std::move(content);
         }
     };
-    typedef ICallback<const libtf_CompositionState, std::unique_ptr<const PreEditContext>> PreEditContextCallback;
+    typedef ICallback<const libtf_CompositionState_t, std::unique_ptr<const PreEditContext>> PreEditContextCallback;
     /**
      * @brief Return the boundary rectangle of the preedit, in window coordinate
      *
@@ -180,7 +180,9 @@ namespace libtf {
             CHECK_HR(selRangeAcp->GetExtent(&acpStart, &len));
 
             PreEditContextCallback::runCallback(
-                libtf_CompositionUpdate, std::make_unique<PreEditContext>(acpStart, acpStart + len, bufPreEdit.get()));
+                libtf_CompositionUpdate,
+                std::make_unique<PreEditContext>(
+                    acpStart, acpStart + len, std::wstring(bufPreEdit.get(), preEditLength)));
 
             END_HRESULT();
         }

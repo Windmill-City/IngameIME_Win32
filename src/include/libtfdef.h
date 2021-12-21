@@ -59,12 +59,15 @@ LIBTF_EXPORT typedef struct libtf_CandidateListContext
      */
 #pragma warning(push)
 #pragma warning(disable : 4200)
-    wchar_t* m_Candidates[0];
+    wchar_t* m_Candidates[];
 #pragma warning(pop)
 } libtf_CandidateListContext_t, *libtf_pCandidateListContext;
-LIBTF_EXPORT typedef void (*libtf_CandidateListCallback)(libtf_CandidateListState_t         state,
-                                                         const libtf_CandidateListContext_t ctx,
-                                                         void*                              userData);
+/**
+ * @param ctx Only **Non-Null** when state is Update
+ */
+LIBTF_EXPORT typedef void (*libtf_CandidateListCallback)(libtf_CandidateListState_t        state,
+                                                         const libtf_pCandidateListContext ctx,
+                                                         void*                             userData);
 #pragma endregion
 #pragma region Composition
 LIBTF_EXPORT typedef enum libtf_CompositionState {
@@ -88,12 +91,15 @@ LIBTF_EXPORT typedef struct libtf_PreEditContext
      */
 #pragma warning(push)
 #pragma warning(disable : 4200)
-    wchar_t m_Content[0];
+    wchar_t m_Content[];
 #pragma warning(pop)
 } libtf_PreEditContext_t, *libtf_pPreEditContext;
-LIBTF_EXPORT typedef void (*libtf_PreEditCallback)(libtf_CompositionState_t     state,
-                                                   const libtf_PreEditContext_t ctx,
-                                                   void*                        userData);
+/**
+ * @param ctx Only **Non-Null** when state is Update
+ */
+LIBTF_EXPORT typedef void (*libtf_PreEditCallback)(const libtf_CompositionState_t state,
+                                                   const libtf_pPreEditContext    ctx,
+                                                   void*                          userData);
 /**
  * @brief Return the boundary rectangle of the preedit, in window coordinate
  *
@@ -174,18 +180,18 @@ LIBTF_EXPORT typedef struct libtf_InputProcessorContext
      */
 #pragma warning(push)
 #pragma warning(disable : 4200)
-    wchar_t* m_InputModes[0];
+    wchar_t* m_InputModes[];
 #pragma warning(pop)
 } libtf_InputProcessorContext_t, *libtf_pInputProcessorContext;
-LIBTF_EXPORT typedef void (*libtf_InputProcessorCallback)(libtf_InputProcessorState_t         state,
-                                                          const libtf_InputProcessorContext_t ctx,
-                                                          void*                               userData);
+LIBTF_EXPORT typedef void (*libtf_InputProcessorCallback)(const libtf_InputProcessorState_t  state,
+                                                          const libtf_pInputProcessorContext ctx,
+                                                          void*                              userData);
 LIBTF_EXPORT typedef struct libtf_InputProcessors
 {
     uint32_t m_InputProcessorsSize;
 #pragma warning(push)
 #pragma warning(disable : 4200)
-    libtf_HInputProcessor m_InputProcessors[0];
+    libtf_HInputProcessor m_InputProcessors[];
 #pragma warning(pop)
 } libtf_InputProcessors_t, *libtf_pInputProcessors;
 #pragma endregion

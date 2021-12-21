@@ -132,6 +132,12 @@ LIBTF_EXPORT libtf_CandidateListCallback libtf_candidate_list_set_callback(libtf
 
     ctx->m_InputContext->m_FullScreenUIElementHandler->m_CandidateListHandler->setCallback(
         [callback, userData](auto&& state, auto&& ctx) {
+            // NULL context only state update
+            if (!ctx) {
+                callback(state, NULL, userData);
+                return;
+            }
+
             auto strTotalLen = std::accumulate(ctx->m_Candidates.begin(),
                                                ctx->m_Candidates.end(),
                                                ctx->m_PageSize,// Number of \0
@@ -149,18 +155,18 @@ LIBTF_EXPORT libtf_CandidateListCallback libtf_candidate_list_set_callback(libtf
 
             // Append strings at the end of the struct
             int  i           = 0;
-            auto pCandidates = libtf_ctx->m_Candidates[ctx->m_PageSize];
+            auto pCandidates = (wchar_t*)&libtf_ctx->m_Candidates[ctx->m_PageSize];
             for (auto&& it : ctx->m_Candidates) {
                 // Point to string start
                 libtf_ctx->m_Candidates[i++] = pCandidates;
 
-                auto size = (it.length() + 1) * sizeof(wchar_t);
+                auto size = it.length() + 1;
                 // Copy string data
-                memcpy(&pCandidates, it.c_str(), size);
+                memcpy(pCandidates, it.c_str(), size * sizeof(wchar_t));
                 pCandidates += size;
             }
 
-            callback(state, *libtf_ctx, userData);
+            callback(state, libtf_ctx.get(), userData);
         });
 
     std::swap(PrevUserData, userData);
@@ -232,6 +238,12 @@ LIBTF_EXPORT libtf_PreEditCallback libtf_preedit_set_callback(libtf_pInputContex
 
     ctx->m_InputContext->m_CompositionHandler->m_PreEditHandler->libtf::PreEditContextCallback::setCallback(
         [callback, userData](auto&& state, auto&& ctx) {
+            // NULL context only state update
+            if (!ctx) {
+                callback(state, NULL, userData);
+                return;
+            }
+
             auto strTotalLen = ctx->m_Content.length() + 1;
             auto libtf_ctx   = std::unique_ptr<libtf_PreEditContext_t, decltype(&::free)>(
                 (libtf_pPreEditContext)malloc(sizeof(libtf_PreEditContext_t) + sizeof(wchar_t) * strTotalLen), free);
@@ -247,9 +259,9 @@ LIBTF_EXPORT libtf_PreEditCallback libtf_preedit_set_callback(libtf_pInputContex
 
             auto size = (ctx->m_Content.length() + 1) * sizeof(wchar_t);
             // Copy string data
-            memcpy(&pContent, ctx->m_Content.c_str(), size);
+            memcpy(pContent, ctx->m_Content.c_str(), size);
 
-            callback(state, *libtf_ctx, userData);
+            callback(state, libtf_ctx.get(), userData);
         });
 
     std::swap(PrevUserData, userData);
@@ -312,33 +324,33 @@ LIBTF_EXPORT libtf_CommitCallback libtf_commit_set_callback(libtf_pInputContext 
  * @param processorCtx libtf::InputProcessorContext
  * @return NULL if out of memory
  */
-libtf_pInputProcessorContext
-inputprocessor_get_ctx(const std::shared_ptr<const libtf::InputProcessorContext> processorCtx)
+libtf_pInputProcessorContext inputprocessor_get_ctx(const libtf::InputProcessorContext processorCtx)
 {
-    auto strTotalLen = std::accumulate(processorCtx->m_InputModes.begin(),
-                                       processorCtx->m_InputModes.end(),
-                                       processorCtx->m_InputModeSize,// Number of \0
+    auto strTotalLen = std::accumulate(processorCtx.m_InputModes.begin(),
+                                       processorCtx.m_InputModes.end(),
+                                       processorCtx.m_InputModeSize,// Number of \0
                                        [](auto&& sum, auto&& it) { return sum + (uint32_t)it.length(); });
     auto libtf_ctx   = (libtf_pInputProcessorContext)malloc(sizeof(libtf_InputProcessorContext_t) +
-                                                          sizeof(wchar_t*) * processorCtx->m_InputModeSize +
+                                                          sizeof(wchar_t*) * processorCtx.m_InputModeSize +
                                                           sizeof(wchar_t) * strTotalLen);
 
     // Out of memory
     if (!libtf_ctx) return NULL;
 
-    libtf_ctx->m_InputProcessor = (void*)processorCtx->m_InputProcessor.get();
-    libtf_ctx->m_InputModeSize  = processorCtx->m_InputModeSize;
+    libtf_ctx->m_InputProcessor = (void*)processorCtx.m_InputProcessor.get();
+    libtf_ctx->m_InputModeSize  = processorCtx.m_InputModeSize;
 
     // Append strings at the end of the struct
     int  i           = 0;
-    auto pInputModes = libtf_ctx->m_InputModes[processorCtx->m_InputModeSize];
-    for (auto&& it : processorCtx->m_InputModes) {
+    auto pInputModes = (wchar_t*)&libtf_ctx->m_InputModes[libtf_ctx->m_InputModeSize];
+
+    for (auto&& it : processorCtx.m_InputModes) {
         // Point to string start
         libtf_ctx->m_InputModes[i++] = pInputModes;
 
-        auto size = (it.length() + 1) * sizeof(wchar_t);
+        auto size = it.length() + 1;
         // Copy string data
-        memcpy(&pInputModes, it.c_str(), size);
+        memcpy(pInputModes, it.c_str(), size * sizeof(wchar_t));
         pInputModes += size;
     }
 
@@ -362,8 +374,8 @@ LIBTF_EXPORT libtf_InputProcessorCallback libtf_inputprocessor_set_callback(libt
 
     ctx->m_InputContext->m_InputProcessorHandler->setCallback([callback, userData](auto&& state, auto&& ctx) {
         auto libtf_ctx =
-            std::unique_ptr<libtf_InputProcessorContext_t, decltype(&::free)>(inputprocessor_get_ctx(ctx), free);
-        if (libtf_ctx) callback(state, *libtf_ctx, userData);
+            std::unique_ptr<libtf_InputProcessorContext_t, decltype(&::free)>(inputprocessor_get_ctx(*ctx), free);
+        if (libtf_ctx) callback(state, libtf_ctx.get(), userData);
     });
 
     std::swap(PrevUserData, userData);
@@ -379,7 +391,7 @@ LIBTF_EXPORT libtf_InputProcessorCallback libtf_inputprocessor_set_callback(libt
 LIBTF_EXPORT libtf_pInputProcessorContext libtf_inputprocessor_get_ctx(const libtf_pInputContext ctx)
 {
     auto processorCtx = ctx->m_InputContext->m_InputProcessorHandler->m_Context;
-    return inputprocessor_get_ctx(processorCtx);
+    return inputprocessor_get_ctx(*processorCtx);
 }
 /**
  * @brief Free InputProcessor context
@@ -470,22 +482,22 @@ LIBTF_EXPORT libtf_pInputProcessorProfile libtf_inputprocessor_get_profile(const
     // Locale
     libtf_profile->m_Locale = pString;
 
-    int size = (int)(sizeof(wchar_t) * (processor->m_Locale.length() + 1));
-    memcpy(&pString, processor->m_Locale.c_str(), size);
+    int size = (int)((processor->m_Locale.length() + 1));
+    memcpy(pString, processor->m_Locale.c_str(), size * sizeof(wchar_t));
     pString += size;
 
     // Locale Name
     libtf_profile->m_LocaleName = pString;
 
-    size = (int)(sizeof(wchar_t) * (processor->m_LocaleName.length() + 1));
-    memcpy(&pString, processor->m_LocaleName.c_str(), size);
+    size = (int)((processor->m_LocaleName.length() + 1));
+    memcpy(pString, processor->m_LocaleName.c_str(), size * sizeof(wchar_t));
     pString += size;
 
     // ProcessorName
     libtf_profile->m_InputProcessorName = pString;
 
-    size = (int)(sizeof(wchar_t) * (processor->m_InputProcessorName.length() + 1));
-    memcpy(&pString, processor->m_InputProcessorName.c_str(), size);
+    size = (int)((processor->m_InputProcessorName.length() + 1));
+    memcpy(pString, processor->m_InputProcessorName.c_str(), size * sizeof(wchar_t));
 
     return libtf_profile;
 }
