@@ -6,12 +6,15 @@ enable_testing()
 
 add_subdirectory(../ ./libtf)
 add_subdirectory(glfw ./glfw)
+add_subdirectory(glad ./glad)
 
 add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
-add_executable(testWnd main.cpp)
-target_include_directories(testWnd PUBLIC ../src/include ./glfw/include)
+add_executable(testWnd ./src/main.cpp)
+target_include_directories(testWnd PUBLIC ../src/include ./glfw/include ./glad/include)
+target_sources(testWnd PRIVATE ./src)
+target_link_libraries(testWnd PRIVATE glad_static)
 target_link_libraries(testWnd PRIVATE glfw ${GLFW_LIBRARIES})
 target_link_libraries(testWnd PRIVATE libtf_shared)
 
