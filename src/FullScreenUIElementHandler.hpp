@@ -95,6 +95,8 @@ namespace libtf {
                     CHECK_HR(m_CandidateListHandler->BeginUIElement(candidateListUIElement));
                 }
             }
+            else
+                *pbShow = true;
             END_HRESULT();
         }
 
