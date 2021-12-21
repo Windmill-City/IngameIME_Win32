@@ -436,12 +436,11 @@ namespace libtf {
         {
             auto result = TextService::getInputModes(conversionMode);
 
-            if (conversionMode & TF_CONVERSIONMODE_KATAKANA) { result.push_back(L"Katakana"); }
-            else if (conversionMode & TF_CONVERSIONMODE_ROMAN) {
-                result.push_back(L"Roman");
-            }
-            else {
-                result.push_back(L"Hiragana");
+            if (conversionMode & TF_CONVERSIONMODE_NATIVE) {
+                if (conversionMode & TF_CONVERSIONMODE_KATAKANA) { result.push_back(L"Katakana"); }
+                else {
+                    result.push_back(L"Hiragana");
+                }
             }
 
             return result;
@@ -452,10 +451,8 @@ namespace libtf {
         {
             auto result = TextService::applyNewInputMode(inputModes, newMode);
 
-            if (newMode == L"Hiragana" || newMode == L"Katakana" || newMode == L"Roman") {
-                result.remove_if([](auto&& oldMode) {
-                    return oldMode == L"Hiragana" || oldMode == L"Katakana" || oldMode == L"Roman";
-                });
+            if (newMode == L"Hiragana" || newMode == L"Katakana") {
+                result.remove_if([](auto&& oldMode) { return oldMode == L"Hiragana" || oldMode == L"Katakana"; });
             }
 
             result.push_back(newMode);
@@ -468,7 +465,6 @@ namespace libtf {
             int result = TextService::getConversionMode(inputModes);
             for (auto&& mode : inputModes) {
                 if (mode == L"Katakana") { result |= TF_CONVERSIONMODE_KATAKANA; }
-                if (mode == L"Roman") { result |= TF_CONVERSIONMODE_ROMAN; }
             }
 
             return result;
@@ -490,7 +486,7 @@ namespace libtf {
             if (profile.dwProfileType == TF_PROFILETYPE_KEYBOARDLAYOUT) {
                 result = std::make_shared<KeyboardLayout>(profile);
             }
-            else if (StrCmpW(getLocale(profile.langid).c_str(), L"ja") == 0) {
+            else if (!getLocale(profile.langid).compare(0, 2, L"ja")) {
                 result = std::make_shared<TextService_Japan>(profile);
             }
             else {
@@ -653,7 +649,7 @@ namespace libtf {
         {
             BEGIN_HRESULT();
             // Only notify active inputprocessor
-            if (!(dwFlags & TF_TMF_ACTIVATED)) return S_OK;
+            if (!(dwFlags & TF_IPSINK_FLAG_ACTIVE)) return S_OK;
 
             TF_INPUTPROCESSORPROFILE profile;
             profile.dwProfileType = dwProfileType;

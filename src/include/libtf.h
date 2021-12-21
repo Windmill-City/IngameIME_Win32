@@ -137,7 +137,7 @@ LIBTF_EXPORT libtf_pInputProcessorContext libtf_inputprocessor_get_ctx(const lib
 /**
  * @brief Free InputProcessor context
  */
-LIBTF_EXPORT void libtf_inputprocessor_free_ctx(libtf_pInputProcessorContext ctx);
+LIBTF_EXPORT void libtf_inputprocessor_free_ctx(libtf_pInputProcessorContext* ctx);
 /**
  * @brief Apply new InputMode to active InputProcessor
  *
@@ -156,7 +156,7 @@ LIBTF_EXPORT libtf_pInputProcessors libtf_get_inputprocessors();
 /**
  * @brief Free the libtf_InputProcessors object
  */
-LIBTF_EXPORT void libtf_free_inputprocessors(libtf_pInputProcessors processors);
+LIBTF_EXPORT void libtf_free_inputprocessors(libtf_pInputProcessors* processors);
 /**
  * @brief Get detailed infomation of the InputProcessor
  *
@@ -167,7 +167,7 @@ LIBTF_EXPORT libtf_pInputProcessorProfile libtf_inputprocessor_get_profile(const
 /**
  * @brief Free the libtf_InputProcessorProfile
  */
-LIBTF_EXPORT void libtf_inputprocessor_free_profile(libtf_pInputProcessorProfile profile);
+LIBTF_EXPORT void libtf_inputprocessor_free_profile(libtf_pInputProcessorProfile* profile);
 /**
  * @brief Set active InputProcessor for calling thread
  *

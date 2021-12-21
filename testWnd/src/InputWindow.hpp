@@ -214,6 +214,7 @@ void process_commit(const wchar_t* commit, void* userData)
 {
     auto pcommit = commit;
 }
+
 /**
  * @brief Receive InputProcessor relevent event
  *
@@ -223,5 +224,18 @@ void process_inputprocessor(const libtf_InputProcessorState_t  state,
                             const libtf_pInputProcessorContext ctx,
                             void*                              userData)
 {
-    wprintf(ctx->m_InputModes[0]);
+    if (state == libtf_InputProcessorFullUpdate) {
+        wprintf(L"InputProcessor Full Update!\n");
+        auto processorCtx = libtf_inputprocessor_get_profile(ctx->m_InputProcessor);
+
+        wprintf(L"[%wS]Locale:%wS, LangName:%wS, InputProcessor:%wS\n",
+                processorCtx->m_Type == libtf_KeyboardLayout ? L"KL" : L"TIP",
+                processorCtx->m_Locale,
+                processorCtx->m_LocaleName,
+                processorCtx->m_InputProcessorName);
+
+        libtf_inputprocessor_free_profile(&processorCtx);
+    }
+    wprintf(L"InputModes:\n");
+    for (size_t i = 0; i < ctx->m_InputModeSize; i++) { wprintf(L"%wS\n", ctx->m_InputModes[i]); }
 }
