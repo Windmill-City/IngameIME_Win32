@@ -67,10 +67,11 @@ namespace libtf {
                 CComBSTR candidate;
                 CHECK_HR(ele->GetString(i, &candidate));
                 m_Candidates.push_back(candidate.m_str);
-                continue;
+                goto SkipErr;
                 END_HRESULT_SCOPE();
                 // If error occurs just put empty string in it
                 m_Candidates.push_back(L"");
+            SkipErr:;
             }
 
             END_HRESULT();
@@ -127,7 +128,7 @@ namespace libtf {
             BEGIN_HRESULT();
 
             // No active candidatelist
-            if(!m_UIElement) return S_OK;
+            if (!m_UIElement) return S_OK;
 
             auto ctx = std::make_shared<CandidateListContext>();
             CHECK_HR(ctx->ctor(m_UIElement));
