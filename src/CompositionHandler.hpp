@@ -51,9 +51,11 @@ namespace libtf {
             CHECK_HR(fullRange->IsEmpty(ec, &isEmpty));
             if (isEmpty) return S_OK;
 
-            ULONG commitLength;
             // Get the text length
-            CHECK_HR(fullRange->GetText(ec, 0, NULL, 0, &commitLength));
+            CComQIPtr<ITfRangeACP> rangeAcp = fullRange;
+            LONG                   acpStart, len;
+            CHECK_HR(rangeAcp->GetExtent(&acpStart, &len));
+            ULONG commitLength = len;
             auto bufCommit = std::make_unique<WCHAR[]>(commitLength);
             // Get the commit text
             CHECK_HR(fullRange->GetText(ec, 0, bufCommit.get(), commitLength, &commitLength));
@@ -279,7 +281,7 @@ namespace libtf {
             m_PreEditHandler->PreEditContextCallback::runCallback(libtf_CompositionEnd, NULL);
 
             BEGIN_HRESULT();
-            CHECK_HR(m_Context->RequestEditSession(m_ClientId, m_CommitHandler, TF_ES_ASYNC | TF_ES_READWRITE, NULL));
+            CHECK_HR(m_Context->RequestEditSession(m_ClientId, m_CommitHandler, TF_ES_ASYNC | TF_ES_READWRITE, &hr));
             END_HRESULT();
         }
 #pragma endregion

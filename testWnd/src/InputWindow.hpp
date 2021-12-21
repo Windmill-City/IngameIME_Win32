@@ -178,6 +178,7 @@ void process_candidate_list(const libtf_CandidateListState_t  state,
                             const libtf_pCandidateListContext ctx,
                             void*                             userData)
 {
+
 }
 /**
  * @brief Receive preedit and compostion state
@@ -199,13 +200,17 @@ void process_preedit(const libtf_CompositionState_t state, const libtf_pPreEditC
  * @note If the length of preedit is 0 (as it would be drawn by input method), the rectangle
  * coincides with the insertion point, and its width is 0.
  */
-void process_preedit_rect(RECT* rect, void* userData) {}
+void process_preedit_rect(RECT* rect, void* userData) {
+
+}
 /**
  * @brief Receives commit string from input method
  *
  * @param userData we pass window here when install callback
  */
-void process_commit(const wchar_t* commit, void* userData) {}
+void process_commit(const wchar_t* commit, void* userData) {
+    auto pcommit = commit;
+}
 /**
  * @brief Receive InputProcessor relevent event
  *
