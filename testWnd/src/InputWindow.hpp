@@ -138,6 +138,7 @@ class InputWindow {
     void switchFullScreen()
     {
         m_FullScreen = !m_FullScreen;
+        // Update FullScreen state
         libtf_set_fullscreen(m_InputContext, m_FullScreen);
 
         auto monitor = glfwGetPrimaryMonitor();
@@ -188,6 +189,15 @@ void process_candidate_list(const libtf_CandidateListState_t  state,
                             const libtf_pCandidateListContext ctx,
                             void*                             userData)
 {
+    if (state == libtf_CandidateListBegin) { wprintf(L"CandidateList Begin!\n"); }
+    else if (state == libtf_CandidateListUpdate) {
+        wprintf(L"CandidateList Update!\n");
+        wprintf(L"Sel:%d\n", ctx->m_Selection);
+        for (size_t i = 0; i < ctx->m_PageSize; i++) { wprintf(L"[%d]%wS\n", i, ctx->m_Candidates[i]); }
+    }
+    else {
+        wprintf(L"CandidateList End!\n");
+    }
 }
 /**
  * @brief Receive preedit and compostion state
@@ -196,9 +206,13 @@ void process_candidate_list(const libtf_CandidateListState_t  state,
  */
 void process_preedit(const libtf_CompositionState_t state, const libtf_pPreEditContext ctx, void* userData)
 {
-    if (state == libtf_CompositionUpdate) {
-        // no wrap
-        auto test = ctx->m_Content;
+    if (state == libtf_CompositionBegin) { wprintf(L"Composition Begin!\n"); }
+    else if (state == libtf_CompositionUpdate) {
+        wprintf(L"Composition Update!\n");
+        wprintf(L"PreEdit:%wS, Sel:<%d,%d>\n", ctx->m_Content, ctx->m_SelStart, ctx->m_SelEnd);
+    }
+    else {
+        wprintf(L"Composition End!\n");
     }
 }
 /**
@@ -220,7 +234,7 @@ void process_preedit_rect(RECT* rect, void* userData)
  */
 void process_commit(const wchar_t* commit, void* userData)
 {
-    auto pcommit = commit;
+    wprintf(L"Commit:%wS\n", commit);
 }
 
 void print_inputprocessor_profile(libtf_HInputProcessor processor)
