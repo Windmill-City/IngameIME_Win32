@@ -55,6 +55,10 @@ void process_commit(const wchar_t* commit, void* userData);
 void process_inputprocessor(const libtf_InputProcessorState_t  state,
                             const libtf_pInputProcessorContext ctx,
                             void*                              userData);
+/**
+ * @brief Print all the inputprocessors available
+ */
+void show_inputprocessors();
 
 class InputWindow {
   public:
@@ -88,6 +92,8 @@ class InputWindow {
 
         HRESULT hr;
         BEGIN_HRESULT_SCOPE();
+
+        show_inputprocessors();
 
         // Create InputContext
         CHECK_HR(libtf_create_ctx(&m_InputContext, glfwGetWin32Window(m_Window)));
@@ -160,6 +166,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) { glfwSetWindowShouldClose(window, GLFW_TRUE); }
     // Switch Fullscreen
     if (glfwGetKey(window, GLFW_KEY_F11) == GLFW_PRESS) { InputWindow::getByGLFWwindow(window)->switchFullScreen(); }
+    // Show InputProcessors
+    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) { show_inputprocessors(); }
 }
 
 void window_size_callback(GLFWwindow* window, int width, int height)
@@ -215,6 +223,19 @@ void process_commit(const wchar_t* commit, void* userData)
     auto pcommit = commit;
 }
 
+void print_inputprocessor_profile(libtf_HInputProcessor processor)
+{
+    auto processorCtx = libtf_inputprocessor_get_profile(processor);
+
+    wprintf(L"[%wS]Locale:%wS, LangName:%wS, InputProcessor:%wS\n",
+            processorCtx->m_Type == libtf_KeyboardLayout ? L"KL" : L"TIP",
+            processorCtx->m_Locale,
+            processorCtx->m_LocaleName,
+            processorCtx->m_InputProcessorName);
+
+    libtf_inputprocessor_free_profile(&processorCtx);
+}
+
 /**
  * @brief Receive InputProcessor relevent event
  *
@@ -226,16 +247,21 @@ void process_inputprocessor(const libtf_InputProcessorState_t  state,
 {
     if (state == libtf_InputProcessorFullUpdate) {
         wprintf(L"InputProcessor Full Update!\n");
-        auto processorCtx = libtf_inputprocessor_get_profile(ctx->m_InputProcessor);
-
-        wprintf(L"[%wS]Locale:%wS, LangName:%wS, InputProcessor:%wS\n",
-                processorCtx->m_Type == libtf_KeyboardLayout ? L"KL" : L"TIP",
-                processorCtx->m_Locale,
-                processorCtx->m_LocaleName,
-                processorCtx->m_InputProcessorName);
-
-        libtf_inputprocessor_free_profile(&processorCtx);
+        print_inputprocessor_profile(ctx->m_InputProcessor);
     }
     wprintf(L"InputModes:\n");
     for (size_t i = 0; i < ctx->m_InputModeSize; i++) { wprintf(L"%wS\n", ctx->m_InputModes[i]); }
+}
+
+/**
+ * @brief Print all the inputprocessors available
+ */
+void show_inputprocessors()
+{
+    auto processors = libtf_get_inputprocessors();
+    wprintf(L"System available InputProcessors:\n");
+    for (size_t i = 0; i < processors->m_InputProcessorsSize; i++) {
+        print_inputprocessor_profile(processors->m_InputProcessors[i]);
+    }
+    libtf_free_inputprocessors(&processors);
 }

@@ -278,6 +278,8 @@ namespace libtf {
             HRESULT hr;
             BEGIN_HRESULT_SCOPE();
 
+            if (!IsGUIThread(false)) break;
+
             CComPtr<ITfInputProcessorProfiles> inputProcessorProfiles;
             CHECK_HR(createInputProcessorProfiles(&inputProcessorProfiles));
             CComQIPtr<ITfInputProcessorProfileMgr> inputProcessorMgr = inputProcessorProfiles;

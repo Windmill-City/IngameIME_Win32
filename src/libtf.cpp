@@ -477,7 +477,7 @@ LIBTF_EXPORT libtf_pInputProcessorProfile libtf_inputprocessor_get_profile(const
     libtf_profile->m_Type = processor->m_Type;
 
     // Append string at the end of the struct
-    auto pString = (wchar_t*)(libtf_profile + sizeof(libtf_profile));
+    auto pString = (wchar_t*)((uint8_t*)libtf_profile + sizeof(libtf_InputProcessorProfile_t));
 
     // Locale
     libtf_profile->m_Locale = pString;
