@@ -144,6 +144,8 @@ namespace libtf {
             // No active candidatelist
             if (!m_UIElement) return S_OK;
 
+            m_UIElement.Release();
+
             runCallback(libtf_CandidateListEnd, NULL);
 
             m_Context.reset();
