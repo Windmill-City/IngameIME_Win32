@@ -10,7 +10,7 @@ namespace libtf {
     class FullScreenUIElementHandler : public CComObjectRoot, public ITfUIElementSink {
         CComQIPtr<ITfUIElementMgr> m_UIElementMgr;
         DWORD                      m_UIElementMgrSinkCookie         = TF_INVALID_COOKIE;
-        DWORD                      m_ActiveCandidateListUIElementId = 0;
+        DWORD                      m_ActiveCandidateListUIElementId = TF_INVALID_UIELEMENTID;
         bool                       m_FullScreenMode                 = false;
 
       public:
@@ -82,6 +82,7 @@ namespace libtf {
         {
             BEGIN_HRESULT();
 
+            if (dwUIElementId == TF_INVALID_UIELEMENTID) return E_INVALIDARG;
             if (!pbShow) return E_INVALIDARG;
 
             *pbShow = !m_FullScreenMode;
@@ -101,13 +102,26 @@ namespace libtf {
 
         HRESULT STDMETHODCALLTYPE UpdateUIElement(DWORD dwUIElementId) override
         {
-            if (dwUIElementId != m_ActiveCandidateListUIElementId) return S_OK;
+            if (dwUIElementId == TF_INVALID_UIELEMENTID) return E_INVALIDARG;
+
+            if (m_ActiveCandidateListUIElementId == TF_INVALID_UIELEMENTID ||
+                dwUIElementId != m_ActiveCandidateListUIElementId)
+                return S_OK;
+
             return m_CandidateListHandler->UpdateUIElement();
         }
 
         HRESULT STDMETHODCALLTYPE EndUIElement(DWORD dwUIElementId) override
         {
-            if (dwUIElementId != m_ActiveCandidateListUIElementId) return S_OK;
+            if (dwUIElementId == TF_INVALID_UIELEMENTID) return E_INVALIDARG;
+
+            if (m_ActiveCandidateListUIElementId == TF_INVALID_UIELEMENTID ||
+                dwUIElementId != m_ActiveCandidateListUIElementId)
+                return S_OK;
+
+            // Cleanup
+            m_ActiveCandidateListUIElementId = TF_INVALID_UIELEMENTID;
+
             return m_CandidateListHandler->EndUIElement();
         }
     };
