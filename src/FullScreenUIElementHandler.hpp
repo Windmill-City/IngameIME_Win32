@@ -87,14 +87,12 @@ namespace libtf {
             CComPtr<ITfUIElement> uiElement;
             CHECK_HR(m_UIElementMgr->GetUIElement(dwUIElementId, &uiElement));
 
-            if (uiElement) {
-                CComQIPtr<ITfCandidateListUIElement> candidateListUIElement;
-                // Check if current UIElement is CandidateListUIElement
-                if (candidateListUIElement = uiElement) {
-                    m_ActiveCandidateListUIElementId = dwUIElementId;
-                    // Handle Candidate List events
-                    CHECK_HR(m_CandidateListHandler->BeginUIElement(candidateListUIElement));
-                }
+            CComQIPtr<ITfCandidateListUIElement> candidateListUIElement;
+            // Check if current UIElement is CandidateListUIElement
+            if (candidateListUIElement = uiElement) {
+                m_ActiveCandidateListUIElementId = dwUIElementId;
+                // Handle Candidate List events
+                CHECK_HR(m_CandidateListHandler->BeginUIElement(candidateListUIElement));
             }
             END_HRESULT();
         }
