@@ -193,7 +193,7 @@ void process_candidate_list(const libtf_CandidateListState_t  state,
     else if (state == libtf_CandidateListUpdate) {
         wprintf(L"CandidateList Update!\n");
         wprintf(L"Sel:%d\n", ctx->m_Selection);
-        for (size_t i = 0; i < ctx->m_PageSize; i++) { wprintf(L"[%d]%wS\n", i, ctx->m_Candidates[i]); }
+        for (size_t i = 0; i < ctx->m_PageSize; i++) { wprintf(L"[%zd]%wS\n", i, ctx->m_Candidates[i]); }
     }
     else {
         wprintf(L"CandidateList End!\n");
