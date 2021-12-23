@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.21.1)
 project(testWnd VERSION 0.1.0)
 
 include(CTest)
@@ -16,13 +16,7 @@ target_include_directories(testWnd PUBLIC ../src/include ./glfw/include ./glad/i
 target_sources(testWnd PRIVATE ./src)
 target_link_libraries(testWnd PRIVATE glad_static)
 target_link_libraries(testWnd PRIVATE glfw ${GLFW_LIBRARIES})
-target_link_libraries(testWnd PRIVATE libtf_shared)
-
-add_custom_command(
-        TARGET testWnd POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "$<TARGET_FILE_DIR:libtf_shared>/libtf.dll"
-        "$<TARGET_FILE_DIR:testWnd>")
+target_link_libraries(testWnd PRIVATE libtf_static)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

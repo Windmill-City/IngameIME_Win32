@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.21.1)
 project(libtf VERSION 3.0.0)
 
 if(NOT MSVC)
@@ -34,11 +34,10 @@ enable_testing()
 include(CleanDirectoryList)
 
 file(GLOB_RECURSE SOURCES ./src/**.cpp ./src/**.c)
-file(GLOB_RECURSE HEADERS LIST_DIRECTORIES true ./src/** )
-clean_directory_list(HEADERS ${PROJECT_SOURCE_DIR}/src ${SDK_INCLUDE_DIR})
+clean_directory_list(PRIVATE_HEADERS ${PROJECT_SOURCE_DIR}/src ${SDK_INCLUDE_DIR})
 
 message(STATUS "Source Files:${SOURCES}")
-message(STATUS "Header Dirs:${HEADERS}")
+message(STATUS "Private Header Dirs:${PRIVATE_HEADERS}")
 
 set(STATIC_VC_RUNTIME 0)
 
@@ -50,12 +49,17 @@ add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
 # Target
+add_library(libtf_static STATIC src/libtf.cpp)
+target_include_directories(libtf_static PUBLIC ./src/include)
+target_include_directories(libtf_static PRIVATE ${PRIVATE_HEADERS})
+target_link_directories(libtf_static PRIVATE ${SDK_LIB_DIR})
+target_sources(libtf_static PRIVATE ${SOURCES})
+
 add_library(libtf_shared SHARED src/libtf.cpp)
-target_include_directories(libtf_shared PUBLIC ${HEADERS})
+target_include_directories(libtf_shared PUBLIC ./src/include)
+target_include_directories(libtf_shared PRIVATE ${PRIVATE_HEADERS})
 target_link_directories(libtf_shared PRIVATE ${SDK_LIB_DIR})
 target_sources(libtf_shared PRIVATE ${SOURCES})
-
-set_target_properties(libtf_shared PROPERTIES OUTPUT_NAME "libtf")
 
 # Install
 set(CMAKE_INSTALL_PREFIX ./install)
