@@ -56,7 +56,7 @@ namespace libtf {
             LONG                   acpStart, len;
             CHECK_HR(rangeAcp->GetExtent(&acpStart, &len));
             ULONG commitLength = len;
-            auto bufCommit = std::make_unique<WCHAR[]>(commitLength);
+            auto  bufCommit    = std::make_unique<WCHAR[]>(commitLength);
             // Get the commit text
             CHECK_HR(fullRange->GetText(ec, 0, bufCommit.get(), commitLength, &commitLength));
             // Clear the texts in the text store
@@ -262,6 +262,7 @@ namespace libtf {
 #pragma region ITfContextOwnerCompositionSink
         HRESULT STDMETHODCALLTYPE OnStartComposition(ITfCompositionView* pComposition, BOOL* pfOk) override
         {
+            if (!pfOk) return E_INVALIDARG;
             // Always allow Composition start
             *pfOk = TRUE;
             m_PreEditHandler->PreEditContextCallback::runCallback(libtf_CompositionBegin, NULL);
@@ -280,9 +281,10 @@ namespace libtf {
             m_PreEditHandler->m_CompositionView.Release();
             m_PreEditHandler->PreEditContextCallback::runCallback(libtf_CompositionEnd, NULL);
 
-            BEGIN_HRESULT();
+            static HRESULT hr;
+            BEGIN_HRESULT_SCOPE();
             CHECK_HR(m_Context->RequestEditSession(m_ClientId, m_CommitHandler, TF_ES_ASYNC | TF_ES_READWRITE, &hr));
-            END_HRESULT();
+            END_HRESULT_SCOPE();
         }
 #pragma endregion
     };

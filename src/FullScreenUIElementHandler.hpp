@@ -82,6 +82,8 @@ namespace libtf {
         {
             BEGIN_HRESULT();
 
+            if (!pbShow) return E_INVALIDARG;
+
             *pbShow = !m_FullScreenMode;
 
             CComPtr<ITfUIElement> uiElement;
