@@ -285,6 +285,7 @@ namespace libtf {
             BEGIN_HRESULT_SCOPE();
             CHECK_HR(m_Context->RequestEditSession(m_ClientId, m_CommitHandler, TF_ES_ASYNC | TF_ES_READWRITE, &hr));
             END_HRESULT_SCOPE();
+            return hr;
         }
 #pragma endregion
     };
