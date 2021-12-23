@@ -1,10 +1,6 @@
 cmake_minimum_required(VERSION 3.21.1)
 project(testWnd VERSION 0.1.0)
 
-include(CTest)
-enable_testing()
-
-add_subdirectory(../ ./libtf)
 add_subdirectory(glfw ./glfw)
 add_subdirectory(glad ./glad)
 
@@ -20,4 +16,3 @@ target_link_libraries(testWnd PRIVATE libtf_static)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
-include(CPack)

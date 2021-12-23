@@ -61,8 +61,12 @@ target_include_directories(libtf_shared PRIVATE ${PRIVATE_HEADERS})
 target_link_directories(libtf_shared PRIVATE ${SDK_LIB_DIR})
 target_sources(libtf_shared PRIVATE ${SOURCES})
 
+# Test Window
+add_subdirectory(testWnd testWnd)
+
 # Install
 set(CMAKE_INSTALL_PREFIX ./install)
+install(TARGETS libtf_static)
 install(TARGETS libtf_shared)
 install(DIRECTORY src/include/ TYPE INCLUDE)
 
