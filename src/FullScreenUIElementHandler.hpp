@@ -81,22 +81,19 @@ namespace libtf {
         HRESULT STDMETHODCALLTYPE BeginUIElement(DWORD dwUIElementId, BOOL* pbShow) override
         {
             BEGIN_HRESULT();
-            if (m_FullScreenMode) {
-                *pbShow = false;
 
-                CComPtr<ITfUIElement> uiElement;
-                CHECK_HR(m_UIElementMgr->GetUIElement(dwUIElementId, &uiElement));
+            *pbShow = !m_FullScreenMode;
 
-                CComQIPtr<ITfCandidateListUIElement> candidateListUIElement;
-                // Check if current UIElement is CandidateListUIElement
-                if (candidateListUIElement = uiElement) {
-                    m_ActiveCandidateListUIElementId = dwUIElementId;
-                    // Handle Candidate List events
-                    CHECK_HR(m_CandidateListHandler->BeginUIElement(candidateListUIElement));
-                }
+            CComPtr<ITfUIElement> uiElement;
+            CHECK_HR(m_UIElementMgr->GetUIElement(dwUIElementId, &uiElement));
+
+            CComQIPtr<ITfCandidateListUIElement> candidateListUIElement;
+            // Check if current UIElement is CandidateListUIElement
+            if (candidateListUIElement = uiElement) {
+                m_ActiveCandidateListUIElementId = dwUIElementId;
+                // Handle Candidate List events
+                CHECK_HR(m_CandidateListHandler->BeginUIElement(candidateListUIElement));
             }
-            else
-                *pbShow = true;
             END_HRESULT();
         }
 
