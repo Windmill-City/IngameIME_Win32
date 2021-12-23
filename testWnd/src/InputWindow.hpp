@@ -141,6 +141,8 @@ class InputWindow {
         // Update FullScreen state
         libtf_set_fullscreen(m_InputContext, m_FullScreen);
 
+        wprintf(L"FullScreen:%wS\n", m_FullScreen ? L"True" : L"False");
+
         auto monitor = glfwGetPrimaryMonitor();
         int  monitorWidth, monitorHeight;
         glfwGetMonitorWorkarea(monitor, NULL, NULL, &monitorWidth, &monitorHeight);
