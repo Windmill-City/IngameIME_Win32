@@ -1,0 +1,3 @@
+[submodule "IngameIME-Common"]
+	path = IngameIME-Common
+	url = https://github.com/Windmill-City/IngameIME-Common.git
