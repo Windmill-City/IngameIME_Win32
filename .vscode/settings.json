@@ -3,6 +3,7 @@
         "CPACK",
         "Ingame",
         "libtf",
+        "UIELEMENTID",
         "Unadvise",
         "WINDOWSSDK"
     ],

@@ -26,8 +26,11 @@ int main()
             auto window = std::make_unique<InputWindow>();
             window->runEventLoop();
         }
-        catch (const std::exception& e) {
+        catch (std::exception& e) {
             std::cerr << e.what() << '\n';
+        }
+        catch (...) {
+            std::cerr << "err occurs!" << '\n';
         }
 
         glfwTerminate();

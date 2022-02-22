@@ -42,7 +42,9 @@ namespace libtf {
         if (!pfn) return E_FAIL;
 
         HRESULT hr;
-        if (FAILED(hr = (*pfn)(pptim))) return hr;
+
+        if (SUCCEEDED(hr = (*pfn)(pptim))) return hr;
+
         return createThreadMgr(pptim);
     }
 
