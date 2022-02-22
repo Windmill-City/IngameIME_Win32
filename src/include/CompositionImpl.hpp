@@ -17,6 +17,40 @@ namespace libtf {
         ComPtr<CompositionHandler> handler;
 
       protected:
+        class ForceContextUpdate : protected ComObjectBase, public ITfEditSession {
+          protected:
+            CompositionImpl* comp;
+
+          public:
+            ForceContextUpdate(CompositionImpl* comp) noexcept : comp(comp) {}
+
+          public:
+            COM_DEF_BEGIN();
+            COM_DEF_INF(ITfEditSession);
+            COM_DEF_END();
+
+          public:
+            /**
+             * @brief Do nothing here, just force the ITfContext update
+             *
+             */
+            HRESULT STDMETHODCALLTYPE DoEditSession(TfEditCookie ec) override
+            {
+                COM_HR_BEGIN(S_OK);
+
+                // Get selection of the preedit
+                TF_SELECTION     sel[1];
+                ULONG            fetched;
+                ComPtr<ITfRange> selRange;
+                CHECK_HR(comp->inputCtx->ctx->GetSelection(ec, TF_DEFAULT_SELECTION, 1, sel, &fetched));
+                // We dont change the selection just force the ctx update
+                CHECK_HR(comp->inputCtx->ctx->SetSelection(ec, 1, sel));
+
+                COM_HR_END();
+                COM_HR_RET();
+            }
+        };
+
         class CompositionHandler : protected ComObjectBase,
                                    public ITfContextOwnerCompositionSink,
                                    public ITfTextEditSink,
@@ -322,7 +356,26 @@ namespace libtf {
             ComQIPtr<ITfContextOwnerCompositionServices> services(IID_ITfContextOwnerCompositionServices,
                                                                   inputCtx->ctx);
             // Pass Null to terminate all the composition
-            services->TerminateComposition(NULL);
+            CHECK_HR(services->TerminateComposition(NULL));
+
+            COM_HR_END();
+            COM_HR_THR();
+        }
+
+        /**
+         * @brief Notify the PreEditRect has changed
+         *
+         */
+        virtual void onPreEditRectChange() override
+        {
+            COM_HR_BEGIN(S_OK);
+
+            ComQIPtr<ITfContextOwnerServices> services(IID_ITfContextOwnerServices, inputCtx->ctx);
+            CHECK_HR(services->OnLayoutChange());
+
+            static HRESULT hr;
+            hr = inputCtx->ctx->RequestEditSession(
+                inputCtx->clientId, new ForceContextUpdate(this), TF_ES_SYNC | TF_ES_READWRITE, &hr);
 
             COM_HR_END();
             COM_HR_THR();

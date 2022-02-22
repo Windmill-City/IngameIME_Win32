@@ -40,6 +40,8 @@ class InputWindow {
 
     std::shared_ptr<const IngameIME::InputProcessor> initialProc;
 
+    int preEditRectOffset = 20;
+
   public:
     static InputWindow* getByGLFWwindow(GLFWwindow* window)
     {
@@ -84,10 +86,11 @@ class InputWindow {
         });
 
         inputCtx->comp->IngameIME::PreEditRectCallbackHolder::setCallback([this](auto&& rect) {
-            rect.left   = 20;
-            rect.top    = 20;
-            rect.right  = 20;
-            rect.bottom = 20;
+            rect.left   = preEditRectOffset;
+            rect.top    = preEditRectOffset;
+            rect.right  = preEditRectOffset;
+            rect.bottom = preEditRectOffset;
+            wprintf(L"PreEditRectOffset: %d\n", preEditRectOffset);
         });
 
         inputCtx->comp->IngameIME::CandidateListCallbackHolder::setCallback([this](auto&& state, auto&& ctx) {
@@ -132,8 +135,23 @@ class InputWindow {
             glClear(GL_COLOR_BUFFER_BIT);
             glfwSwapBuffers(window);
             glfwPollEvents();
+
+            moveCandWnd();
         }
     }
+
+    void moveCandWnd()
+    {
+        static int last;
+        auto       cur = (int)glfwGetTime();
+        if (cur % 3 == 0 && last != cur) {
+            last = cur;
+            preEditRectOffset += 5;
+            if (preEditRectOffset > 200) preEditRectOffset = 20;
+            inputCtx->comp->onPreEditRectChange();
+        }
+    }
+
     void switchFullScreen()
     {
         fullscreen = !fullscreen;
