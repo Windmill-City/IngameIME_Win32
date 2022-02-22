@@ -41,27 +41,29 @@
     if (FAILED(hr)) THR_HR(hr);
 #define COM_HR_RET() return hr;
 
-class ComObjectBase {
-  private:
-    /**
-     * @brief Reference count of the ComObj
-     *
-     */
-    DWORD ref = 0;
+namespace libtf {
+    class ComObjectBase {
+      private:
+        /**
+         * @brief Reference count of the ComObj
+         *
+         */
+        DWORD ref = 0;
 
-  public:
-    virtual ~ComObjectBase() = default;
+      public:
+        virtual ~ComObjectBase() = default;
 
-  protected:
-    ULONG InternalAddRef(void)
-    {
-        return ++ref;
-    }
+      protected:
+        ULONG InternalAddRef(void)
+        {
+            return ++ref;
+        }
 
-    ULONG InternalRelease(void)
-    {
-        if (--ref == 0) delete this;
-        if (ref < 0) throw new std::exception("Double-free of COM Object");
-        return ref;
-    }
-};
+        ULONG InternalRelease(void)
+        {
+            if (--ref == 0) delete this;
+            if (ref < 0) throw new std::exception("Double-free of COM Object");
+            return ref;
+        }
+    };
+}// namespace libtf
