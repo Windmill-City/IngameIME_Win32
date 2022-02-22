@@ -158,12 +158,13 @@ namespace libtf {
             }
 
             if (ctx) {
+                setActivated(false);
+                comp.reset();
                 docMgr->Pop(TF_POPF_ALL);
                 ctx.reset();
             }
 
             if (docMgr) {
-                setActivated(false);
                 docMgr.reset();
                 emptyDocMgr.reset();
             }
@@ -195,6 +196,8 @@ namespace libtf {
             else {
                 // Focus on empty context docMgr can deactivate input method
                 CHECK_HR(threadMgr->AssociateFocus(hWnd, emptyDocMgr.get(), &prevDocumentMgr));
+                // Terminate active composition
+                comp->terminate();
             }
 
             COM_HR_END();
