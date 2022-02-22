@@ -150,7 +150,7 @@ namespace libtf {
         }
 
       protected:
-        TF_INPUTPROCESSORPROFILE profile;
+        const TF_INPUTPROCESSORPROFILE profile;
 
       public:
         /**
@@ -160,7 +160,7 @@ namespace libtf {
         bool isJap;
 
       public:
-        InputProcessorImpl(TF_INPUTPROCESSORPROFILE profile) : profile(profile)
+        InputProcessorImpl(const TF_INPUTPROCESSORPROFILE profile) : profile(profile)
         {
             type   = profile.dwProfileType == TF_PROFILETYPE_KEYBOARDLAYOUT ?
                          IngameIME::InputProcessorType::KeyboardLayout :
@@ -171,26 +171,32 @@ namespace libtf {
         }
 
       public:
-        static std::shared_ptr<const InputProcessorImpl> getInputProcessor(TF_INPUTPROCESSORPROFILE profile)
+        static std::shared_ptr<const InputProcessorImpl> getInputProcessor(const TF_INPUTPROCESSORPROFILE profile)
         {
-            struct CompareCLSID
+            struct CompareProfile
             {
-                bool operator()(const CLSID& s1, const CLSID& s2) const
+                bool operator()(const TF_INPUTPROCESSORPROFILE& s1, const TF_INPUTPROCESSORPROFILE& s2) const
                 {
-                    return memcmp(&s1, &s2, sizeof(CLSID)) < 0;
+                    if (s1.dwProfileType == s2.dwProfileType)
+                        if (s1.dwProfileType == TF_PROFILETYPE_KEYBOARDLAYOUT)
+                            return s1.hkl < s2.hkl;
+                        else
+                            return memcmp(&s1.clsid, &s2.clsid, sizeof(CLSID)) < 0;
+                    else
+                        return s1.dwProfileType < s2.dwProfileType;
                 }
             };
 
-            static std::map<CLSID, std::weak_ptr<const InputProcessorImpl>, CompareCLSID> weakRefs;
+            static std::map<TF_INPUTPROCESSORPROFILE, std::weak_ptr<const InputProcessorImpl>, CompareProfile> weakRefs;
 
-            auto iter = weakRefs.find(profile.clsid);
+            auto iter = weakRefs.find(profile);
 
             std::shared_ptr<const InputProcessorImpl> proc;
 
             // Create new proc if not exist or expired
             if (iter == weakRefs.end() || !(proc = (*iter).second.lock())) {
-                proc                    = std::make_shared<InputProcessorImpl>(profile);
-                weakRefs[profile.clsid] = proc;
+                proc              = std::make_shared<InputProcessorImpl>(profile);
+                weakRefs[profile] = proc;
             }
 
             // Clear unref items
@@ -295,9 +301,9 @@ namespace libtf {
       public:
         std::unique_ptr<IngameIME::InputProcessorContext> getCtx()
         {
-            auto ctx            = std::make_unique<IngameIME::InputProcessorContext>();
-            ctx->inputProcessor = activeProc;
-            ctx->inputModes     = getInputModes();
+            auto ctx   = std::make_unique<IngameIME::InputProcessorContext>();
+            ctx->proc  = activeProc;
+            ctx->modes = getInputModes();
 
             return ctx;
         }
@@ -342,7 +348,8 @@ namespace libtf {
             COM_HR_BEGIN(S_OK);
 
             if (IsEqualGUID(rguid, GUID_COMPARTMENT_KEYBOARD_INPUTMODE_CONVERSION))
-                IngameIME::Global::getInstance().runCallback(IngameIME::InputProcessorState::FullUpdate, *getCtx());
+                IngameIME::Global::getInstance().runCallback(IngameIME::InputProcessorState::InputModeUpdate,
+                                                             *getCtx());
 
             COM_HR_END();
             COM_HR_RET();
