@@ -41,7 +41,7 @@ class InputWindow {
         m_Window            = glfwCreateWindow(m_Width = 800, m_Height = 600, "libtf", NULL, NULL);
         WindowMap[m_Window] = this;
 
-        if (!m_Window) throw new std::exception("Failed to create window");
+        if (!m_Window) throw std::exception("Failed to create window");
 
         glfwMakeContextCurrent(m_Window);
         glfwSetKeyCallback(m_Window, key_callback);
@@ -49,15 +49,50 @@ class InputWindow {
         glfwSetFramebufferSizeCallback(m_Window, framebuffer_size_callback);
 
         // glad: load all OpenGL function pointers
-        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) throw new std::exception("Failed to initialize GLAD");
+        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) throw std::exception("Failed to initialize GLAD");
 
         // Create InputContext
         m_InputContext = IngameIME::Global::getInstance().getInputContext(glfwGetWin32Window(m_Window));
 
         // Register callbacks
         m_InputContext->comp->IngameIME::PreEditCallbackHolder::setCallback([this](auto&& state, auto&& ctx) {
-            
+            switch (state) {
+                case IngameIME::CompositionState::Begin: wprintf(L"Composition Begin!\n"); break;
+                case IngameIME::CompositionState::Update:
+                    wprintf(L"Composition Update!\n");
+                    wprintf(L"PreEdit: %S\n", ctx->content.c_str());
+                    wprintf(L"Sel: %d-%d\n", ctx->selStart, ctx->selEnd);
+                    break;
+                case IngameIME::CompositionState::End: wprintf(L"Composition End\n"); break;
+            }
         });
+
+        m_InputContext->comp->IngameIME::CommitCallbackHolder::setCallback([this](auto&& commit) {
+            // Show commit
+            wprintf(L"Commit: %S\n", commit.c_str());
+        });
+
+        m_InputContext->comp->IngameIME::PreEditRectCallbackHolder::setCallback([this](auto&& rect) {
+            rect.left   = 20;
+            rect.top    = 20;
+            rect.right  = 20;
+            rect.bottom = 20;
+        });
+
+        m_InputContext->comp->IngameIME::CandidateListCallbackHolder::setCallback([this](auto&& state, auto&& ctx) {
+            switch (state) {
+                case IngameIME::CandidateListState::Begin: wprintf(L"CandidateList Begin!\n"); break;
+                case IngameIME::CandidateListState::Update:
+                    wprintf(L"CandidateList Update!\n");
+                    wprintf(L"Selection: %d\n", ctx->selection);
+                    for (auto&& cand : ctx->candidates) { wprintf(L"%S\n", cand.c_str()); }
+                    break;
+                case IngameIME::CandidateListState::End: wprintf(L"CandidateList End!\n"); break;
+            }
+        });
+
+        m_InputContext->setActivated(true);
+        m_InputContext->setFullScreen(true);
     }
 
   public:
