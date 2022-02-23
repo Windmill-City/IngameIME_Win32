@@ -401,7 +401,7 @@ namespace libimm {
 
         static std::wstring getInputProcessorName(HKL hkl)
         {
-            auto size = ImmGetDescriptionW(hkl, NULL, 0);
+            auto size = ImmGetDescriptionW(hkl, NULL, 0) + 1;
 
             if (size == 0) return L"[IMM:unknown]";
 
