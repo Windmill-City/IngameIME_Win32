@@ -88,6 +88,7 @@ class InputWindow {
             rect.top    = 20;
             rect.right  = 20;
             rect.bottom = 20;
+            wprintf(L"Update PreEditRect\n");
         });
 
         inputCtx->comp->IngameIME::CandidateListCallbackHolder::setCallback([this](auto&& state, auto&& ctx) {
@@ -166,6 +167,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if (glfwGetKey(window, GLFW_KEY_F5) == GLFW_PRESS) {
         auto inputCtx = InputWindow::getByGLFWwindow(window)->inputCtx;
         inputCtx->setActivated(!inputCtx->getActivated());
+        wprintf(L"Activated:%wS\n", inputCtx->getActivated() ? L"True" : L"False");
     }
     // Activate Initial InputProc
     if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {

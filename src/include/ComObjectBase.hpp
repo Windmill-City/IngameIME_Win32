@@ -34,7 +34,7 @@
     }                                                                                                                  \
     while (0)                                                                                                          \
         ;
-#define THR_HR(hr) throw ComException(hr);
+#define THR_HR(hr) throw libtf::ComException(hr);
 #define CHECK_HR(exp)                                                                                                  \
     if (FAILED(hr = (exp))) break;
 #define COM_HR_THR()                                                                                                   \

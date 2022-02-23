@@ -165,16 +165,7 @@ namespace libimm {
          */
         virtual std::list<std::shared_ptr<const IngameIME::InputProcessor>> getInputProcessors() const override
         {
-            int size = GetKeyboardLayoutList(0, NULL);
-
-            auto buf = std::make_unique<HKL[]>(size);
-            GetKeyboardLayoutList(size, buf.get());
-
-            std::list<std::shared_ptr<const IngameIME::InputProcessor>> result;
-
-            for (size_t i = 0; i < size; i++) { result.push_back(InputProcessorImpl::getInputProcessor(buf[i])); }
-
-            return result;
+            return InputProcessorImpl::getInputProcessors();
         }
 
         /**
@@ -200,9 +191,8 @@ namespace libimm {
 libimm::InputContextImpl::InputContextImpl(HWND hWnd)
 {
     comp     = std::make_shared<CompositionImpl>(this);
-    ctx      = ImmCreateContext();
+    ctx      = ImmAssociateContext(hWnd, NULL);
     prevProc = (WNDPROC)SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)InputContextImpl::WndProc);
-    setActivated(false);
 }
 
 std::list<std::wstring> libimm::InputContextImpl::getInputModes()
@@ -264,7 +254,10 @@ LRESULT libimm::InputContextImpl::WndProc(HWND hWnd, UINT msg, WPARAM wparam, LP
             case WM_IME_SETCONTEXT:
                 // wparam indicates window active state, when it is true, we should associate the ctx
                 // if the inputCtx is activated
-                if (wparam && inputCtx->activated) ImmAssociateContext(hWnd, inputCtx->ctx);
+                if (wparam && inputCtx->activated)
+                    ImmAssociateContext(hWnd, inputCtx->ctx);
+                else
+                    ImmAssociateContext(hWnd, NULL);
 
                 // We should always hide Composition Window to make the PreEditCallback for work
                 lparam &= ~ISC_SHOWUICOMPOSITIONWINDOW;
@@ -279,19 +272,13 @@ LRESULT libimm::InputContextImpl::WndProc(HWND hWnd, UINT msg, WPARAM wparam, LP
                                                                               nullptr);
                 return true;
             case WM_IME_COMPOSITION:
-                if (lparam & (GCS_COMPREADSTR | GCS_CURSORPOS)) inputCtx->procPreEdit();
+                if (lparam & (GCS_COMPSTR | GCS_CURSORPOS)) inputCtx->procPreEdit();
                 if (lparam & GCS_RESULTSTR) inputCtx->procCommit();
 
                 if (!inputCtx->fullscreen) inputCtx->procPreEditRect();
 
-                // Current Composition has been canceled
-                if (!lparam) {
-                    inputCtx->comp->IngameIME::PreEditCallbackHolder::runCallback(IngameIME::CompositionState::End,
-                                                                                  nullptr);
-                    inputCtx->comp->IngameIME::CandidateListCallbackHolder::runCallback(
-                        IngameIME::CandidateListState::End, nullptr);
-                }
-                return true;
+                // when lparam == 0 that means current Composition has been canceled
+                if (lparam) return true;
             case WM_IME_ENDCOMPOSITION:
                 inputCtx->comp->IngameIME::PreEditCallbackHolder::runCallback(IngameIME::CompositionState::End,
                                                                               nullptr);
@@ -311,6 +298,10 @@ LRESULT libimm::InputContextImpl::WndProc(HWND hWnd, UINT msg, WPARAM wparam, LP
                             return true;
                         default: break;
                     }
+                if (wparam == IMN_SETCONVERSIONMODE) {
+                    IngameIME::Global::getInstance().runCallback(IngameIME::InputProcessorState::InputModeUpdate,
+                                                                 inputCtx->getInputProcCtx());
+                }
                 break;
             case WM_IME_CHAR:
                 // Commit text already handled at WM_IME_COMPOSITION

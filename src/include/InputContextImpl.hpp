@@ -50,8 +50,8 @@ namespace libtf {
         HWND                 hWnd;
         ComPtr<ContextOwner> owner;
 
-        bool activated;
-        bool fullscreen;
+        bool activated{false};
+        bool fullscreen{false};
 
         friend class CompositionImpl;
 
@@ -246,8 +246,8 @@ namespace libimm {
 
         HIMC ctx;
 
-        bool activated;
-        bool fullscreen;
+        bool activated{false};
+        bool fullscreen{false};
 
         friend class CompositionImpl;
         friend class GlobalImpl;
@@ -258,8 +258,7 @@ namespace libimm {
         {
             InputCtxMap.erase(hWnd);
             comp->terminate();
-            setActivated(false);
-            ImmDestroyContext(ctx);
+            ImmAssociateContextEx(hWnd, NULL, IACE_DEFAULT);
             SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)prevProc);
         }
 
@@ -273,16 +272,18 @@ namespace libimm {
         void procPreEdit()
         {
             // PreEdit Text
-            auto size = ImmGetCompositionStringW(ctx, GCS_COMPREADSTR, NULL, 0);
+            auto size = ImmGetCompositionStringW(ctx, GCS_COMPSTR, NULL, 0);
+            // Error occurs
+            if (size <= 0) return;
 
-            auto buf = std::make_unique<WCHAR[]>(size);
-            ImmGetCompositionStringW(ctx, GCS_COMPREADSTR, buf.get(), size);
+            auto buf = std::make_unique<WCHAR[]>(size / sizeof(WCHAR));
+            ImmGetCompositionStringW(ctx, GCS_COMPSTR, buf.get(), size);
 
             // Selection
             int sel = ImmGetCompositionStringW(ctx, GCS_CURSORPOS, NULL, 0);
 
             IngameIME::PreEditContext ctx;
-            ctx.content  = std::wstring(buf.get(), size);
+            ctx.content  = std::wstring(buf.get(), size / sizeof(WCHAR) - 1);
             ctx.selStart = ctx.selEnd = sel;
 
             comp->IngameIME::PreEditCallbackHolder::runCallback(IngameIME::CompositionState::Update, &ctx);
@@ -295,11 +296,13 @@ namespace libimm {
         void procCommit()
         {
             auto size = ImmGetCompositionStringW(ctx, GCS_RESULTSTR, NULL, 0);
+            // Error occurs
+            if (size <= 0) return;
 
-            auto buf = std::make_unique<WCHAR[]>(size);
+            auto buf = std::make_unique<WCHAR[]>(size / sizeof(WCHAR));
             ImmGetCompositionStringW(ctx, GCS_RESULTSTR, buf.get(), size);
 
-            comp->IngameIME::CommitCallbackHolder::runCallback(std::wstring(buf.get(), size));
+            comp->IngameIME::CommitCallbackHolder::runCallback(std::wstring(buf.get(), size / sizeof(WCHAR) - 1));
         }
 
         /**
@@ -331,6 +334,8 @@ namespace libimm {
             IngameIME::CandidateListContext candCtx;
 
             auto size = ImmGetCandidateListW(ctx, 0, NULL, 0);
+            // Error occurs
+            if (size == 0) return;
 
             auto buf  = std::make_unique<byte[]>(size);
             auto cand = (LPCANDIDATELIST)buf.get();
@@ -343,6 +348,8 @@ namespace libimm {
             auto pageStart    = cand->dwPageStart;
             auto pageEnd      = pageStart + pageSize;
             candCtx.selection = cand->dwSelection;
+            // Absolute index to relative index
+            candCtx.selection -= pageStart;
 
             for (size_t i = 0; i < pageSize; i++) {
                 auto pStrStart = buf.get() + cand->dwOffset[i + pageStart];
@@ -391,11 +398,11 @@ namespace libimm {
         virtual void setFullScreen(const bool fullscreen) noexcept override
         {
             this->fullscreen = fullscreen;
-            if (activated) {
-                // Make it send WM_IME_SETCONTEXT again
-                ImmAssociateContext(hWnd, NULL);
+
+            if (activated)
                 ImmAssociateContext(hWnd, ctx);
-            }
+            else
+                ImmAssociateContext(hWnd, NULL);
         }
         /**
          * @brief Get if InputContext in full screen state
