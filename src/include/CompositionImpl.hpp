@@ -114,13 +114,12 @@ namespace libtf {
                 rangeAcp = selRange;
                 CHECK_HR(rangeAcp->GetExtent(&acpStart, &len));
 
-                auto preEditCtx      = std::make_unique<IngameIME::PreEditContext>();
-                preEditCtx->selStart = acpStart;
-                preEditCtx->selEnd   = acpStart + len;
-                preEditCtx->content  = std::wstring(bufPreEdit.get(), preEditLen);
+                IngameIME::PreEditContext preEditCtx;
+                preEditCtx.selStart = acpStart;
+                preEditCtx.selEnd   = acpStart + len;
+                preEditCtx.content  = std::wstring(bufPreEdit.get(), preEditLen);
 
-                comp->IngameIME::PreEditCallbackHolder::runCallback(IngameIME::CompositionState::Update,
-                                                                    preEditCtx.get());
+                comp->IngameIME::PreEditCallbackHolder::runCallback(IngameIME::CompositionState::Update, &preEditCtx);
 
                 COM_HR_END();
                 COM_HR_RET();
@@ -224,26 +223,26 @@ namespace libtf {
                 uint32_t pageEnd   = curPage == pageCount - 1 ? totalCount : pageStarts[curPage + 1];
                 uint32_t pageSize  = pageEnd - pageStart;
 
-                auto candCtx = std::make_unique<IngameIME::CandidateListContext>();
+                IngameIME::CandidateListContext candCtx;
 
                 // Currently Selected Candidate's absolute index
                 UINT sel;
                 CHECK_HR(ele->GetSelection(&sel));
                 // Absolute index to relative index
                 sel -= pageStart;
-                candCtx->selection = sel;
+                candCtx.selection = sel;
 
                 // Get Candidate Strings
                 for (uint32_t i = pageStart; i < pageEnd; i++) {
                     ComBSTR candidate;
                     if (FAILED(ele->GetString(i, &candidate)))
-                        candCtx->candidates.push_back(L"[err]");
+                        candCtx.candidates.push_back(L"[err]");
                     else
-                        candCtx->candidates.push_back(candidate.bstr);
+                        candCtx.candidates.push_back(candidate.bstr);
                 }
 
                 comp->IngameIME::CandidateListCallbackHolder::runCallback(IngameIME::CandidateListState::Update,
-                                                                          candCtx.get());
+                                                                          &candCtx);
 
                 COM_HR_END();
                 COM_HR_RET();
@@ -329,3 +328,23 @@ namespace libtf {
         }
     };
 }// namespace libtf
+
+namespace libimm {
+    class CompositionImpl : public IngameIME::Composition {
+      protected:
+        InputContextImpl* inputCtx;
+
+      public:
+        CompositionImpl(InputContextImpl* inputCtx) : inputCtx(inputCtx) {}
+
+      public:
+        /**
+         * @brief Terminate active composition
+         *
+         */
+        virtual void terminate() noexcept override
+        {
+            ImmNotifyIME(inputCtx->ctx, NI_COMPOSITIONSTR, CPS_CANCEL, 0);
+        }
+    };
+}// namespace libimm

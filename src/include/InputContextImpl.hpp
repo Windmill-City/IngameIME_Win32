@@ -1,15 +1,39 @@
 #pragma once
+#include <map>
+
 #include <windef.h>
 #include <wtypes.h>
+
+#include <imm.h>
+#pragma comment(lib, "imm32.lib")
 
 #include <msctf.h>
 
 #include "InputContext.hpp"
+#include "InputProcessor.hpp"
 
 #include "ComObjectBase.hpp"
 #include "ComPtr.hpp"
 #include "IThreadAssociate.hpp"
 #include "TfFunction.hpp"
+
+namespace IngameIME {
+    struct InternalRect : public IngameIME::PreEditRect
+    {
+        InternalRect() = default;
+
+        operator RECT() noexcept
+        {
+            RECT rect;
+            rect.left   = this->left;
+            rect.top    = this->top;
+            rect.right  = this->right;
+            rect.bottom = this->bottom;
+
+            return rect;
+        }
+    };
+}// namespace IngameIME
 
 namespace libtf {
     class InputContextImpl : public IngameIME::InputContext, public IThreadAssociate {
@@ -30,40 +54,12 @@ namespace libtf {
         bool fullscreen;
 
         friend class CompositionImpl;
-        friend class GlobalImpl;
 
       private:
         DWORD cookie{TF_INVALID_COOKIE};
 
       protected:
         class ContextOwner : protected ComObjectBase, public ITfContextOwner {
-          protected:
-            struct InternalRect : public IngameIME::PreEditRect
-            {
-                InternalRect() = default;
-
-                InternalRect(const RECT& rect) noexcept
-                {
-                    this->left   = rect.left;
-                    this->top    = rect.top;
-                    this->right  = rect.right;
-                    this->bottom = rect.bottom;
-                }
-
-                /**
-                 * @brief Assign the value of this rect to another rect
-                 *
-                 * @param rect the rect to assign to
-                 */
-                void assignTo(RECT& rect) noexcept
-                {
-                    rect.left   = this->left;
-                    rect.top    = this->top;
-                    rect.right  = this->right;
-                    rect.bottom = this->bottom;
-                }
-            };
-
           protected:
             InputContextImpl* ctx;
 
@@ -93,9 +89,9 @@ namespace libtf {
             HRESULT STDMETHODCALLTYPE GetTextExt(LONG acpStart, LONG acpEnd, RECT* prc, BOOL* pfClipped) override
             {
                 // Fetch bounding box
-                auto box = std::make_unique<InternalRect>(*prc);
-                ctx->comp->IngameIME::PreEditRectCallbackHolder::runCallback(*box);
-                box->assignTo(*prc);
+                IngameIME::InternalRect box;
+                ctx->comp->IngameIME::PreEditRectCallbackHolder::runCallback(box);
+                *prc = box;
 
                 // Map window coordinate to screen coordinate
                 MapWindowPoints(ctx->hWnd, NULL, (LPPOINT)prc, 2);
@@ -148,6 +144,7 @@ namespace libtf {
         };
 
       public:
+        InputContextImpl(HWND hWnd);
         ~InputContextImpl()
         {
             if (cookie != TF_INVALID_COOKIE) {
@@ -236,3 +233,180 @@ namespace libtf {
         }
     };
 }// namespace libtf
+
+namespace libimm {
+    class InputContextImpl : public IngameIME::InputContext, public libtf::IThreadAssociate {
+      protected:
+        static std::map<HWND, std::weak_ptr<InputContextImpl>> InputCtxMap;
+        static LRESULT WndProc(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam);
+
+      protected:
+        HWND    hWnd;
+        WNDPROC prevProc;
+
+        HIMC ctx;
+
+        bool activated;
+        bool fullscreen;
+
+        friend class CompositionImpl;
+        friend class GlobalImpl;
+
+      public:
+        InputContextImpl(HWND hWnd);
+        ~InputContextImpl()
+        {
+            InputCtxMap.erase(hWnd);
+            comp->terminate();
+            setActivated(false);
+            ImmDestroyContext(ctx);
+            SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)prevProc);
+        }
+
+      protected:
+        std::list<std::wstring> getInputModes();
+
+        /**
+         * @brief Retrive PreEdit info for current Composition
+         *
+         */
+        void procPreEdit()
+        {
+            // PreEdit Text
+            auto size = ImmGetCompositionStringW(ctx, GCS_COMPREADSTR, NULL, 0);
+
+            auto buf = std::make_unique<WCHAR[]>(size);
+            ImmGetCompositionStringW(ctx, GCS_COMPREADSTR, buf.get(), size);
+
+            // Selection
+            int sel = ImmGetCompositionStringW(ctx, GCS_CURSORPOS, NULL, 0);
+
+            IngameIME::PreEditContext ctx;
+            ctx.content  = std::wstring(buf.get(), size);
+            ctx.selStart = ctx.selEnd = sel;
+
+            comp->IngameIME::PreEditCallbackHolder::runCallback(IngameIME::CompositionState::Update, &ctx);
+        }
+
+        /**
+         * @brief Retrive Commit text for current Composition
+         *
+         */
+        void procCommit()
+        {
+            auto size = ImmGetCompositionStringW(ctx, GCS_RESULTSTR, NULL, 0);
+
+            auto buf = std::make_unique<WCHAR[]>(size);
+            ImmGetCompositionStringW(ctx, GCS_RESULTSTR, buf.get(), size);
+
+            comp->IngameIME::CommitCallbackHolder::runCallback(std::wstring(buf.get(), size));
+        }
+
+        /**
+         * @brief Set CandidateList window's position for current Composition
+         *
+         */
+        void procPreEditRect()
+        {
+            IngameIME::InternalRect rect;
+            comp->IngameIME::PreEditRectCallbackHolder::runCallback(rect);
+
+            CANDIDATEFORM cand;
+            cand.dwIndex        = 0;
+            cand.dwStyle        = CFS_EXCLUDE;
+            cand.ptCurrentPos.x = rect.left;
+            cand.ptCurrentPos.y = rect.top;
+            cand.rcArea         = rect;
+            ImmSetCandidateWindow(ctx, &cand);
+
+            COMPOSITIONFORM comp;
+            comp.dwStyle        = CFS_POINT;
+            comp.ptCurrentPos.x = rect.left;
+            comp.ptCurrentPos.y = rect.top;
+            ImmSetCompositionWindow(ctx, &comp);
+        }
+
+        void procCand()
+        {
+            IngameIME::CandidateListContext candCtx;
+
+            auto size = ImmGetCandidateListW(ctx, 0, NULL, 0);
+
+            auto buf  = std::make_unique<byte[]>(size);
+            auto cand = (LPCANDIDATELIST)buf.get();
+
+            ImmGetCandidateListW(ctx, 0, cand, size);
+
+            auto pageSize  = cand->dwPageSize;
+            auto candCount = cand->dwCount;
+
+            auto pageStart    = cand->dwPageStart;
+            auto pageEnd      = pageStart + pageSize;
+            candCtx.selection = cand->dwSelection;
+
+            for (size_t i = 0; i < pageSize; i++) {
+                auto pStrStart = buf.get() + cand->dwOffset[i + pageStart];
+                auto pStrEnd = buf.get() + ((i + pageStart + 1 < candCount) ? cand->dwOffset[i + pageStart + 1] : size);
+                auto lenStr  = pStrEnd - pStrStart;
+
+                candCtx.candidates.push_back(std::wstring((wchar_t*)pStrStart, lenStr));
+            }
+
+            comp->IngameIME::CandidateListCallbackHolder::runCallback(IngameIME::CandidateListState::Update, &candCtx);
+        }
+
+      public:
+        IngameIME::InputProcessorContext getInputProcCtx();
+
+      public:
+        /**
+         * @brief Set InputContext activate state
+         *
+         * @param activated if InputContext activated
+         */
+        virtual void setActivated(const bool activated) noexcept override
+        {
+            this->activated = activated;
+
+            if (activated)
+                ImmAssociateContext(hWnd, ctx);
+            else
+                ImmAssociateContext(hWnd, NULL);
+        }
+        /**
+         * @brief Get if InputContext activated
+         *
+         * @return true activated
+         * @return false not activated
+         */
+        virtual bool getActivated() const noexcept override
+        {
+            return activated;
+        }
+        /**
+         * @brief Set InputContext full screen state
+         *
+         * @param fullscreen if InputContext full screen
+         */
+        virtual void setFullScreen(const bool fullscreen) noexcept override
+        {
+            this->fullscreen = fullscreen;
+            if (activated) {
+                // Make it send WM_IME_SETCONTEXT again
+                ImmAssociateContext(hWnd, NULL);
+                ImmAssociateContext(hWnd, ctx);
+            }
+        }
+        /**
+         * @brief Get if InputContext in full screen state
+         *
+         * @return true full screen mode
+         * @return false window mode
+         */
+        virtual bool getFullScreen() const noexcept override
+        {
+            return fullscreen;
+        }
+    };
+    std::map<HWND, std::weak_ptr<InputContextImpl>> InputContextImpl::InputCtxMap = {};
+}// namespace libimm
