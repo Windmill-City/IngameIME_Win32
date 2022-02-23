@@ -188,7 +188,7 @@ namespace libimm {
     };
 }// namespace libimm
 
-libimm::InputContextImpl::InputContextImpl(HWND hWnd)
+libimm::InputContextImpl::InputContextImpl(HWND hWnd) : hWnd(hWnd)
 {
     comp     = std::make_shared<CompositionImpl>(this);
     ctx      = ImmAssociateContext(hWnd, NULL);
@@ -244,21 +244,11 @@ LRESULT libimm::InputContextImpl::WndProc(HWND hWnd, UINT msg, WPARAM wparam, LP
     std::shared_ptr<InputContextImpl> inputCtx;
     if (iter != InputCtxMap.end() && (inputCtx = (*iter).second.lock())) {
         switch (msg) {
-            case WM_GETDLGCODE:
-                // Allow InputMethod get keys
-                return DLGC_WANTALLKEYS;
             case WM_INPUTLANGCHANGE:
                 IngameIME::Global::getInstance().runCallback(IngameIME::InputProcessorState::FullUpdate,
                                                              inputCtx->getInputProcCtx());
                 break;
             case WM_IME_SETCONTEXT:
-                // wparam indicates window active state, when it is true, we should associate the ctx
-                // if the inputCtx is activated
-                if (wparam && inputCtx->activated)
-                    ImmAssociateContext(hWnd, inputCtx->ctx);
-                else
-                    ImmAssociateContext(hWnd, NULL);
-
                 // We should always hide Composition Window to make the PreEditCallback for work
                 lparam &= ~ISC_SHOWUICOMPOSITIONWINDOW;
 
