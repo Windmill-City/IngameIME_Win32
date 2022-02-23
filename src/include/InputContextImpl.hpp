@@ -283,7 +283,7 @@ namespace libimm {
             int sel = ImmGetCompositionStringW(ctx, GCS_CURSORPOS, NULL, 0);
 
             IngameIME::PreEditContext ctx;
-            ctx.content  = std::wstring(buf.get(), size / sizeof(WCHAR) - 1);
+            ctx.content  = std::wstring(buf.get(), size / sizeof(WCHAR));
             ctx.selStart = ctx.selEnd = sel;
 
             comp->IngameIME::PreEditCallbackHolder::runCallback(IngameIME::CompositionState::Update, &ctx);
@@ -302,7 +302,7 @@ namespace libimm {
             auto buf = std::make_unique<WCHAR[]>(size / sizeof(WCHAR));
             ImmGetCompositionStringW(ctx, GCS_RESULTSTR, buf.get(), size);
 
-            comp->IngameIME::CommitCallbackHolder::runCallback(std::wstring(buf.get(), size / sizeof(WCHAR) - 1));
+            comp->IngameIME::CommitCallbackHolder::runCallback(std::wstring(buf.get(), size / sizeof(WCHAR)));
         }
 
         /**
@@ -323,9 +323,10 @@ namespace libimm {
             ImmSetCandidateWindow(ctx, &cand);
 
             COMPOSITIONFORM comp;
-            comp.dwStyle        = CFS_POINT;
+            comp.dwStyle        = CFS_RECT;
             comp.ptCurrentPos.x = rect.left;
             comp.ptCurrentPos.y = rect.top;
+            comp.rcArea         = rect;
             ImmSetCompositionWindow(ctx, &comp);
         }
 
@@ -352,11 +353,12 @@ namespace libimm {
             candCtx.selection -= pageStart;
 
             for (size_t i = 0; i < pageSize; i++) {
-                auto pStrStart = buf.get() + cand->dwOffset[i + pageStart];
-                auto pStrEnd = buf.get() + ((i + pageStart + 1 < candCount) ? cand->dwOffset[i + pageStart + 1] : size);
-                auto lenStr  = pStrEnd - pStrStart;
+                auto strStart = buf.get() + cand->dwOffset[i + pageStart];
+                auto strEnd =
+                    buf.get() + (((i + pageStart + 1) < candCount) ? cand->dwOffset[i + pageStart + 1] : size);
+                auto len = (strEnd - strStart) / sizeof(WCHAR);
 
-                candCtx.candidates.push_back(std::wstring((wchar_t*)pStrStart, lenStr));
+                candCtx.candidates.push_back(std::wstring((wchar_t*)strStart, len));
             }
 
             comp->IngameIME::CandidateListCallbackHolder::runCallback(IngameIME::CandidateListState::Update, &candCtx);
@@ -399,10 +401,11 @@ namespace libimm {
         {
             this->fullscreen = fullscreen;
 
-            if (activated)
-                ImmAssociateContext(hWnd, ctx);
-            else
+            if (activated) {
+                // Refresh InputContext
                 ImmAssociateContext(hWnd, NULL);
+                ImmAssociateContext(hWnd, ctx);
+            }
         }
         /**
          * @brief Get if InputContext in full screen state
