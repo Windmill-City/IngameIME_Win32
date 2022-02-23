@@ -1,6 +1,6 @@
 #pragma once
-#include <processthreadsapi.h>
-#include <winerror.h>
+#include <Windows.h>
+
 namespace libtf {
     class IThreadAssociate {
       private:
