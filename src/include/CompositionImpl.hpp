@@ -344,7 +344,7 @@ namespace libimm {
          */
         virtual void terminate() noexcept override
         {
-            ImmNotifyIME(inputCtx->ctx, NI_COMPOSITIONSTR, CPS_CANCEL, 0);
+            ImmNotifyIME(inputCtx->ctx, NI_COMPOSITIONSTR, CPS_COMPLETE, 0);
         }
     };
 }// namespace libimm

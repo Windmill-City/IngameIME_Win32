@@ -216,6 +216,7 @@ namespace libtf {
         virtual void setFullScreen(const bool fullscreen) override
         {
             this->fullscreen = fullscreen;
+            if (activated) comp->terminate();
         }
 
         /**
@@ -399,6 +400,7 @@ namespace libimm {
             this->fullscreen = fullscreen;
 
             if (activated) {
+                comp->terminate();
                 // Refresh InputContext
                 ImmAssociateContext(hWnd, NULL);
                 ImmAssociateContext(hWnd, ctx);
