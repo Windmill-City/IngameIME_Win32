@@ -1,11 +1,8 @@
 #include <stdarg.h>
 
-#include <Windows.h>
-
-#include <WinUser.h>
+#include "IngameIME.hpp"
 
 #include "CompositionImpl.hpp"
-#include "IngameIME.hpp"
 #include "InputProcessorImpl.hpp"
 
 namespace libtf {
@@ -61,7 +58,7 @@ namespace libtf {
          */
         virtual std::shared_ptr<const IngameIME::InputProcessor> getActiveInputProcessor() const override
         {
-            return handler->activeProc;
+            return IngameIME::InputProcessorImpl::getActiveInputProcessor();
         }
 
         /**
@@ -71,36 +68,7 @@ namespace libtf {
          */
         virtual std::list<std::shared_ptr<const IngameIME::InputProcessor>> getInputProcessors() const override
         {
-            std::list<std::shared_ptr<const IngameIME::InputProcessor>> result;
-
-            COM_HR_BEGIN(S_OK);
-
-            if (!IsGUIThread(false)) break;
-
-            ComPtr<ITfInputProcessorProfiles> profiles;
-            CHECK_HR(createInputProcessorProfiles(&profiles));
-            ComQIPtr<ITfInputProcessorProfileMgr> procMgr(IID_ITfInputProcessorProfileMgr, profiles);
-
-            ComPtr<IEnumTfInputProcessorProfiles> enumProfiles;
-            // Pass 0 to langid to enum all profiles
-            CHECK_HR(procMgr->EnumProfiles(0, &enumProfiles));
-
-            TF_INPUTPROCESSORPROFILE profile[1];
-            while (true) {
-                ULONG fetch;
-                CHECK_HR(enumProfiles->Next(1, profile, &fetch));
-
-                // No more
-                if (fetch == 0) break;
-
-                // InputProcessor not enabled can't be activated
-                if (!(profile[0].dwFlags & TF_IPP_FLAG_ENABLED)) continue;
-
-                result.push_back(InputProcessorImpl::getInputProcessor(profile[0]));
-            }
-            COM_HR_END();
-
-            return result;
+            return IngameIME::InputProcessorImpl::getInputProcessors();
         }
 
         /**
@@ -155,7 +123,7 @@ namespace libimm {
          */
         virtual std::shared_ptr<const IngameIME::InputProcessor> getActiveInputProcessor() const override
         {
-            return InputProcessorImpl::getActiveInputProcessor();
+            return IngameIME::InputProcessorImpl::getActiveInputProcessor();
         }
 
         /**
@@ -165,7 +133,7 @@ namespace libimm {
          */
         virtual std::list<std::shared_ptr<const IngameIME::InputProcessor>> getInputProcessors() const override
         {
-            return InputProcessorImpl::getInputProcessors();
+            return IngameIME::InputProcessorImpl::getInputProcessors();
         }
 
         /**
@@ -190,8 +158,12 @@ namespace libimm {
 
 libimm::InputContextImpl::InputContextImpl(HWND hWnd) : hWnd(hWnd)
 {
-    comp     = std::make_shared<CompositionImpl>(this);
-    ctx      = ImmAssociateContext(hWnd, NULL);
+    comp = std::make_shared<CompositionImpl>(this);
+
+    // Reset to default context
+    ImmAssociateContextEx(hWnd, NULL, IACE_DEFAULT);
+    ctx = ImmAssociateContext(hWnd, NULL);
+
     prevProc = (WNDPROC)SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)InputContextImpl::WndProc);
 }
 
@@ -200,7 +172,7 @@ std::list<std::wstring> libimm::InputContextImpl::getInputModes()
     DWORD mode;
     ImmGetConversionStatus(ctx, &mode, NULL);
 
-    auto activeProc = InputProcessorImpl::getActiveInputProcessor();
+    auto activeProc = IngameIME::InputProcessorImpl::getActiveInputProcessor();
 
     std::list<std::wstring> modes;
     if (activeProc->type == IngameIME::InputProcessorType::KeyboardLayout)
@@ -231,7 +203,7 @@ IngameIME::InputProcessorContext libimm::InputContextImpl::getInputProcCtx()
 {
     IngameIME::InputProcessorContext result;
 
-    result.proc  = InputProcessorImpl::getActiveInputProcessor();
+    result.proc  = IngameIME::InputProcessorImpl::getActiveInputProcessor();
     result.modes = getInputModes();
 
     return result;

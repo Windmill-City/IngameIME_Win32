@@ -84,79 +84,6 @@ namespace IngameIME {
     };
     std::map<LANGID, std::weak_ptr<const InternalLocale>> InternalLocale::weakRefs = {};
 
-    std::wstring getKeyboardLayoutName(LANGID langId)
-    {
-        auto result = format(L"[KL:0x%1!08x!]", langId);
-
-        HKEY layouts;
-        if (ERROR_SUCCESS ==
-            RegOpenKeyExW(
-                HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Keyboard Layouts", 0, KEY_READ, &layouts)) {
-            // the key of the keyboard layout is its langid
-            char layoutKey[9];
-            snprintf(layoutKey, 9, "%08x", langId);
-
-            HKEY layout;
-            if (ERROR_SUCCESS == RegOpenKeyExA(layouts, layoutKey, 0, KEY_READ, &layout)) {
-                // Get data size first
-                DWORD size;
-                if (ERROR_SUCCESS == RegGetValueW(layout,
-                                                  NULL,
-                                                  L"Layout Display Name",
-                                                  RRF_RT_REG_SZ | RRF_RT_REG_EXPAND_SZ | RRF_NOEXPAND,
-                                                  NULL,
-                                                  NULL,
-                                                  &size)) {
-                    // Get resource key of the name
-                    auto resKey = std::make_unique<wchar_t[]>(size);
-                    if (ERROR_SUCCESS == RegGetValueW(layout,
-                                                      NULL,
-                                                      L"Layout Display Name",
-                                                      RRF_RT_REG_SZ | RRF_RT_REG_EXPAND_SZ | RRF_NOEXPAND,
-                                                      NULL,
-                                                      resKey.get(),
-                                                      &size)) {
-                        // Get the layout name by resource key
-                        wchar_t layoutName[64];
-                        HRESULT hr;
-                        if (SUCCEEDED(hr = SHLoadIndirectString(resKey.get(), layoutName, 64, NULL))) {
-                            result = std::wstring(layoutName);
-                        }
-                    }
-                }
-                RegCloseKey(layout);
-            }
-            RegCloseKey(layouts);
-        }
-
-        return result;
-    }
-    std::wstring getTextServiceName(const TF_INPUTPROCESSORPROFILE profile)
-    {
-        auto result = format(L"[TIP:{%1!08x!-0x%1!04x!-0x%1!04x!-0x%1!04x!-0x%1!012x!}]",
-                             profile.clsid.Data1,
-                             profile.clsid.Data2,
-                             profile.clsid.Data3,
-                             profile.clsid.Data4);
-
-        COM_HR_BEGIN(S_OK);
-
-        libtf::ComPtr<ITfInputProcessorProfiles> inputProcessorProfiles;
-        CHECK_HR(libtf::createInputProcessorProfiles(&inputProcessorProfiles));
-
-        libtf::ComBSTR name;
-        CHECK_HR(inputProcessorProfiles->GetLanguageProfileDescription(
-            profile.clsid, profile.langid, profile.guidProfile, &name));
-
-        result = std::wstring(name.bstr);
-
-        COM_HR_END();
-
-        return result;
-    }
-}// namespace IngameIME
-
-namespace libtf {
     class InputProcessorImpl : public IngameIME::InputProcessor {
       protected:
         struct CompareProfile
@@ -176,13 +103,114 @@ namespace libtf {
         static std::map<TF_INPUTPROCESSORPROFILE, std::weak_ptr<const InputProcessorImpl>, CompareProfile> weakRefs;
 
       protected:
+        static std::wstring getKeyboardLayoutName(LANGID langId)
+        {
+            auto result = format(L"[KL: 0x%1!08x!]", langId);
+
+            HKEY layouts;
+            if (ERROR_SUCCESS == RegOpenKeyExW(HKEY_LOCAL_MACHINE,
+                                               L"SYSTEM\\CurrentControlSet\\Control\\Keyboard Layouts",
+                                               0,
+                                               KEY_READ,
+                                               &layouts)) {
+                // the key of the keyboard layout is its langid
+                char layoutKey[9];
+                snprintf(layoutKey, 9, "%08x", langId);
+
+                HKEY layout;
+                if (ERROR_SUCCESS == RegOpenKeyExA(layouts, layoutKey, 0, KEY_READ, &layout)) {
+                    // Get data size first
+                    DWORD size;
+                    if (ERROR_SUCCESS == RegGetValueW(layout,
+                                                      NULL,
+                                                      L"Layout Display Name",
+                                                      RRF_RT_REG_SZ | RRF_RT_REG_EXPAND_SZ | RRF_NOEXPAND,
+                                                      NULL,
+                                                      NULL,
+                                                      &size)) {
+                        // Get resource key of the name
+                        auto resKey = std::make_unique<wchar_t[]>(size);
+                        if (ERROR_SUCCESS == RegGetValueW(layout,
+                                                          NULL,
+                                                          L"Layout Display Name",
+                                                          RRF_RT_REG_SZ | RRF_RT_REG_EXPAND_SZ | RRF_NOEXPAND,
+                                                          NULL,
+                                                          resKey.get(),
+                                                          &size)) {
+                            // Get the layout name by resource key
+                            wchar_t layoutName[64];
+                            HRESULT hr;
+                            if (SUCCEEDED(hr = SHLoadIndirectString(resKey.get(), layoutName, 64, NULL))) {
+                                result = std::wstring(layoutName);
+                            }
+                        }
+                    }
+                    RegCloseKey(layout);
+                }
+                RegCloseKey(layouts);
+            }
+            return result;
+        }
+
+        static std::wstring getTextServiceName(const TF_INPUTPROCESSORPROFILE profile)
+        {
+            auto result = format(L"[TIP: {%1!08x!-0x%1!04x!-0x%1!04x!-0x%1!04x!-0x%1!012x!}]",
+                                 profile.clsid.Data1,
+                                 profile.clsid.Data2,
+                                 profile.clsid.Data3,
+                                 profile.clsid.Data4);
+
+            COM_HR_BEGIN(S_OK);
+
+            libtf::ComPtr<ITfInputProcessorProfiles> inputProcessorProfiles;
+            CHECK_HR(libtf::createInputProcessorProfiles(&inputProcessorProfiles));
+
+            libtf::ComBSTR name;
+            CHECK_HR(inputProcessorProfiles->GetLanguageProfileDescription(
+                profile.clsid, profile.langid, profile.guidProfile, &name));
+
+            result = std::wstring(name.bstr);
+
+            COM_HR_END();
+
+            return result;
+        }
+
+        static std::wstring getImmName(HKL hkl)
+        {
+            auto size = ImmGetDescriptionW(hkl, NULL, 0) + 1;
+
+            if (size == 0) return format(L"[IMM: %1!08x!]", hkl);
+
+            auto buf = std::make_unique<WCHAR[]>(size);
+            ImmGetDescriptionW(hkl, buf.get(), size);
+
+            return std::wstring(buf.get(), size);
+        }
+
+        /**
+         * @brief Check if the HKL correspond to a Imm InputMethod
+         *
+         * @param hkl hkl to check
+         * @return true - Imm InputMethod
+         * @return false - Normal KeyboardLayout
+         */
+        static bool isImm(HKL hkl)
+        {
+            return (0xF000 & HIWORD(hkl)) == 0xE000;
+        }
+
         static std::wstring getInputProcessorName(const TF_INPUTPROCESSORPROFILE profile)
         {
             switch (profile.dwProfileType) {
-                case TF_PROFILETYPE_INPUTPROCESSOR: return IngameIME::getTextServiceName(profile);
-                case TF_PROFILETYPE_KEYBOARDLAYOUT: return IngameIME::getKeyboardLayoutName(profile.langid);
+                case TF_PROFILETYPE_INPUTPROCESSOR: return getTextServiceName(profile);
+                case TF_PROFILETYPE_KEYBOARDLAYOUT:
+                    if (isImm(profile.hkl))
+                        return getImmName(profile.hkl);
+                    else
+                        return getKeyboardLayoutName(profile.langid);
+                default: return L"[InputProcessor: unknown]";
             }
-            return L"[unknown]";
         }
 
       protected:
@@ -198,9 +226,9 @@ namespace libtf {
       public:
         InputProcessorImpl(const TF_INPUTPROCESSORPROFILE profile) : profile(profile)
         {
-            type   = profile.dwProfileType == TF_PROFILETYPE_KEYBOARDLAYOUT ?
-                         IngameIME::InputProcessorType::KeyboardLayout :
-                         IngameIME::InputProcessorType::TextService;
+            type   = profile.dwProfileType == TF_PROFILETYPE_INPUTPROCESSOR || isImm(profile.hkl) ?
+                         IngameIME::InputProcessorType::TextService :
+                         IngameIME::InputProcessorType::KeyboardLayout;
             name   = getInputProcessorName(profile);
             locale = IngameIME::InternalLocale::getLocale(profile.langid);
             isJap  = locale->locale.compare(0, 2, L"ja") == 0;
@@ -227,6 +255,60 @@ namespace libtf {
             return proc;
         }
 
+        static std::shared_ptr<const InputProcessorImpl> getActiveInputProcessor()
+        {
+            COM_HR_BEGIN(S_OK);
+
+            if (!IsGUIThread(false)) THR_HR(UI_E_WRONG_THREAD);
+
+            libtf::ComPtr<ITfInputProcessorProfiles> inputProcessorProfiles;
+            CHECK_HR(libtf::createInputProcessorProfiles(&inputProcessorProfiles));
+            libtf::ComQIPtr<ITfInputProcessorProfileMgr> inputProcessorMgr(IID_ITfInputProcessorProfileMgr,
+                                                                           inputProcessorProfiles);
+
+            TF_INPUTPROCESSORPROFILE profile;
+            CHECK_HR(inputProcessorMgr->GetActiveProfile(GUID_TFCAT_TIP_KEYBOARD, &profile));
+            return InputProcessorImpl::getInputProcessor(profile);
+
+            COM_HR_END();
+            COM_HR_THR();
+        }
+
+        static std::list<std::shared_ptr<const IngameIME::InputProcessor>> getInputProcessors()
+        {
+            COM_HR_BEGIN(S_OK);
+
+            std::list<std::shared_ptr<const IngameIME::InputProcessor>> result;
+
+            if (!IsGUIThread(false)) break;
+
+            libtf::ComPtr<ITfInputProcessorProfiles> profiles;
+            CHECK_HR(libtf::createInputProcessorProfiles(&profiles));
+            libtf::ComQIPtr<ITfInputProcessorProfileMgr> procMgr(IID_ITfInputProcessorProfileMgr, profiles);
+
+            libtf::ComPtr<IEnumTfInputProcessorProfiles> enumProfiles;
+            // Pass 0 to langid to enum all profiles
+            CHECK_HR(procMgr->EnumProfiles(0, &enumProfiles));
+
+            TF_INPUTPROCESSORPROFILE profile[1];
+            while (true) {
+                ULONG fetch;
+                CHECK_HR(enumProfiles->Next(1, profile, &fetch));
+
+                // Reach end
+                if (fetch == 0) break;
+
+                // InputProcessor not enabled can't be activated
+                if (!(profile[0].dwFlags & TF_IPP_FLAG_ENABLED)) continue;
+
+                result.push_back(InputProcessorImpl::getInputProcessor(profile[0]));
+            }
+
+            return result;
+
+            COM_HR_END();
+        }
+
       public:
         virtual void setActivated() const override
         {
@@ -234,10 +316,10 @@ namespace libtf {
 
             if (!IsGUIThread(false)) THR_HR(UI_E_WRONG_THREAD);
 
-            ComPtr<ITfInputProcessorProfiles> inputProcessorProfiles;
-            CHECK_HR(createInputProcessorProfiles(&inputProcessorProfiles));
-            ComQIPtr<ITfInputProcessorProfileMgr> inputProcessorMgr(IID_ITfInputProcessorProfileMgr,
-                                                                    inputProcessorProfiles);
+            libtf::ComPtr<ITfInputProcessorProfiles> inputProcessorProfiles;
+            CHECK_HR(libtf::createInputProcessorProfiles(&inputProcessorProfiles));
+            libtf::ComQIPtr<ITfInputProcessorProfileMgr> inputProcessorMgr(IID_ITfInputProcessorProfileMgr,
+                                                                           inputProcessorProfiles);
 
             CHECK_HR(inputProcessorMgr->ActivateProfile(profile.dwProfileType,
                                                         profile.langid,
@@ -252,16 +334,15 @@ namespace libtf {
     };
     std::map<TF_INPUTPROCESSORPROFILE, std::weak_ptr<const InputProcessorImpl>, InputProcessorImpl::CompareProfile>
         InputProcessorImpl::weakRefs = {};
+}// namespace IngameIME
 
+namespace libtf {
     class InputProcessorHandler : public ComObjectBase,
                                   public ITfInputProcessorProfileActivationSink,
                                   public ITfCompartmentEventSink {
       public:
         ComQIPtr<ITfCompartmentMgr> compMgr{IID_ITfCompartmentMgr};
         ComPtr<ITfCompartment>      mode;
-
-      public:
-        std::shared_ptr<const InputProcessorImpl> activeProc;
 
       public:
         InputProcessorHandler()
@@ -272,15 +353,6 @@ namespace libtf {
             CHECK_HR(getThreadMgr(&threadMgr));
             compMgr = threadMgr;
 
-            ComPtr<ITfInputProcessorProfiles> inputProcessorProfiles;
-            CHECK_HR(createInputProcessorProfiles(&inputProcessorProfiles));
-            ComQIPtr<ITfInputProcessorProfileMgr> inputProcessorMgr(IID_ITfInputProcessorProfileMgr,
-                                                                    inputProcessorProfiles);
-
-            TF_INPUTPROCESSORPROFILE profile;
-            CHECK_HR(inputProcessorMgr->GetActiveProfile(GUID_TFCAT_TIP_KEYBOARD, &profile));
-            activeProc = InputProcessorImpl::getInputProcessor(profile);
-
             CHECK_HR(compMgr->GetCompartment(GUID_COMPARTMENT_KEYBOARD_INPUTMODE_CONVERSION, &mode));
 
             COM_HR_END();
@@ -288,42 +360,36 @@ namespace libtf {
         }
 
       protected:
-        std::list<std::wstring> getInputModes()
-        {
-            VARIANT var;
-            mode->GetValue(&var);
-
-            std::list<std::wstring> modes;
-            if (activeProc->type == IngameIME::InputProcessorType::KeyboardLayout)
-                modes.push_back(L"AlphaNumeric");
-            else {
-                if (var.intVal & TF_CONVERSIONMODE_NATIVE) {
-                    modes.push_back(L"Native");
-
-                    if (activeProc->isJap)
-                        if (var.intVal & TF_CONVERSIONMODE_KATAKANA)
-                            modes.push_back(L"Katakana");
-                        else
-                            modes.push_back(L"Hiragana");
-                }
-                else
-                    modes.push_back(L"AlphaNumeric");
-
-                if (var.intVal & TF_CONVERSIONMODE_FULLSHAPE)
-                    modes.push_back(L"FullShape");
-                else
-                    modes.push_back(L"HalfShape");
-            }
-
-            return modes;
-        }
-
-      public:
         IngameIME::InputProcessorContext getCtx()
         {
             IngameIME::InputProcessorContext result;
-            result.proc  = activeProc;
-            result.modes = getInputModes();
+
+            auto activeProc = IngameIME::InputProcessorImpl::getActiveInputProcessor();
+            result.proc     = activeProc;
+
+            VARIANT var;
+            mode->GetValue(&var);
+
+            if (activeProc->type == IngameIME::InputProcessorType::KeyboardLayout)
+                result.modes.push_back(L"AlphaNumeric");
+            else {
+                if (var.intVal & TF_CONVERSIONMODE_NATIVE) {
+                    result.modes.push_back(L"Native");
+
+                    if (activeProc->isJap)
+                        if (var.intVal & TF_CONVERSIONMODE_KATAKANA)
+                            result.modes.push_back(L"Katakana");
+                        else
+                            result.modes.push_back(L"Hiragana");
+                }
+                else
+                    result.modes.push_back(L"AlphaNumeric");
+
+                if (var.intVal & TF_CONVERSIONMODE_FULLSHAPE)
+                    result.modes.push_back(L"FullShape");
+                else
+                    result.modes.push_back(L"HalfShape");
+            }
 
             return result;
         }
@@ -355,8 +421,6 @@ namespace libtf {
             profile.guidProfile   = guidProfile;
             profile.hkl           = hkl;
 
-            activeProc = InputProcessorImpl::getInputProcessor(profile);
-
             IngameIME::Global::getInstance().runCallback(IngameIME::InputProcessorState::FullUpdate, getCtx());
 
             COM_HR_END();
@@ -375,178 +439,3 @@ namespace libtf {
         }
     };
 }// namespace libtf
-
-namespace libimm {
-    class InputProcessorImpl : public IngameIME::InputProcessor {
-      protected:
-        static std::map<HKL, std::weak_ptr<const InputProcessorImpl>> weakRefs;
-
-      protected:
-        const HKL hkl;
-
-      public:
-        /**
-         * @brief If this is a Japanese InputProcessor
-         *
-         */
-        bool isJap;
-
-      protected:
-        static bool isIMM(HKL hkl)
-        {
-            return (0xF000 & HIWORD(hkl)) == 0xE000;
-        }
-
-        static std::wstring getInputProcessorName(HKL hkl)
-        {
-            auto size = ImmGetDescriptionW(hkl, NULL, 0) + 1;
-
-            if (size == 0) return L"[IMM:unknown]";
-
-            auto buf = std::make_unique<WCHAR[]>(size);
-            ImmGetDescriptionW(hkl, buf.get(), size);
-
-            return std::wstring(buf.get(), size);
-        }
-
-      public:
-        InputProcessorImpl(const HKL hkl) : hkl(hkl)
-        {
-            if (!isIMM(hkl)) throw std::exception("Only support IMM!");
-            type   = IngameIME::InputProcessorType::TextService;
-            locale = IngameIME::InternalLocale::getLocale(MAKELCID(LOWORD(hkl), SORT_DEFAULT));
-            name   = getInputProcessorName(hkl);
-            isJap  = locale->locale.compare(0, 2, L"ja") == 0;
-        }
-
-        InputProcessorImpl(const TF_INPUTPROCESSORPROFILE profile) : hkl(profile.hkl)
-        {
-            if (profile.dwProfileType == TF_PROFILETYPE_KEYBOARDLAYOUT) {
-                type = IngameIME::InputProcessorType::KeyboardLayout;
-                name = IngameIME::getKeyboardLayoutName(profile.langid);
-            }
-            else {
-                type = IngameIME::InputProcessorType::TextService;
-                name = IngameIME::getTextServiceName(profile);
-            }
-            locale = IngameIME::InternalLocale::getLocale(profile.langid);
-            isJap  = locale->locale.compare(0, 2, L"ja") == 0;
-        }
-
-        ~InputProcessorImpl() noexcept
-        {
-            weakRefs.erase(hkl);
-        }
-
-      public:
-        static std::shared_ptr<const InputProcessorImpl> getInputProcessor(const HKL hkl)
-        {
-            auto iter = weakRefs.find(hkl);
-
-            std::shared_ptr<const InputProcessorImpl> proc;
-
-            // Create new proc if not exist or expired
-            if (iter == weakRefs.end() || !(proc = (*iter).second.lock())) {
-                proc          = std::make_shared<InputProcessorImpl>(hkl);
-                weakRefs[hkl] = proc;
-            }
-
-            return proc;
-        }
-
-        static std::shared_ptr<const InputProcessorImpl> getInputProcessor(const TF_INPUTPROCESSORPROFILE profile)
-        {
-            auto iter = weakRefs.find(profile.hkl);
-
-            std::shared_ptr<const InputProcessorImpl> proc;
-
-            // Create new proc if not exist or expired
-            if (iter == weakRefs.end() || !(proc = (*iter).second.lock())) {
-                proc                  = std::make_shared<InputProcessorImpl>(profile);
-                weakRefs[profile.hkl] = proc;
-            }
-
-            return proc;
-        }
-
-        static std::shared_ptr<const InputProcessorImpl> getActiveInputProcessor()
-        {
-            // Pass Null to get current thread
-            auto hkl = GetKeyboardLayout(NULL);
-            if (isIMM(hkl))
-                return InputProcessorImpl::getInputProcessor(hkl);
-            else {
-                COM_HR_BEGIN(S_OK);
-
-                libtf::ComPtr<ITfInputProcessorProfiles> inputProcessorProfiles;
-                CHECK_HR(libtf::createInputProcessorProfiles(&inputProcessorProfiles));
-                libtf::ComQIPtr<ITfInputProcessorProfileMgr> inputProcessorMgr(IID_ITfInputProcessorProfileMgr,
-                                                                               inputProcessorProfiles);
-
-                TF_INPUTPROCESSORPROFILE profile;
-                CHECK_HR(inputProcessorMgr->GetActiveProfile(GUID_TFCAT_TIP_KEYBOARD, &profile));
-                return InputProcessorImpl::getInputProcessor(profile);
-
-                COM_HR_END();
-                COM_HR_THR();
-            }
-            // Should not reach here
-            return nullptr;
-        }
-
-        static std::list<std::shared_ptr<const IngameIME::InputProcessor>> getInputProcessors()
-        {
-            int size = GetKeyboardLayoutList(0, NULL);
-
-            auto buf = std::make_unique<HKL[]>(size);
-            GetKeyboardLayoutList(size, buf.get());
-
-            std::list<std::shared_ptr<const IngameIME::InputProcessor>> result;
-
-            for (size_t i = 0; i < size; i++) {
-                auto hkl = buf[i];
-                if (isIMM(hkl)) result.push_back(InputProcessorImpl::getInputProcessor(hkl));
-            }
-
-            COM_HR_BEGIN(S_OK);
-
-            if (!IsGUIThread(false)) break;
-
-            libtf::ComPtr<ITfInputProcessorProfiles> profiles;
-            CHECK_HR(libtf::createInputProcessorProfiles(&profiles));
-            libtf::ComQIPtr<ITfInputProcessorProfileMgr> procMgr(IID_ITfInputProcessorProfileMgr, profiles);
-
-            libtf::ComPtr<IEnumTfInputProcessorProfiles> enumProfiles;
-            // Pass 0 to langid to enum all profiles
-            CHECK_HR(procMgr->EnumProfiles(0, &enumProfiles));
-
-            TF_INPUTPROCESSORPROFILE profile[1];
-            while (true) {
-                ULONG fetch;
-                CHECK_HR(enumProfiles->Next(1, profile, &fetch));
-
-                // No more
-                if (fetch == 0) break;
-
-                // InputProcessor not enabled can't be activated
-                if (!(profile[0].dwFlags & TF_IPP_FLAG_ENABLED) || isIMM(profile->hkl)) continue;
-
-                result.push_back(InputProcessorImpl::getInputProcessor(profile[0]));
-            }
-            COM_HR_END();
-
-            return result;
-        }
-
-      public:
-        /**
-         * @brief Set active InputProcessor for current InputProcessor
-         *
-         */
-        virtual void setActivated() const noexcept override
-        {
-            ActivateKeyboardLayout(hkl, 0);
-        }
-    };
-    std::map<HKL, std::weak_ptr<const InputProcessorImpl>> InputProcessorImpl::weakRefs = {};
-}// namespace libimm
