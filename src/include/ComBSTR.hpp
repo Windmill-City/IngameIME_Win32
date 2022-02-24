@@ -1,8 +1,7 @@
 #pragma once
-#include <windows.h>
-
 #include <exception>
-#include <oleauto.h>
+
+#include <Windows.h>
 
 namespace libtf {
     class ComBSTR {

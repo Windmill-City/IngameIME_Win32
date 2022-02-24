@@ -1,7 +1,5 @@
 #pragma once
-#include <guiddef.h>
-#include <stddef.h>
-#include <winerror.h>
+#include <Windows.h>
 
 namespace libtf {
     template <class T>

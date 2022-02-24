@@ -1,6 +1,7 @@
 #pragma once
+#include <Windows.h>
+
 #include "ComException.hpp"
-#include <Unknwn.h>
 
 #define COM_DEF_BEGIN()                                                                                                \
     virtual HRESULT STDMETHODCALLTYPE QueryInterface(                                                                  \
@@ -62,7 +63,6 @@ namespace libtf {
         ULONG InternalRelease(void)
         {
             if (--ref == 0) delete this;
-            if (ref < 0) throw new std::exception("Double-free of COM Object");
             return ref;
         }
     };

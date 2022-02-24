@@ -4,22 +4,20 @@
 #include <map>
 
 #include <Windows.h>
+#pragma comment(lib, "imm32.lib")
 
 #include <Shlwapi.h>
 #pragma comment(lib, "shlwapi.lib")
 
-#include <imm.h>
-#pragma comment(lib, "imm32.lib")
-
-#include <WinUser.h>
 #include <msctf.h>
+
+#include "IngameIME.hpp"
+#include "InputProcessor.hpp"
 
 #include "ComBSTR.hpp"
 #include "ComObjectBase.hpp"
 #include "ComPtr.hpp"
 #include "FormatUtil.hpp"
-#include "IngameIME.hpp"
-#include "InputProcessor.hpp"
 #include "TfFunction.hpp"
 
 namespace IngameIME {

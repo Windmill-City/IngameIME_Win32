@@ -1,8 +1,8 @@
 #pragma once
-
 #include <functional>
 #include <memory>
 
+#include <Windows.h>
 #include <msctf.h>
 
 namespace libtf {
