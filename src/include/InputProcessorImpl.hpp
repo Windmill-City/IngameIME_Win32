@@ -272,13 +272,16 @@ namespace IngameIME {
 
             COM_HR_END();
             COM_HR_THR();
+
+            // Should not reach here
+            return nullptr;
         }
 
         static std::list<std::shared_ptr<const IngameIME::InputProcessor>> getInputProcessors()
         {
-            COM_HR_BEGIN(S_OK);
-
             std::list<std::shared_ptr<const IngameIME::InputProcessor>> result;
+
+            COM_HR_BEGIN(S_OK);
 
             if (!IsGUIThread(false)) break;
 
@@ -304,9 +307,9 @@ namespace IngameIME {
                 result.push_back(InputProcessorImpl::getInputProcessor(profile[0]));
             }
 
-            return result;
-
             COM_HR_END();
+
+            return result;
         }
 
       public:
