@@ -1,6 +1,6 @@
-# libtf
+# IngameIME_Win32
 
-A library for Text Service Framework
+A library for Text Service Framework(TSF) & Input Method Manager(IMM)
 
 ## How to use?
 
