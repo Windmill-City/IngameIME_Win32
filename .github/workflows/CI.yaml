@@ -24,7 +24,7 @@ jobs:
           submodules: true
 
       - name: Setup CMake
-        run: cmake -B build -A ${{matrix:target}}
+        run: cmake -B build -A ${{matrix.target}}
 
       - name: Build
         run: cmake --build build --config Release --target ALL_BUILD
