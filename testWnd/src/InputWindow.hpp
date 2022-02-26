@@ -1,7 +1,7 @@
 #pragma once
-#include <exception>
 #include <map>
 #include <memory>
+#include <stdexcept>
 
 #include <glad/glad.h>
 #include <glfw/glfw3.h>

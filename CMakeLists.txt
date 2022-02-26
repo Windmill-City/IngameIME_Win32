@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.18)
 project(IngameIME-Win32 VERSION 5.1.0)
 
-set(CMAKE_CXX_STANDARD 20)
-set(WIN32 TRUE)
+set(CMAKE_CXX_STANDARD 17)
 
 include(IngameIME-Common/IngameIME.cmake)
 
