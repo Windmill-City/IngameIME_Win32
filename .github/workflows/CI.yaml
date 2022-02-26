@@ -15,7 +15,7 @@ jobs:
   build:
     strategy:
       matrix:
-        target: [Win32, x64, arm64]
+        target: [win32, x64, arm64]
     runs-on: windows-latest
     steps:
       - name: Checkout Repo
