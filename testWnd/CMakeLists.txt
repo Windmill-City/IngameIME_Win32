@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.18)
-project(testWnd VERSION 0.1.0)
+project(testWnd)
 
 add_subdirectory(glfw ${CMAKE_CURRENT_SOURCE_DIR}/glfw)
 add_subdirectory(glad ${CMAKE_CURRENT_SOURCE_DIR}/glad)

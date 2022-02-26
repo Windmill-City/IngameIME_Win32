@@ -82,6 +82,7 @@
         "condition_variable": "cpp",
         "deque": "cpp",
         "mutex": "cpp",
-        "numeric": "cpp"
+        "numeric": "cpp",
+        "*.rh": "cpp"
     }
 }

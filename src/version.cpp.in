@@ -1,0 +1,3 @@
+#include "IngameIME.hpp"
+
+const std::string IngameIME::Global::Version = "@VERSION@";

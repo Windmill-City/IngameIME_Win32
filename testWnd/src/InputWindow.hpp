@@ -62,6 +62,9 @@ class InputWindow {
         // glad: load all OpenGL function pointers
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) throw std::runtime_error("Failed to initialize GLAD");
 
+        // Print library version
+        printf("IngameIME Library Version: %s\n", IngameIME::Global::Version.c_str());
+
         // Create InputContext
         inputCtx = IngameIME::Global::getInstance().getInputContext(glfwGetWin32Window(window));
 
