@@ -22,6 +22,8 @@ jobs:
         uses: actions/checkout@v2
         with:
           submodules: true
+          # Fetch all to make git describe work correctly
+          fetch-depth: 0
 
       - name: Setup CMake
         run: cmake -B build -A ${{matrix.target}}
