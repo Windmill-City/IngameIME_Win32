@@ -52,7 +52,7 @@ class InputWindow {
         window            = glfwCreateWindow(width = 800, height = 600, "libtf", NULL, NULL);
         WindowMap[window] = this;
 
-        if (!window) throw std::exception("Failed to create window");
+        if (!window) throw std::runtime_error("Failed to create window");
 
         glfwMakeContextCurrent(window);
         glfwSetKeyCallback(window, key_callback);
@@ -60,7 +60,7 @@ class InputWindow {
         glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
         // glad: load all OpenGL function pointers
-        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) throw std::exception("Failed to initialize GLAD");
+        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) throw std::runtime_error("Failed to initialize GLAD");
 
         // Create InputContext
         inputCtx = IngameIME::Global::getInstance().getInputContext(glfwGetWin32Window(window));
