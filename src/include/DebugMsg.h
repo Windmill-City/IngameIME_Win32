@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include <Windows.h>
+#include <windows.h>
 
 const std::vector<UINT> IgnoredMsg = {
     WM_MOVE,           WM_PAINT,      WM_MOUSEACTIVATE, WM_GETMINMAXINFO, WM_WINDOWPOSCHANGING, WM_WINDOWPOSCHANGED,

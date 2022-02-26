@@ -1,7 +1,7 @@
 #pragma once
 #include <map>
 
-#include <Windows.h>
+#include <windows.h>
 #pragma comment(lib, "imm32.lib")
 
 #include <msctf.h>

@@ -1,5 +1,5 @@
 #pragma once
-#include <Windows.h>
+#include <windows.h>
 
 namespace libtf {
     template <class T>
@@ -34,7 +34,7 @@ namespace libtf {
         }
 
       public:
-        _NODISCARD T* get() const noexcept
+        [[nodiscard]] T* get() const noexcept
         {
             return ptr;
         }
@@ -89,12 +89,12 @@ namespace libtf {
             return *this;
         }
 
-        _NODISCARD T& operator*() const noexcept
+        [[nodiscard]] T& operator*() const noexcept
         {
             return *ptr;
         }
 
-        _NODISCARD T* operator->() const noexcept
+        [[nodiscard]] T* operator->() const noexcept
         {
             return ptr;
         }
@@ -107,9 +107,9 @@ namespace libtf {
          *
          * @return address of the raw pointer
          */
-        _NODISCARD T** operator&()
+        [[nodiscard]] T** operator&()
         {
-            if (ptr) throw new std::exception("Acquire address for non-null pointer");
+            if (ptr) throw new std::runtime_error("Acquire address for non-null pointer");
             return &ptr;
         }
 

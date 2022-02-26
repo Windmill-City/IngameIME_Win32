@@ -2,7 +2,7 @@
 #include <functional>
 #include <memory>
 
-#include <Windows.h>
+#include <windows.h>
 #include <msctf.h>
 
 namespace libtf {

@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-#include <Windows.h>
+#include <windows.h>
 
 std::string format(const HRESULT hr)
 {

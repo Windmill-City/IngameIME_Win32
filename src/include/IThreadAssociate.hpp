@@ -1,5 +1,6 @@
 #pragma once
-#include <Windows.h>
+#include <windows.h>
+#include <winerror.h>
 
 namespace libtf {
     class IThreadAssociate {

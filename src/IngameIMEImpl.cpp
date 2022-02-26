@@ -274,7 +274,7 @@ LRESULT libimm::InputContextImpl::WndProc(HWND hWnd, UINT msg, WPARAM wparam, LP
     return DefWindowProcW(hWnd, msg, wparam, lparam);
 }
 
-#include <VersionHelpers.h>
+#include <versionhelpers.h>
 IngameIME::Global& IngameIME::Global::getInstance()
 {
     thread_local IngameIME::Global& Instance = IsWindows8OrGreater() ? (IngameIME::Global&)*new libtf::GlobalImpl() :

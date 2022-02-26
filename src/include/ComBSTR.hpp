@@ -1,7 +1,7 @@
 #pragma once
 #include <exception>
 
-#include <Windows.h>
+#include <windows.h>
 
 namespace libtf {
     class ComBSTR {
@@ -25,9 +25,9 @@ namespace libtf {
          *
          * @return address of the bstr
          */
-        _NODISCARD BSTR* operator&()
+        [[nodiscard]] BSTR* operator&()
         {
-            if (bstr) throw new std::exception("Acquire address for non-null pointer");
+            if (bstr) throw new std::runtime_error("Acquire address for non-null pointer");
             return &bstr;
         }
 

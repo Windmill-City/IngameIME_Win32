@@ -3,10 +3,10 @@
 #include <list>
 #include <map>
 
-#include <Windows.h>
+#include <windows.h>
 #pragma comment(lib, "imm32.lib")
 
-#include <Shlwapi.h>
+#include <shlwapi.h>
 #pragma comment(lib, "shlwapi.lib")
 
 #include <msctf.h>
