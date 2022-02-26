@@ -24,8 +24,18 @@ IngameIME_add_library(IngameIME_Shared SHARED ${source_file})
 target_include_directories(IngameIME_Static PRIVATE ${include_dir})
 target_include_directories(IngameIME_Shared PRIVATE ${include_dir})
 
-IngameIME_add_swig_library(IngameIME_Java SHARED java ${source_file})
-target_include_directories(IngameIME_Java PRIVATE ${include_dir})
+# Install
+install(TARGETS IngameIME_Static IngameIME_Shared PUBLIC_HEADER)
+
+# Pack
+set(CPACK_PACKAGE_FILE_NAME ${CMAKE_PROJECT_NAME}-${CMAKE_VS_PLATFORM_NAME}-${VERSION})
+set(CPACK_PACKAGE_VENDOR "Windmill_City")
+set(CPACK_PACKAGE_CHECKSUM "SHA1")
+set(CPACK_GENERATOR "ZIP")
+
+set(CPACK_PACKAGE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/pack)
+
+include(CPack)
 
 # Test Window
 add_subdirectory(testWnd testWnd)

@@ -126,6 +126,10 @@ class InputWindow {
 
         wprintf(L"InputProcs:\n");
         for (auto proc : IngameIME::Global::getInstance().getInputProcessors()) { debugShowInputProcessor(proc); }
+
+        wprintf(L"Press F5 to switch on/off InputContext\n");
+        wprintf(L"Press F11 to switch on/off fullscreen\n");
+        wprintf(L"Press F3 to activate the InputProcessor recored when inital\n");
     }
 
   public:

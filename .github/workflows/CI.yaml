@@ -1,0 +1,40 @@
+name: CI
+on:
+  push:
+    paths-ignore:
+      - docs/**
+      - cmake/**
+      - .vscode/**
+      - README.md
+permissions:
+  contents: write
+jobs:
+  build:
+    strategy:
+      matrix:
+        target: [Win32, x64, arm, arm64]
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Setup CMake
+        run: cmake -B build -A ${{matrix:target}}
+
+      - name: Build
+        run: cmake --build build --config Release --target ALL_BUILD
+
+      - name: Pack
+        if: startsWith(github.ref, 'refs/tags/')
+        run: cmake --build build --config Release --target package
+
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+         generate_release_notes: true
+
+         # Publish Packed files
+         files: build/pack/*.zip
+         fail_on_unmatched_files: true
