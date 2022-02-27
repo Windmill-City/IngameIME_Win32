@@ -1,3 +1,6 @@
 [submodule "IngameIME-Common"]
 	path = IngameIME-Common
 	url = https://github.com/Windmill-City/IngameIME-Common.git
+[submodule "testWnd/glfw"]
+	path = testWnd/glfw
+	url = https://github.com/glfw/glfw
