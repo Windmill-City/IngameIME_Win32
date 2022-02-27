@@ -6,6 +6,8 @@ on:
     branches:
       - master
       - main
+    paths-ignore:
+      - workflows/**
   # pull_request event is required only for autolabeler
   pull_request:
     # Only following types are handled by the action, but one can default to all as well
