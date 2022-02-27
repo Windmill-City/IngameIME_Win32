@@ -7,7 +7,7 @@ on:
       - cmake/**
       - .vscode/**
       - README.md
-      - workflows/**
+      - .github/workflows/**
 
 permissions:
   contents: write
