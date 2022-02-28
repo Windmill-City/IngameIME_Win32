@@ -1,9 +1,8 @@
 #pragma once
-#include <memory>
 #include <string>
 
 #include "ComBSTR.hpp"
-#include "InputContextImpl.hpp"
+#include "TfInputContextImpl.hpp"
 
 namespace libtf {
     class CompositionImpl : public IngameIME::Composition {
@@ -328,23 +327,3 @@ namespace libtf {
         }
     };
 }// namespace libtf
-
-namespace libimm {
-    class CompositionImpl : public IngameIME::Composition {
-      protected:
-        InputContextImpl* inputCtx;
-
-      public:
-        CompositionImpl(InputContextImpl* inputCtx) : inputCtx(inputCtx) {}
-
-      public:
-        /**
-         * @brief Terminate active composition
-         *
-         */
-        virtual void terminate() noexcept override
-        {
-            ImmNotifyIME(inputCtx->ctx, NI_COMPOSITIONSTR, CPS_COMPLETE, 0);
-        }
-    };
-}// namespace libimm
