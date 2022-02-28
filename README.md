@@ -1,4 +1,4 @@
-# IngameIME_Win32 ![CI Status](actions/workflows/CI.yaml/badge.svg)
+# IngameIME_Win32 ![CI Status](https://github.com/Windmill-City/IngameIME_Win32/actions/workflows/CI.yaml/badge.svg)
 
 A library for Text Service Framework(TSF) & Input Method Manager(IMM)
 
