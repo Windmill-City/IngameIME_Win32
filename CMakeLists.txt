@@ -17,16 +17,23 @@ message(STATUS "Build version: ${VERSION}")
 
 include(IngameIME-Common/IngameIME.cmake)
 
-set(include_dir ${CMAKE_CURRENT_SOURCE_DIR}/src/include)
+set(include_dir
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/include/common
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/include/tf
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/include/imm)
 set(source_file ${CMAKE_CURRENT_SOURCE_DIR}/src/IngameIMEImpl.cpp ${version_file})
 
 IngameIME_add_library(IngameIME_Static STATIC ${source_file})
 IngameIME_add_library(IngameIME_Shared SHARED ${source_file})
-target_include_directories(IngameIME_Static PRIVATE ${include_dir})
-target_include_directories(IngameIME_Shared PRIVATE ${include_dir})
+target_include_directories(IngameIME_Static PRIVATE "${include_dir}")
+target_include_directories(IngameIME_Shared PRIVATE "${include_dir}")
+
+# Test Window
+add_subdirectory(testWnd)
 
 # Install
-install(TARGETS IngameIME_Static IngameIME_Shared PUBLIC_HEADER)
+install(TARGETS IngameIME_Static IngameIME_Shared testWnd PUBLIC_HEADER)
 
 # Pack
 set(CPACK_PACKAGE_FILE_NAME ${CMAKE_PROJECT_NAME}-${CMAKE_VS_PLATFORM_NAME}-${VERSION})
@@ -37,6 +44,3 @@ set(CPACK_GENERATOR "ZIP")
 set(CPACK_PACKAGE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/pack)
 
 include(CPack)
-
-# Test Window
-add_subdirectory(testWnd testWnd)
