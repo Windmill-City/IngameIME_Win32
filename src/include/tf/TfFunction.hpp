@@ -2,8 +2,8 @@
 #include <functional>
 #include <memory>
 
-#include <windows.h>
 #include <msctf.h>
+#include <windows.h>
 
 namespace libtf {
     typedef HRESULT(WINAPI* pTF_CreateThreadMgr)(ITfThreadMgr**);
