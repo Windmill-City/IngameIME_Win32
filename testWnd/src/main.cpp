@@ -19,7 +19,7 @@ int main()
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-        // Set locale to the system active for wprintf
+        // Must call once to set active locale
         setlocale(LC_ALL, "");
 
         try {
