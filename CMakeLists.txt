@@ -1,11 +1,26 @@
 cmake_minimum_required(VERSION 3.18)
 project(IngameIME-Win32)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+###########################
+# Compiler flags
+###########################
 
-# Appends the cmake/modules path to MAKE_MODULE_PATH variable.
+set(CMAKE_CXX_STANDARD 17)
+
+if(MSVC)
+    # Use Static Runtime Library
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+
+###########################
+# Find Packages
+###########################
+
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
+
+###########################
+# Get Version String
+###########################
 
 include(GetGitRevisionDescription)
 git_describe(VERSION --tags --dirty=-dirty)
@@ -15,7 +30,10 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/version.cpp.in
 set(version_file ${CMAKE_CURRENT_BINARY_DIR}/version.cpp)
 message(STATUS "Build version: ${VERSION}")
 
-include(IngameIME-Common/IngameIME.cmake)
+
+###########################
+# Build files
+###########################
 
 set(include_dir
     ${CMAKE_CURRENT_SOURCE_DIR}/src/include
@@ -24,6 +42,12 @@ set(include_dir
     ${CMAKE_CURRENT_SOURCE_DIR}/src/include/imm)
 set(source_file ${CMAKE_CURRENT_SOURCE_DIR}/src/IngameIMEImpl.cpp ${version_file})
 
+###########################
+# Targets
+###########################
+
+# Library Target
+include(IngameIME-Common/IngameIME.cmake)
 IngameIME_add_library(IngameIME_Static STATIC ${source_file})
 IngameIME_add_library(IngameIME_Shared SHARED ${source_file})
 target_include_directories(IngameIME_Static PRIVATE "${include_dir}")
@@ -31,6 +55,10 @@ target_include_directories(IngameIME_Shared PRIVATE "${include_dir}")
 
 # Test Window
 add_subdirectory(testWnd)
+
+###########################
+# Packaging
+###########################
 
 # Install
 install(TARGETS IngameIME_Static IngameIME_Shared testWnd PUBLIC_HEADER)
