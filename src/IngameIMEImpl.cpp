@@ -47,7 +47,7 @@ libimm::InputContextImpl::InputContextImpl(HWND hWnd) : hWnd(hWnd)
 }
 
 #include <versionhelpers.h>
-IngameIME::Global& IngameIME::Global::getInstance()
+IngameIME::Global& IngameIME::Global::getInstance(void* ignore, ...)
 {
     thread_local IngameIME::Global& Instance = IsWindows8OrGreater() ? (IngameIME::Global&)*new libtf::GlobalImpl() :
                                                                        (IngameIME::Global&)*new libimm::GlobalImpl();
