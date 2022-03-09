@@ -61,7 +61,7 @@ add_subdirectory(testWnd)
 ###########################
 
 # Install
-install(TARGETS IngameIME_Static IngameIME_Shared testWnd PUBLIC_HEADER)
+install(TARGETS IngameIME_Static IngameIME_Shared PUBLIC_HEADER)
 
 # Pack
 set(CPACK_PACKAGE_FILE_NAME ${CMAKE_PROJECT_NAME}-${CMAKE_VS_PLATFORM_NAME}-${VERSION})

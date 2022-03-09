@@ -5,11 +5,8 @@ add_subdirectory(glfw EXCLUDE_FROM_ALL)
 add_subdirectory(glad EXCLUDE_FROM_ALL)
 
 add_executable(testWnd ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
-target_include_directories(testWnd PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/glfw/include ${CMAKE_CURRENT_SOURCE_DIR}/glad/include)
 target_sources(testWnd PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-target_link_libraries(testWnd PRIVATE glad_static)
-target_link_libraries(testWnd PRIVATE glfw ${GLFW_LIBRARIES})
-target_link_libraries(testWnd PRIVATE IngameIME_Static)
+target_link_libraries(testWnd PRIVATE glad_static glfw IngameIME_Static)
 
 # Install
 install(TARGETS testWnd)
