@@ -4,7 +4,7 @@
 #include "InputContext.hpp"
 
 namespace IngameIME {
-    struct InternalRect : public IngameIME::PreEditRect
+    struct InternalRect : public PreEditRect
     {
         InternalRect() = default;
 

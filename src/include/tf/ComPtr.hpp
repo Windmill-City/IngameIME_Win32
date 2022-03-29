@@ -1,7 +1,7 @@
 #pragma once
 #include <windows.h>
 
-namespace libtf {
+namespace IngameIME::tf {
     template <class T>
     class ComPtr {
       protected:
@@ -145,4 +145,4 @@ namespace libtf {
             return *this;
         }
     };
-}// namespace libtf
+}// namespace IngameIME::tf

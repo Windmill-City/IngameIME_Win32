@@ -13,14 +13,14 @@
 
 #include "InputProcessor.hpp"
 
-#include "ComBSTR.hpp"
-#include "ComObjectBase.hpp"
-#include "ComPtr.hpp"
-#include "FormatUtil.hpp"
-#include "TfFunction.hpp"
+#include "..\FormatUtil.hpp"
+#include "..\tf\ComBSTR.hpp"
+#include "..\tf\ComObjectBase.hpp"
+#include "..\tf\ComPtr.hpp"
+#include "..\tf\TfFunction.hpp"
 
 namespace IngameIME {
-    struct InternalLocale : public IngameIME::Locale
+    struct InternalLocale : public Locale
     {
       protected:
         static std::map<LANGID, std::weak_ptr<const InternalLocale>> weakRefs;
@@ -83,7 +83,7 @@ namespace IngameIME {
     };
     std::map<LANGID, std::weak_ptr<const InternalLocale>> InternalLocale::weakRefs = {};
 
-    class InputProcessorImpl : public IngameIME::InputProcessor {
+    class InputProcessorImpl : public InputProcessor {
       protected:
         struct CompareProfile
         {
@@ -161,10 +161,10 @@ namespace IngameIME {
 
             COM_HR_BEGIN(S_OK);
 
-            libtf::ComPtr<ITfInputProcessorProfiles> inputProcessorProfiles;
-            CHECK_HR(libtf::createInputProcessorProfiles(&inputProcessorProfiles));
+            tf::ComPtr<ITfInputProcessorProfiles> inputProcessorProfiles;
+            CHECK_HR(tf::createInputProcessorProfiles(&inputProcessorProfiles));
 
-            libtf::ComBSTR name;
+            tf::ComBSTR name;
             CHECK_HR(inputProcessorProfiles->GetLanguageProfileDescription(
                 profile.clsid, profile.langid, profile.guidProfile, &name));
 
@@ -226,10 +226,10 @@ namespace IngameIME {
         InputProcessorImpl(const TF_INPUTPROCESSORPROFILE profile) : profile(profile)
         {
             type   = profile.dwProfileType == TF_PROFILETYPE_INPUTPROCESSOR || isImm(profile.hkl) ?
-                         IngameIME::InputProcessorType::TextService :
-                         IngameIME::InputProcessorType::KeyboardLayout;
+                         InputProcessorType::TextService :
+                         InputProcessorType::KeyboardLayout;
             name   = getInputProcessorName(profile);
-            locale = IngameIME::InternalLocale::getLocale(profile.langid);
+            locale = InternalLocale::getLocale(profile.langid);
             isJap  = locale->locale.compare(0, 2, L"ja") == 0;
         }
 
@@ -260,10 +260,10 @@ namespace IngameIME {
 
             if (!IsGUIThread(false)) THR_HR(UI_E_WRONG_THREAD);
 
-            libtf::ComPtr<ITfInputProcessorProfiles> inputProcessorProfiles;
-            CHECK_HR(libtf::createInputProcessorProfiles(&inputProcessorProfiles));
-            libtf::ComQIPtr<ITfInputProcessorProfileMgr> inputProcessorMgr(IID_ITfInputProcessorProfileMgr,
-                                                                           inputProcessorProfiles);
+            tf::ComPtr<ITfInputProcessorProfiles> inputProcessorProfiles;
+            CHECK_HR(tf::createInputProcessorProfiles(&inputProcessorProfiles));
+            tf::ComQIPtr<ITfInputProcessorProfileMgr> inputProcessorMgr(IID_ITfInputProcessorProfileMgr,
+                                                                        inputProcessorProfiles);
 
             TF_INPUTPROCESSORPROFILE profile;
             CHECK_HR(inputProcessorMgr->GetActiveProfile(GUID_TFCAT_TIP_KEYBOARD, &profile));
@@ -276,19 +276,19 @@ namespace IngameIME {
             return nullptr;
         }
 
-        static std::list<std::shared_ptr<const IngameIME::InputProcessor>> getInputProcessors()
+        static std::list<std::shared_ptr<const InputProcessor>> getInputProcessors()
         {
-            std::list<std::shared_ptr<const IngameIME::InputProcessor>> result;
+            std::list<std::shared_ptr<const InputProcessor>> result;
 
             COM_HR_BEGIN(S_OK);
 
             if (!IsGUIThread(false)) break;
 
-            libtf::ComPtr<ITfInputProcessorProfiles> profiles;
-            CHECK_HR(libtf::createInputProcessorProfiles(&profiles));
-            libtf::ComQIPtr<ITfInputProcessorProfileMgr> procMgr(IID_ITfInputProcessorProfileMgr, profiles);
+            tf::ComPtr<ITfInputProcessorProfiles> profiles;
+            CHECK_HR(tf::createInputProcessorProfiles(&profiles));
+            tf::ComQIPtr<ITfInputProcessorProfileMgr> procMgr(IID_ITfInputProcessorProfileMgr, profiles);
 
-            libtf::ComPtr<IEnumTfInputProcessorProfiles> enumProfiles;
+            tf::ComPtr<IEnumTfInputProcessorProfiles> enumProfiles;
             // Pass 0 to langid to enum all profiles
             CHECK_HR(procMgr->EnumProfiles(0, &enumProfiles));
 
@@ -318,10 +318,10 @@ namespace IngameIME {
 
             if (!IsGUIThread(false)) THR_HR(UI_E_WRONG_THREAD);
 
-            libtf::ComPtr<ITfInputProcessorProfiles> inputProcessorProfiles;
-            CHECK_HR(libtf::createInputProcessorProfiles(&inputProcessorProfiles));
-            libtf::ComQIPtr<ITfInputProcessorProfileMgr> inputProcessorMgr(IID_ITfInputProcessorProfileMgr,
-                                                                           inputProcessorProfiles);
+            tf::ComPtr<ITfInputProcessorProfiles> inputProcessorProfiles;
+            CHECK_HR(tf::createInputProcessorProfiles(&inputProcessorProfiles));
+            tf::ComQIPtr<ITfInputProcessorProfileMgr> inputProcessorMgr(IID_ITfInputProcessorProfileMgr,
+                                                                        inputProcessorProfiles);
 
             CHECK_HR(inputProcessorMgr->ActivateProfile(profile.dwProfileType,
                                                         profile.langid,

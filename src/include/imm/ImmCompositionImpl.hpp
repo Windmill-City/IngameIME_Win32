@@ -1,8 +1,8 @@
 #pragma once
 #include "ImmInputContextImpl.hpp"
 
-namespace libimm {
-    class CompositionImpl : public IngameIME::Composition {
+namespace IngameIME::imm {
+    class CompositionImpl : public Composition {
       protected:
         InputContextImpl* inputCtx;
 
@@ -19,4 +19,4 @@ namespace libimm {
             ImmNotifyIME(inputCtx->ctx, NI_COMPOSITIONSTR, CPS_COMPLETE, 0);
         }
     };
-}// namespace libimm
+}// namespace IngameIME::imm

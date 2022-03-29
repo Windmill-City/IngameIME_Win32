@@ -1,20 +1,20 @@
 #pragma once
 #include "IngameIME.hpp"
-#include "InputProcessorImpl.hpp"
+#include "common/InputProcessorImpl.hpp"
 
 #include "ImmInputContextImpl.hpp"
 
-namespace libimm {
-    class GlobalImpl : public IngameIME::Global {
+namespace IngameIME::imm {
+    class GlobalImpl : public Global {
       public:
         /**
          * @brief Get Active InputProcessor
          *
          * @return std::shared_ptr<InputProcessor>
          */
-        virtual std::shared_ptr<const IngameIME::InputProcessor> getActiveInputProcessor() const override
+        virtual std::shared_ptr<const InputProcessor> getActiveInputProcessor() const override
         {
-            return IngameIME::InputProcessorImpl::getActiveInputProcessor();
+            return InputProcessorImpl::getActiveInputProcessor();
         }
 
         /**
@@ -22,9 +22,9 @@ namespace libimm {
          *
          * @return std::list<std::shared_ptr<InputProcessor>>
          */
-        virtual std::list<std::shared_ptr<const IngameIME::InputProcessor>> getInputProcessors() const override
+        virtual std::list<std::shared_ptr<const InputProcessor>> getInputProcessors() const override
         {
-            return IngameIME::InputProcessorImpl::getInputProcessors();
+            return InputProcessorImpl::getInputProcessors();
         }
 
         /**
@@ -32,7 +32,7 @@ namespace libimm {
          *
          * @return std::shared_ptr<InputContext>
          */
-        virtual std::shared_ptr<IngameIME::InputContext> getInputContext(void* hWnd, ...) override
+        virtual std::shared_ptr<InputContext> getInputContext(void* hWnd, ...) override
         {
             std::shared_ptr<InputContextImpl> ctx;
 
@@ -45,4 +45,4 @@ namespace libimm {
             return ctx;
         }
     };
-}// namespace libimm
+}// namespace IngameIME::imm

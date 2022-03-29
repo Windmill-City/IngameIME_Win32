@@ -4,8 +4,8 @@
 #include "ComBSTR.hpp"
 #include "TfInputContextImpl.hpp"
 
-namespace libtf {
-    class CompositionImpl : public IngameIME::Composition {
+namespace IngameIME::tf {
+    class CompositionImpl : public Composition {
       private:
         DWORD cookieEditSink{TF_INVALID_COOKIE};
         DWORD cookieEleSink{TF_INVALID_COOKIE};
@@ -52,7 +52,7 @@ namespace libtf {
                 // Always allow Composition start
                 *pfOk = true;
 
-                comp->IngameIME::PreEditCallbackHolder::runCallback(IngameIME::CompositionState::Begin, nullptr);
+                comp->PreEditCallbackHolder::runCallback(CompositionState::Begin, nullptr);
 
                 return S_OK;
             }
@@ -69,7 +69,7 @@ namespace libtf {
             HRESULT STDMETHODCALLTYPE OnEndComposition(ITfCompositionView* pComposition) override
             {
                 compView.reset();
-                comp->IngameIME::PreEditCallbackHolder::runCallback(IngameIME::CompositionState::End, nullptr);
+                comp->PreEditCallbackHolder::runCallback(CompositionState::End, nullptr);
 
                 static HRESULT hr;
                 hr = comp->inputCtx->ctx->RequestEditSession(
@@ -113,12 +113,12 @@ namespace libtf {
                 rangeAcp = selRange;
                 CHECK_HR(rangeAcp->GetExtent(&acpStart, &len));
 
-                IngameIME::PreEditContext preEditCtx;
+                PreEditContext preEditCtx;
                 preEditCtx.selStart = acpStart;
                 preEditCtx.selEnd   = acpStart + len;
                 preEditCtx.content  = std::wstring(bufPreEdit.get(), preEditLen);
 
-                comp->IngameIME::PreEditCallbackHolder::runCallback(IngameIME::CompositionState::Update, &preEditCtx);
+                comp->PreEditCallbackHolder::runCallback(CompositionState::Update, &preEditCtx);
 
                 COM_HR_END();
                 COM_HR_RET();
@@ -157,7 +157,7 @@ namespace libtf {
                 // Clear the texts in the text store
                 CHECK_HR(fullRange->SetText(ec, 0, NULL, 0));
 
-                comp->IngameIME::CommitCallbackHolder::runCallback(std::wstring(bufCommit.get(), commitLen));
+                comp->CommitCallbackHolder::runCallback(std::wstring(bufCommit.get(), commitLen));
 
                 COM_HR_END();
                 COM_HR_RET();
@@ -187,8 +187,7 @@ namespace libtf {
                     ele   = candEle;
                     eleId = dwUIElementId;
                     // Handle Candidate List events
-                    comp->IngameIME::CandidateListCallbackHolder::runCallback(IngameIME::CandidateListState::Begin,
-                                                                              nullptr);
+                    comp->CandidateListCallbackHolder::runCallback(CandidateListState::Begin, nullptr);
                 }
 
                 COM_HR_END();
@@ -222,7 +221,7 @@ namespace libtf {
                 uint32_t pageEnd   = curPage == pageCount - 1 ? totalCount : pageStarts[curPage + 1];
                 uint32_t pageSize  = pageEnd - pageStart;
 
-                IngameIME::CandidateListContext candCtx;
+                CandidateListContext candCtx;
 
                 // Currently Selected Candidate's absolute index
                 UINT sel;
@@ -240,8 +239,7 @@ namespace libtf {
                         candCtx.candidates.push_back(candidate.bstr);
                 }
 
-                comp->IngameIME::CandidateListCallbackHolder::runCallback(IngameIME::CandidateListState::Update,
-                                                                          &candCtx);
+                comp->CandidateListCallbackHolder::runCallback(CandidateListState::Update, &candCtx);
 
                 COM_HR_END();
                 COM_HR_RET();
@@ -257,7 +255,7 @@ namespace libtf {
                 eleId = TF_INVALID_UIELEMENTID;
                 ele.reset();
 
-                comp->IngameIME::CandidateListCallbackHolder::runCallback(IngameIME::CandidateListState::End, nullptr);
+                comp->CandidateListCallbackHolder::runCallback(CandidateListState::End, nullptr);
 
                 COM_HR_END();
                 COM_HR_RET();
@@ -326,4 +324,4 @@ namespace libtf {
             COM_HR_THR();
         }
     };
-}// namespace libtf
+}// namespace IngameIME::tf

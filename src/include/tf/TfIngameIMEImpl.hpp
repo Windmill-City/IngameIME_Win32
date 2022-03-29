@@ -4,15 +4,15 @@
 #include "TfInputContextImpl.hpp"
 #include "TfInputProcessorImpl.hpp"
 
-namespace libtf {
-    class GlobalImpl : public IngameIME::Global {
+namespace IngameIME::tf {
+    class GlobalImpl : public Global {
       private:
         DWORD cookieComp{TF_INVALID_COOKIE};
         DWORD cookieProc{TF_INVALID_COOKIE};
 
       protected:
         ComPtr<InputProcessorHandler> handler;
-        friend class IngameIME::Global;
+        friend class Global;
 
       protected:
         GlobalImpl()
@@ -55,9 +55,9 @@ namespace libtf {
          *
          * @return std::shared_ptr<InputProcessor>
          */
-        virtual std::shared_ptr<const IngameIME::InputProcessor> getActiveInputProcessor() const override
+        virtual std::shared_ptr<const InputProcessor> getActiveInputProcessor() const override
         {
-            return IngameIME::InputProcessorImpl::getActiveInputProcessor();
+            return InputProcessorImpl::getActiveInputProcessor();
         }
 
         /**
@@ -65,9 +65,9 @@ namespace libtf {
          *
          * @return std::list<std::shared_ptr<InputProcessor>>
          */
-        virtual std::list<std::shared_ptr<const IngameIME::InputProcessor>> getInputProcessors() const override
+        virtual std::list<std::shared_ptr<const InputProcessor>> getInputProcessors() const override
         {
-            return IngameIME::InputProcessorImpl::getInputProcessors();
+            return InputProcessorImpl::getInputProcessors();
         }
 
         /**
@@ -76,9 +76,9 @@ namespace libtf {
          * @param hWnd the window to create InputContext
          * @return std::shared_ptr<InputContext>
          */
-        virtual std::shared_ptr<IngameIME::InputContext> getInputContext(void* hWnd, ...) override
+        virtual std::shared_ptr<InputContext> getInputContext(void* hWnd, ...) override
         {
             return std::make_shared<InputContextImpl>(reinterpret_cast<HWND>(hWnd));
         }
     };
-}// namespace libtf
+}// namespace IngameIME::tf

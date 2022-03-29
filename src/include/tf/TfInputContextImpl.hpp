@@ -1,8 +1,8 @@
 #pragma once
 #include <map>
 
-#include "InputContextImpl.hpp"
 #include "InputProcessor.hpp"
+#include "common/InputContextImpl.hpp"
 
 #include <msctf.h>
 
@@ -11,8 +11,8 @@
 #include "IThreadAssociate.hpp"
 #include "TfFunction.hpp"
 
-namespace libtf {
-    class InputContextImpl : public IngameIME::InputContext, public IThreadAssociate {
+namespace IngameIME::tf {
+    class InputContextImpl : public InputContext, public IThreadAssociate {
       protected:
         class ContextOwner;
 
@@ -65,8 +65,8 @@ namespace libtf {
             HRESULT STDMETHODCALLTYPE GetTextExt(LONG acpStart, LONG acpEnd, RECT* prc, BOOL* pfClipped) override
             {
                 // Fetch bounding box
-                IngameIME::InternalRect box;
-                ctx->comp->IngameIME::PreEditRectCallbackHolder::runCallback(box);
+                InternalRect box;
+                ctx->comp->PreEditRectCallbackHolder::runCallback(box);
                 *prc = box;
 
                 // Map window coordinate to screen coordinate
@@ -209,4 +209,4 @@ namespace libtf {
             return fullscreen;
         }
     };
-}// namespace libtf
+}// namespace IngameIME::tf

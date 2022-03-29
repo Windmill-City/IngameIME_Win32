@@ -1,12 +1,12 @@
 #include <stdarg.h>
 
-#include "ImmCompositionImpl.hpp"
-#include "ImmIngameIMEImpl.hpp"
+#include "..\include\imm\ImmCompositionImpl.hpp"
+#include "..\include\imm\ImmIngameIMEImpl.hpp"
 
-#include "TfCompositionImpl.hpp"
-#include "TfIngameIMEImpl.hpp"
+#include "..\include\tf\TfCompositionImpl.hpp"
+#include "..\include\tf\TfIngameIMEImpl.hpp"
 
-libtf::InputContextImpl::InputContextImpl(HWND hWnd)
+IngameIME::tf::InputContextImpl::InputContextImpl(HWND hWnd)
 {
     COM_HR_BEGIN(S_OK);
 
@@ -35,7 +35,7 @@ libtf::InputContextImpl::InputContextImpl(HWND hWnd)
     COM_HR_THR();
 }
 
-libimm::InputContextImpl::InputContextImpl(HWND hWnd) : hWnd(hWnd)
+IngameIME::imm::InputContextImpl::InputContextImpl(HWND hWnd) : hWnd(hWnd)
 {
     comp = std::make_shared<CompositionImpl>(this);
 
@@ -49,7 +49,7 @@ libimm::InputContextImpl::InputContextImpl(HWND hWnd) : hWnd(hWnd)
 #include <versionhelpers.h>
 IngameIME::Global& IngameIME::Global::getInstance(void* ignore, ...)
 {
-    thread_local IngameIME::Global& Instance = IsWindows8OrGreater() ? (IngameIME::Global&)*new libtf::GlobalImpl() :
-                                                                       (IngameIME::Global&)*new libimm::GlobalImpl();
+    thread_local IngameIME::Global& Instance =
+        IsWindows8OrGreater() ? (IngameIME::Global&)*new tf::GlobalImpl() : (IngameIME::Global&)*new imm::GlobalImpl();
     return Instance;
 }

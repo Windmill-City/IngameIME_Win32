@@ -2,7 +2,7 @@
 #include <windows.h>
 #include <winerror.h>
 
-namespace libtf {
+namespace IngameIME::tf {
     class IThreadAssociate {
       private:
         DWORD threadId;
@@ -41,4 +41,4 @@ namespace libtf {
             return threadId;
         }
     };
-}// namespace libtf
+}// namespace IngameIME::tf

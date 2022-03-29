@@ -9,7 +9,7 @@
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
 
-#include "IngameIME.hpp"
+#include "..\..\IngameIME-Common\include\IngameIME.hpp"
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void window_size_callback(GLFWwindow* window, int width, int height);

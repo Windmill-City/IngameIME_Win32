@@ -17,12 +17,9 @@ message(STATUS "Build version: ${VERSION}")
 
 include(IngameIME-Common/IngameIME.cmake)
 
-set(include_dir
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/include/common
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/include/tf
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/include/imm)
-set(source_file ${CMAKE_CURRENT_SOURCE_DIR}/src/IngameIMEImpl.cpp ${version_file})
+set(include_dir ${CMAKE_CURRENT_SOURCE_DIR}/src/include)
+file(GLOB_RECURSE source_file ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+list(APPEND source_file ${version_file})
 
 IngameIME_add_library(IngameIME_Static STATIC ${source_file})
 IngameIME_add_library(IngameIME_Shared SHARED ${source_file})

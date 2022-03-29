@@ -5,7 +5,7 @@
 #include <msctf.h>
 #include <windows.h>
 
-namespace libtf {
+namespace IngameIME::tf {
     typedef HRESULT(WINAPI* pTF_CreateThreadMgr)(ITfThreadMgr**);
     typedef HRESULT(WINAPI* pTF_CreateInputProcessorProfiles)(ITfInputProcessorProfiles**);
     typedef HRESULT(WINAPI* pTF_GetThreadMgr)(ITfThreadMgr**);
@@ -61,4 +61,4 @@ namespace libtf {
 
         return pfn ? (*pfn)(ppipr) : E_FAIL;
     }
-}// namespace libtf
+}// namespace IngameIME::tf

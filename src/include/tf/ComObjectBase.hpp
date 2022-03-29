@@ -35,14 +35,14 @@
     }                                                                                                                  \
     while (0)                                                                                                          \
         ;
-#define THR_HR(hr) throw libtf::ComException(hr);
+#define THR_HR(hr) throw IngameIME::tf::ComException(hr);
 #define CHECK_HR(exp)                                                                                                  \
     if (FAILED(hr = (exp))) break;
 #define COM_HR_THR()                                                                                                   \
     if (FAILED(hr)) THR_HR(hr);
 #define COM_HR_RET() return hr;
 
-namespace libtf {
+namespace IngameIME::tf {
     class ComObjectBase {
       private:
         /**
@@ -66,4 +66,4 @@ namespace libtf {
             return ref;
         }
     };
-}// namespace libtf
+}// namespace IngameIME::tf

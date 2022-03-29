@@ -1,7 +1,7 @@
 #pragma once
-#include "InputProcessorImpl.hpp"
+#include "..\common\InputProcessorImpl.hpp"
 
-namespace libtf {
+namespace IngameIME::tf {
     class InputProcessorHandler : public ComObjectBase,
                                   public ITfInputProcessorProfileActivationSink,
                                   public ITfCompartmentEventSink {
@@ -25,17 +25,17 @@ namespace libtf {
         }
 
       protected:
-        IngameIME::InputProcessorContext getCtx()
+        InputProcessorContext getCtx()
         {
-            IngameIME::InputProcessorContext result;
+            InputProcessorContext result;
 
-            auto activeProc = IngameIME::InputProcessorImpl::getActiveInputProcessor();
+            auto activeProc = InputProcessorImpl::getActiveInputProcessor();
             result.proc     = activeProc;
 
             VARIANT var;
             mode->GetValue(&var);
 
-            if (activeProc->type == IngameIME::InputProcessorType::KeyboardLayout)
+            if (activeProc->type == InputProcessorType::KeyboardLayout)
                 result.modes.push_back(L"AlphaNumeric");
             else {
                 if (var.intVal & TF_CONVERSIONMODE_NATIVE) {
@@ -86,7 +86,7 @@ namespace libtf {
             profile.guidProfile   = guidProfile;
             profile.hkl           = hkl;
 
-            IngameIME::Global::getInstance().runCallback(IngameIME::InputProcessorState::FullUpdate, getCtx());
+            Global::getInstance().runCallback(InputProcessorState::FullUpdate, getCtx());
 
             COM_HR_END();
             COM_HR_RET();
@@ -97,10 +97,10 @@ namespace libtf {
             COM_HR_BEGIN(S_OK);
 
             if (IsEqualGUID(rguid, GUID_COMPARTMENT_KEYBOARD_INPUTMODE_CONVERSION))
-                IngameIME::Global::getInstance().runCallback(IngameIME::InputProcessorState::InputModeUpdate, getCtx());
+                Global::getInstance().runCallback(InputProcessorState::InputModeUpdate, getCtx());
 
             COM_HR_END();
             COM_HR_RET();
         }
     };
-}// namespace libtf
+}// namespace IngameIME::tf

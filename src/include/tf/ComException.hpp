@@ -3,7 +3,7 @@
 
 #include "FormatUtil.hpp"
 
-namespace libtf {
+namespace IngameIME::tf {
 
     class ComException : public std::runtime_error {
       public:
@@ -13,4 +13,4 @@ namespace libtf {
         {
         }
     };
-}// namespace libtf
+}// namespace IngameIME::tf

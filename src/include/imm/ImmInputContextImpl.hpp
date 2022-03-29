@@ -5,11 +5,12 @@
 #pragma comment(lib, "imm32.lib")
 
 #include "IngameIME.hpp"
-#include "InputContextImpl.hpp"
-#include "InputProcessorImpl.hpp"
 
-namespace libimm {
-    class InputContextImpl : public IngameIME::InputContext {
+#include "common/InputContextImpl.hpp"
+#include "common/InputProcessorImpl.hpp"
+
+namespace IngameIME::imm {
+    class InputContextImpl : public InputContext {
       protected:
         static std::map<HWND, std::weak_ptr<InputContextImpl>> InputCtxMap;
         static LRESULT WndProc(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam)
@@ -20,8 +21,7 @@ namespace libimm {
             if (iter != InputCtxMap.end() && (inputCtx = (*iter).second.lock())) {
                 switch (msg) {
                     case WM_INPUTLANGCHANGE:
-                        IngameIME::Global::getInstance().runCallback(IngameIME::InputProcessorState::FullUpdate,
-                                                                     inputCtx->getInputProcCtx());
+                        Global::getInstance().runCallback(InputProcessorState::FullUpdate, inputCtx->getInputProcCtx());
                         break;
                     case WM_IME_SETCONTEXT:
                         // We should always hide Composition Window to make the PreEditCallback for work
@@ -33,8 +33,7 @@ namespace libimm {
                         }
                         break;
                     case WM_IME_STARTCOMPOSITION:
-                        inputCtx->comp->IngameIME::PreEditCallbackHolder::runCallback(
-                            IngameIME::CompositionState::Begin, nullptr);
+                        inputCtx->comp->PreEditCallbackHolder::runCallback(CompositionState::Begin, nullptr);
                         return true;
                     case WM_IME_COMPOSITION:
                         if (lparam & (GCS_COMPSTR | GCS_CURSORPOS)) inputCtx->procPreEdit();
@@ -45,27 +44,25 @@ namespace libimm {
                         // when lparam == 0 that means current Composition has been canceled
                         if (lparam) return true;
                     case WM_IME_ENDCOMPOSITION:
-                        inputCtx->comp->IngameIME::PreEditCallbackHolder::runCallback(IngameIME::CompositionState::End,
-                                                                                      nullptr);
-                        inputCtx->comp->IngameIME::CandidateListCallbackHolder::runCallback(
-                            IngameIME::CandidateListState::End, nullptr);
+                        inputCtx->comp->PreEditCallbackHolder::runCallback(CompositionState::End, nullptr);
+                        inputCtx->comp->CandidateListCallbackHolder::runCallback(CandidateListState::End, nullptr);
                         return true;
                     case WM_IME_NOTIFY:
                         if (inputCtx->fullscreen) switch (wparam) {
                                 case IMN_OPENCANDIDATE:
-                                    inputCtx->comp->IngameIME::CandidateListCallbackHolder::runCallback(
-                                        IngameIME::CandidateListState::Begin, nullptr);
+                                    inputCtx->comp->CandidateListCallbackHolder::runCallback(CandidateListState::Begin,
+                                                                                             nullptr);
                                     return true;
                                 case IMN_CHANGECANDIDATE: inputCtx->procCand(); return true;
                                 case IMN_CLOSECANDIDATE:
-                                    inputCtx->comp->IngameIME::CandidateListCallbackHolder::runCallback(
-                                        IngameIME::CandidateListState::End, nullptr);
+                                    inputCtx->comp->CandidateListCallbackHolder::runCallback(CandidateListState::End,
+                                                                                             nullptr);
                                     return true;
                                 default: break;
                             }
                         if (wparam == IMN_SETCONVERSIONMODE) {
-                            IngameIME::Global::getInstance().runCallback(
-                                IngameIME::InputProcessorState::InputModeUpdate, inputCtx->getInputProcCtx());
+                            Global::getInstance().runCallback(InputProcessorState::InputModeUpdate,
+                                                              inputCtx->getInputProcCtx());
                         }
                         break;
                     case WM_IME_CHAR:
@@ -117,11 +114,11 @@ namespace libimm {
             // Selection
             int sel = ImmGetCompositionStringW(ctx, GCS_CURSORPOS, NULL, 0);
 
-            IngameIME::PreEditContext ctx;
+            PreEditContext ctx;
             ctx.content  = std::wstring(buf.get(), size / sizeof(WCHAR));
             ctx.selStart = ctx.selEnd = sel;
 
-            comp->IngameIME::PreEditCallbackHolder::runCallback(IngameIME::CompositionState::Update, &ctx);
+            comp->PreEditCallbackHolder::runCallback(CompositionState::Update, &ctx);
         }
 
         /**
@@ -137,7 +134,7 @@ namespace libimm {
             auto buf = std::make_unique<WCHAR[]>(size / sizeof(WCHAR));
             ImmGetCompositionStringW(ctx, GCS_RESULTSTR, buf.get(), size);
 
-            comp->IngameIME::CommitCallbackHolder::runCallback(std::wstring(buf.get(), size / sizeof(WCHAR)));
+            comp->CommitCallbackHolder::runCallback(std::wstring(buf.get(), size / sizeof(WCHAR)));
         }
 
         /**
@@ -146,8 +143,8 @@ namespace libimm {
          */
         void procPreEditRect()
         {
-            IngameIME::InternalRect rect;
-            comp->IngameIME::PreEditRectCallbackHolder::runCallback(rect);
+            InternalRect rect;
+            comp->PreEditRectCallbackHolder::runCallback(rect);
 
             CANDIDATEFORM cand;
             cand.dwIndex        = 0;
@@ -167,7 +164,7 @@ namespace libimm {
 
         void procCand()
         {
-            IngameIME::CandidateListContext candCtx;
+            CandidateListContext candCtx;
 
             auto size = ImmGetCandidateListW(ctx, 0, NULL, 0);
             // Error occurs
@@ -196,21 +193,21 @@ namespace libimm {
                 candCtx.candidates.push_back(std::wstring((wchar_t*)strStart, len));
             }
 
-            comp->IngameIME::CandidateListCallbackHolder::runCallback(IngameIME::CandidateListState::Update, &candCtx);
+            comp->CandidateListCallbackHolder::runCallback(CandidateListState::Update, &candCtx);
         }
 
       public:
-        IngameIME::InputProcessorContext getInputProcCtx()
+        InputProcessorContext getInputProcCtx()
         {
-            IngameIME::InputProcessorContext result;
+            InputProcessorContext result;
 
             DWORD mode;
             ImmGetConversionStatus(ctx, &mode, NULL);
 
-            auto activeProc = IngameIME::InputProcessorImpl::getActiveInputProcessor();
+            auto activeProc = InputProcessorImpl::getActiveInputProcessor();
 
             std::list<std::wstring> modes;
-            if (activeProc->type == IngameIME::InputProcessorType::KeyboardLayout)
+            if (activeProc->type == InputProcessorType::KeyboardLayout)
                 modes.push_back(L"AlphaNumeric");
             else {
                 if (mode & IME_CMODE_NATIVE) {
@@ -290,4 +287,4 @@ namespace libimm {
         }
     };
     std::map<HWND, std::weak_ptr<InputContextImpl>> InputContextImpl::InputCtxMap = {};
-}// namespace libimm
+}// namespace IngameIME::imm

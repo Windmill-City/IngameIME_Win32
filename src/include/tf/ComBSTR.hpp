@@ -3,7 +3,7 @@
 
 #include <windows.h>
 
-namespace libtf {
+namespace IngameIME::tf {
     class ComBSTR {
       public:
         BSTR bstr{nullptr};
@@ -36,4 +36,4 @@ namespace libtf {
             return bstr != nullptr;
         }
     };
-}// namespace libtf
+}// namespace IngmaeIME::tf

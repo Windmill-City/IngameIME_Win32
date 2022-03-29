@@ -84,5 +84,6 @@
         "mutex": "cpp",
         "numeric": "cpp",
         "*.rh": "cpp"
-    }
+    },
+    "C_Cpp.intelliSenseEngine": "Default",
 }
