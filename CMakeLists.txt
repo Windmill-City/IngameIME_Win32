@@ -17,7 +17,7 @@ message(STATUS "Build version: ${VERSION}")
 
 include(IngameIME-Common/IngameIME.cmake)
 
-set(include_dir ${CMAKE_CURRENT_SOURCE_DIR}/src/include)
+set(include_dir ${CMAKE_CURRENT_SOURCE_DIR}/include)
 file(GLOB_RECURSE source_file ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 list(APPEND source_file ${version_file})
 
