@@ -14,7 +14,8 @@ void error_callback(int error, const char* description)
 int main()
 {
     glfwSetErrorCallback(error_callback);
-    if (glfwInit()) {
+    if (glfwInit())
+    {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -22,14 +23,18 @@ int main()
         // Must call once to set active locale
         setlocale(LC_ALL, "");
 
-        try {
+        try
+        {
             auto window = std::make_unique<InputWindow>();
-            window->runEventLoop();
+            while (window->pollEvent())
+                ;
         }
-        catch (std::exception& e) {
+        catch (std::exception& e)
+        {
             std::cerr << e.what() << '\n';
         }
-        catch (...) {
+        catch (...)
+        {
             std::cerr << "err occurs!" << '\n';
         }
 
