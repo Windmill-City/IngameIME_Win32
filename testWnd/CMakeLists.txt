@@ -15,9 +15,7 @@ target_include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/glad/include 
 )
 target_sources(testWnd PRIVATE "${source_file}")
-target_link_libraries(testWnd PRIVATE glad_static)
-target_link_libraries(testWnd PRIVATE glfw ${GLFW_LIBRARIES})
-target_link_libraries(testWnd PRIVATE IngameIME_Static)
+target_link_libraries(testWnd PRIVATE glad_static glfw IngameIME_Static)
 
 # Install
 install(TARGETS testWnd)

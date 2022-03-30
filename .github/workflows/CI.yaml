@@ -7,7 +7,6 @@ on:
       - cmake/**
       - .vscode/**
       - README.md
-      - .github/workflows/**
 
 permissions:
   contents: write
@@ -43,5 +42,5 @@ jobs:
          generate_release_notes: true
 
          # Publish Packed files
-         files: build/pack/*.zip
+         files: build/pack/*.zip,build/pack/*.sha1
          fail_on_unmatched_files: true
