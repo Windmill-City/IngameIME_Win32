@@ -4,66 +4,63 @@
 #include "ComException.hpp"
 
 #define COM_DEF_BEGIN()                                                                                                \
-    virtual HRESULT STDMETHODCALLTYPE QueryInterface(                                                                  \
-        /* [in] */ REFIID riid, /* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject) override        \
-    {                                                                                                                  \
-        if (!ppvObject) return E_POINTER;                                                                              \
-        *ppvObject = nullptr;                                                                                          \
-        if (IsEqualIID(IID_IUnknown, riid)) *ppvObject = this;
+  virtual HRESULT STDMETHODCALLTYPE QueryInterface(                                                                    \
+      /* [in] */ REFIID                                           riid,                                                \
+      /* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject) override                                  \
+  {                                                                                                                    \
+    if (!ppvObject) return E_POINTER;                                                                                  \
+    *ppvObject = nullptr;                                                                                              \
+    if (IsEqualIID(IID_IUnknown, riid)) *ppvObject = this;
 #define COM_DEF_INF(InfName)                                                                                           \
-    if (IsEqualIID(IID_##InfName, riid)) *ppvObject = static_cast<InfName*>(this);
+  if (IsEqualIID(IID_##InfName, riid)) *ppvObject = static_cast<InfName*>(this);
 #define COM_DEF_END()                                                                                                  \
-    if (*ppvObject) {                                                                                                  \
-        this->AddRef();                                                                                                \
-        return S_OK;                                                                                                   \
-    }                                                                                                                  \
-    return E_NOINTERFACE;                                                                                              \
-    }                                                                                                                  \
-    virtual ULONG STDMETHODCALLTYPE AddRef(void) override                                                              \
-    {                                                                                                                  \
-        return ComObjectBase::InternalAddRef();                                                                        \
-    }                                                                                                                  \
-    virtual ULONG STDMETHODCALLTYPE Release(void) override                                                             \
-    {                                                                                                                  \
-        return ComObjectBase::InternalRelease();                                                                       \
-    }
+  if (*ppvObject)                                                                                                      \
+  {                                                                                                                    \
+    this->AddRef();                                                                                                    \
+    return S_OK;                                                                                                       \
+  }                                                                                                                    \
+  return E_NOINTERFACE;                                                                                                \
+  }                                                                                                                    \
+  virtual ULONG STDMETHODCALLTYPE AddRef(void) override                                                                \
+  {                                                                                                                    \
+    return ComObjectBase::InternalAddRef();                                                                            \
+  }                                                                                                                    \
+  virtual ULONG STDMETHODCALLTYPE Release(void) override                                                               \
+  {                                                                                                                    \
+    return ComObjectBase::InternalRelease();                                                                           \
+  }
 
 #define COM_HR_BEGIN(DefaultHR)                                                                                        \
-    HRESULT hr = DefaultHR;                                                                                            \
-    do {
+  HRESULT hr = DefaultHR;                                                                                              \
+  do                                                                                                                   \
+  {
 #define COM_HR_END()                                                                                                   \
-    }                                                                                                                  \
-    while (0)                                                                                                          \
-        ;
+  }                                                                                                                    \
+  while (0)                                                                                                            \
+    ;
 #define THR_HR(hr) throw IngameIME::tf::ComException(hr);
 #define CHECK_HR(exp)                                                                                                  \
-    if (FAILED(hr = (exp))) break;
+  if (FAILED(hr = (exp))) break;
 #define COM_HR_THR()                                                                                                   \
-    if (FAILED(hr)) THR_HR(hr);
+  if (FAILED(hr)) THR_HR(hr);
 #define COM_HR_RET() return hr;
 
-namespace IngameIME::tf {
-    class ComObjectBase {
-      private:
-        /**
-         * @brief Reference count of the ComObj
-         *
-         */
-        DWORD ref = 0;
+namespace IngameIME::tf
+{
+class ComObjectBase
+{
+  private:
+    /**
+     * @brief Reference count of the ComObj
+     *
+     */
+    DWORD ref = 0;
 
-      public:
-        virtual ~ComObjectBase() = default;
+  public:
+    virtual ~ComObjectBase() = default;
 
-      protected:
-        ULONG InternalAddRef(void)
-        {
-            return ++ref;
-        }
-
-        ULONG InternalRelease(void)
-        {
-            if (--ref == 0) delete this;
-            return ref;
-        }
-    };
-}// namespace IngameIME::tf
+  protected:
+    ULONG InternalAddRef(void);
+    ULONG InternalRelease(void);
+};
+} // namespace IngameIME::tf

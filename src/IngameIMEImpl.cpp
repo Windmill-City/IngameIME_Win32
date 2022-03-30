@@ -1,52 +1,10 @@
 #include <stdarg.h>
 
-#include "..\include\imm\ImmCompositionImpl.hpp"
-#include "..\include\imm\ImmIngameIMEImpl.hpp"
-
-#include "..\include\tf\TfCompositionImpl.hpp"
-#include "..\include\tf\TfIngameIMEImpl.hpp"
-
-IngameIME::tf::InputContextImpl::InputContextImpl(HWND hWnd)
-{
-    COM_HR_BEGIN(S_OK);
-
-    if (!(this->hWnd = reinterpret_cast<HWND>(hWnd))) THR_HR(E_INVALIDARG);
-    if (initialCreatorThread() != GetWindowThreadProcessId(hWnd, NULL)) THR_HR(UI_E_WRONG_THREAD);
-
-    CHECK_HR(getThreadMgr(&threadMgr));
-
-    ComQIPtr<ITfThreadMgrEx> threadMgrEx(IID_ITfThreadMgrEx, threadMgr);
-    CHECK_HR(threadMgrEx->ActivateEx(&clientId, TF_TMAE_UIELEMENTENABLEDONLY));
-
-    CHECK_HR(threadMgr->CreateDocumentMgr(&emptyDocMgr));
-    CHECK_HR(threadMgr->CreateDocumentMgr(&docMgr));
-
-    comp = std::make_shared<CompositionImpl>(this);
-    CHECK_HR(docMgr->Push(ctx.get()));
-
-    // Deactivate input contxt
-    setActivated(false);
-
-    ComQIPtr<ITfSource> source(IID_ITfSource, ctx);
-    owner = new InputContextImpl::ContextOwner(this);
-    CHECK_HR(source->AdviseSink(IID_ITfContextOwner, owner.get(), &cookie));
-
-    COM_HR_END();
-    COM_HR_THR();
-}
-
-IngameIME::imm::InputContextImpl::InputContextImpl(HWND hWnd) : hWnd(hWnd)
-{
-    comp = std::make_shared<CompositionImpl>(this);
-
-    // Reset to default context
-    ImmAssociateContextEx(hWnd, NULL, IACE_DEFAULT);
-    ctx = ImmAssociateContext(hWnd, NULL);
-
-    prevProc = (WNDPROC)SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)InputContextImpl::WndProc);
-}
+#include "imm/ImmIngameIMEImpl.hpp"
+#include "tf/TfIngameIMEImpl.hpp"
 
 #include <versionhelpers.h>
+
 IngameIME::Global& IngameIME::Global::getInstance(void* ignore, ...)
 {
     thread_local IngameIME::Global& Instance =

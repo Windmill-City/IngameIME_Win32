@@ -1,6 +1,6 @@
 BasedOnStyle: LLVM
 IndentWidth: 4
-ColumnLimit: 80
+ColumnLimit: 120
 
 Language: Cpp
 # Strings to be interpreted as attributes/qualifers
@@ -41,6 +41,7 @@ BraceWrapping:
   SplitEmptyFunction: true
   AfterControlStatement: Always
 KeepEmptyLinesAtTheStartOfBlocks: false
+SeparateDefinitionBlocks: Always
 
 # Comment
 ReflowComments: true
@@ -50,10 +51,12 @@ EmptyLineBeforeAccessModifier: LogicalBlock
 EmptyLineAfterAccessModifier: Never
 BreakInheritanceList: BeforeComma
 BreakConstructorInitializers: BeforeComma
+PackConstructorInitializers: Never
 
 # Alignment
 PointerAlignment: Left
 ReferenceAlignment: Left
+QualifierAlignment: Left
 
 # Array Structure
 AlignArrayOfStructures: Right
@@ -81,7 +84,7 @@ BinPackParameters: false
 
 # Loop
 AllowShortLoopsOnASingleLine: false
-AllowShortBlocksOnASingleLine: false
+AllowShortBlocksOnASingleLine: Empty
 
 # String
 AlwaysBreakBeforeMultilineStrings: true
