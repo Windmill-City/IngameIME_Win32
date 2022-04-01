@@ -1,6 +1,6 @@
-#include "imm/ImmInputContextImpl.hpp"
+#include "imm\ImmInputContextImpl.hpp"
 
-#include "imm/ImmCompositionImpl.hpp"
+#include "imm\ImmCompositionImpl.hpp"
 
 IngameIME::imm::InputContextImpl::Singleton::RefHolderType IngameIME::imm::InputContextImpl::WeakRefs = {};
 std::mutex IngameIME::imm::InputContextImpl::RefHolderMutex                                           = std::mutex();
