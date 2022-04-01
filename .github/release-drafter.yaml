@@ -1,6 +1,6 @@
 # Release Template
-name-template: 'v$RESOLVED_VERSION 🌈'
-tag-template: 'v$RESOLVED_VERSION'
+name-template: "v$RESOLVED_VERSION 🌈"
+tag-template: "v$RESOLVED_VERSION"
 
 template: |
   ## Changes
@@ -8,54 +8,61 @@ template: |
   $CHANGES
 
 # Change Template
-change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+change-template: "- $TITLE @$AUTHOR (#$NUMBER)"
 change-title-escapes: '\<*_&' # You can add # and @ to disable mentions, and add ` to disable code blocks.
 
 # Categories
 categories:
-  - title: '🚀 Features'
+  - title: "🚀 Features"
     labels:
-      - 'feature'
-      - 'enhancement'
-  - title: '🐛 Bug Fixes'
+      - "feature"
+      - "enhancement"
+  - title: "🐛 Bug Fixes"
     labels:
-      - 'fix'
-      - 'bugfix'
-      - 'bug'
-  - title: '🧰 Maintenance'
-    label: 'chore'
+      - "fix"
+      - "bugfix"
+      - "bug"
+  - title: "🧰 Maintenance"
+    label: "chore"
 
 # Auto-Labeler
 autolabeler:
-  - label: 'chore'
+  - label: "chore"
     files:
-      - '*.md'
+      - "*.md"
+      - "*.cmake"
+      - "CMakeLists.txt"
+      - ".gitignore"
+      - ".clang-format"
+      - ".cmake-format"
     branch:
       - '/docs{0,1}\/.+/'
-  - label: 'bug'
+      - '/chore\/.+/'
+  - label: "bug"
     branch:
       - '/fix\/.+/'
     title:
-      - '/fix/i'
-  - label: 'enhancement'
+      - "/fix/i"
+  - label: "enhancement"
     branch:
       - '/feature\/.+/'
+      - '/feat\/.+/'
     body:
-      - '/JIRA-[0-9]{1,4}/'
+      - "/JIRA-[0-9]{1,4}/"
 
 # Exclude Labels
 exclude-labels:
-  - 'skip-changelog'
+  - "skip-changelog"
 
 # Version Resolver
 version-resolver:
   major:
     labels:
-      - 'major'
+      - "major"
   minor:
     labels:
-      - 'minor'
+      - "minor"
   patch:
     labels:
-      - 'patch'
+      - "patch"
   default: patch

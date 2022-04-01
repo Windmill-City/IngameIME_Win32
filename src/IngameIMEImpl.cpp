@@ -1,7 +1,7 @@
 #include <stdarg.h>
 
-#include "imm/ImmIngameIMEImpl.hpp"
-#include "tf/TfIngameIMEImpl.hpp"
+#include "imm\ImmIngameIMEImpl.hpp"
+#include "tf\TfIngameIMEImpl.hpp"
 
 #include <versionhelpers.h>
 

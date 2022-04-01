@@ -1,0 +1,22 @@
+format:
+  disable: false
+  line_width: 80
+  tab_size: 2
+  line_ending: unix
+  command_case: canonical
+  keyword_case: unchanged
+  enable_sort: true
+  autosort: true
+markup:
+  bullet_char: "*"
+  enum_char: .
+lint:
+  max_statement_spacing: 2
+  max_returns: 6
+  max_branches: 12
+  max_arguments: 5
+  max_localvars: 15
+  max_statements: 50
+encode:
+  emit_byteorder_mark: false
+  output_encoding: utf-8

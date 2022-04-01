@@ -22,6 +22,7 @@
         "IMEKEYDOWN",
         "IMEKEYUP",
         "Ingame",
+        "ingameime",
         "LBUTTONDBLCLK",
         "LBUTTONDOWN",
         "LBUTTONUP",
