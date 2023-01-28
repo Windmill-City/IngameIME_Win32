@@ -37,7 +37,7 @@ message(STATUS "Build version: ${VERSION}")
 # Build files
 # ##############################################################################
 
-set(include_dir ${CMAKE_CURRENT_SOURCE_DIR}/include/ingameime-win32)
+set(include_dir ${CMAKE_CURRENT_SOURCE_DIR}/include)
 file(GLOB_RECURSE source_file ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 list(APPEND source_file ${version_file})
 

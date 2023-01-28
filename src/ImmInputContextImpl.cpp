@@ -192,28 +192,28 @@ InputProcessorContext InputContextImpl::getInputProcCtx()
 
     auto activeProc = InputProcessorImpl::getActiveInputProcessor();
 
-    std::list<std::wstring> modes;
+    std::list<InputMode> modes;
     if (activeProc->type == InputProcessorType::KeyboardLayout)
-        modes.push_back(L"AlphaNumeric");
+        modes.push_back(InputMode::AlphaNumeric);
     else
     {
         if (mode & IME_CMODE_NATIVE)
         {
-            modes.push_back(L"Native");
+            modes.push_back(InputMode::Native);
 
             if (activeProc->isJap)
                 if (mode & IME_CMODE_KATAKANA)
-                    modes.push_back(L"Katakana");
+                    modes.push_back(InputMode::Katakana);
                 else
-                    modes.push_back(L"Hiragana");
+                    modes.push_back(InputMode::Hiragana);
         }
         else
-            modes.push_back(L"AlphaNumeric");
+            modes.push_back(InputMode::AlphaNumeric);
 
         if (mode & IME_CMODE_FULLSHAPE)
-            modes.push_back(L"FullShape");
+            modes.push_back(InputMode::FullShape);
         else
-            modes.push_back(L"HalfShape");
+            modes.push_back(InputMode::HalfShape);
     }
 
     result.proc  = activeProc;

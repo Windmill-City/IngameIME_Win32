@@ -155,7 +155,7 @@ InputWindow::InputWindow()
             printf("InputModes:\n");
             for (auto&& mode : ctx.modes)
             {
-                printf("%ls\n", mode.c_str());
+                printf("%d\n", mode);
             }
         });
 
