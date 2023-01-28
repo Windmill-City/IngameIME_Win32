@@ -54,7 +54,8 @@ target_link_libraries(IngameIME_Win32_Static PUBLIC IngameIME_Interface)
 target_link_libraries(IngameIME_Win32_Shared PUBLIC IngameIME_Interface)
 
 # Exec Target
-add_subdirectory(testWnd)
+add_subdirectory(IngameIME-Common/testWnd)
+target_link_libraries(testWnd PRIVATE IngameIME_Win32_Static)
 
 # ##############################################################################
 # Packaging
