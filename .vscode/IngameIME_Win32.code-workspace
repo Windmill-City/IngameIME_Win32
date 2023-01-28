@@ -3,9 +3,6 @@
 		{
 			"name": "IngameIME_Win32",
 			"path": ".."
-		},
-		{
-			"path": "../../IngameIME-Common"
 		}
 	],
 	"settings": {
