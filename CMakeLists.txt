@@ -19,7 +19,7 @@ endif()
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 
 # IngameIME-Interface
-add_subdirectory(IngameIME-Common)
+add_subdirectory(IngameIME-Common EXCLUDE_FROM_ALL)
 
 # ##############################################################################
 # Get Version String
@@ -28,7 +28,7 @@ add_subdirectory(IngameIME-Common)
 include(GetGitRevisionDescription)
 git_describe(VERSION --tags --dirty=-dirty)
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/version.cpp.in
+configure_file(src/version.cpp.in
                ${CMAKE_CURRENT_BINARY_DIR}/version.cpp)
 set(version_file ${CMAKE_CURRENT_BINARY_DIR}/version.cpp)
 message(STATUS "Build version: ${VERSION}")
@@ -37,8 +37,7 @@ message(STATUS "Build version: ${VERSION}")
 # Build files
 # ##############################################################################
 
-set(include_dir ${CMAKE_CURRENT_SOURCE_DIR}/include)
-file(GLOB_RECURSE source_file ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+file(GLOB_RECURSE source_file src/*.cpp)
 list(APPEND source_file ${version_file})
 
 # ##############################################################################
@@ -46,20 +45,19 @@ list(APPEND source_file ${version_file})
 # ##############################################################################
 
 # Library Target
-add_library(IngameIME_Win32_Static STATIC "${source_file}")
-add_library(IngameIME_Win32_Shared SHARED "${source_file}")
-target_include_directories(IngameIME_Win32_Static PRIVATE "${include_dir}")
-target_include_directories(IngameIME_Win32_Shared PRIVATE "${include_dir}")
-target_link_libraries(IngameIME_Win32_Static PUBLIC IngameIME_Interface)
-target_link_libraries(IngameIME_Win32_Shared PUBLIC IngameIME_Interface)
+add_library(IngameIME_Static STATIC ${source_file})
+add_library(IngameIME_Shared SHARED ${source_file})
+target_include_directories(IngameIME_Static PRIVATE include)
+target_include_directories(IngameIME_Shared PRIVATE include)
+target_link_libraries(IngameIME_Static PUBLIC IngameIME)
+target_link_libraries(IngameIME_Shared PUBLIC IngameIME)
 
 # ##############################################################################
 # Packaging
 # ##############################################################################
 
 # Install
-install(TARGETS IngameIME_Win32_Static IngameIME_Win32_Shared
-                IngameIME_Interface)
+install(TARGETS IngameIME_Static IngameIME_Shared)
 
 # Pack
 set(CPACK_PACKAGE_FILE_NAME
