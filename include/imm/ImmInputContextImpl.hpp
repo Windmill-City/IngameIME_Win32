@@ -47,7 +47,7 @@ class InputContextImpl
     /**
      * @brief Set CandidateList window's position for current Composition
      */
-    void procPreEditRect();
+    void setPreEditRect(InternalRect& rect);
     /**
      * @brief Retrive CandidateList infomation for application to draw
      */

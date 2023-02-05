@@ -23,11 +23,8 @@ HRESULT STDMETHODCALLTYPE InputContextImpl::ContextOwner::GetTextExt(LONG  acpSt
                                                                      RECT* prc,
                                                                      BOOL* pfClipped)
 {
-    // Fetch bounding box
-    InternalRect box;
-    ctx->comp->PreEditRectCallbackHolder::runCallback(box);
-    *prc = box;
-
+    InternalRect rect = this->ctx->comp->getPreEditRect();
+    *prc              = rect;
     // Map window coordinate to screen coordinate
     MapWindowPoints(ctx->hWnd, NULL, (LPPOINT)prc, 2);
 

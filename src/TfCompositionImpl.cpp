@@ -260,6 +260,16 @@ CompositionImpl::~CompositionImpl()
     }
 }
 
+void CompositionImpl::setPreEditRect(const PreEditRect& rect)
+{
+    this->rect = rect;
+}
+
+PreEditRect CompositionImpl::getPreEditRect()
+{
+    return this->rect;
+}
+
 void CompositionImpl::terminate()
 {
     COM_HR_BEGIN(S_OK);

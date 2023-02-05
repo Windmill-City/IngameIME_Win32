@@ -37,8 +37,6 @@ LRESULT InputContextImpl::WndProc(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lpa
             if (lparam & (GCS_COMPSTR | GCS_CURSORPOS)) inputCtx->procPreEdit();
             if (lparam & GCS_RESULTSTR) inputCtx->procCommit();
 
-            if (!inputCtx->fullscreen) inputCtx->procPreEditRect();
-
             // when lparam == 0 that means current Composition has been
             // canceled
             if (lparam) return true;
@@ -128,23 +126,20 @@ void InputContextImpl::procCommit()
     comp->CommitCallbackHolder::runCallback(std::wstring(buf.get(), size / sizeof(WCHAR)));
 }
 
-void InputContextImpl::procPreEditRect()
+void InputContextImpl::setPreEditRect(InternalRect& rect)
 {
-    InternalRect rect;
-    comp->PreEditRectCallbackHolder::runCallback(rect);
-
     CANDIDATEFORM cand;
     cand.dwIndex        = 0;
     cand.dwStyle        = CFS_EXCLUDE;
-    cand.ptCurrentPos.x = rect.left;
-    cand.ptCurrentPos.y = rect.top;
+    cand.ptCurrentPos.x = rect.x;
+    cand.ptCurrentPos.y = rect.y;
     cand.rcArea         = rect;
     ImmSetCandidateWindow(ctx, &cand);
 
     COMPOSITIONFORM comp;
     comp.dwStyle        = CFS_RECT;
-    comp.ptCurrentPos.x = rect.left;
-    comp.ptCurrentPos.y = rect.top;
+    comp.ptCurrentPos.x = rect.x;
+    comp.ptCurrentPos.y = rect.y;
     comp.rcArea         = rect;
     ImmSetCompositionWindow(ctx, &comp);
 }
@@ -192,32 +187,34 @@ InputProcessorContext InputContextImpl::getInputProcCtx()
 
     auto activeProc = InputProcessorImpl::getActiveInputProcessor();
 
-    std::list<InputMode> modes;
+    ConversionMode  conv;
+    PunctuationMode pun;
     if (activeProc->type == InputProcessorType::KeyboardLayout)
-        modes.push_back(InputMode::AlphaNumeric);
+        conv = ConversionMode::AlphaNumeric;
     else
     {
         if (mode & IME_CMODE_NATIVE)
         {
-            modes.push_back(InputMode::Native);
+            conv = ConversionMode::Native;
 
             if (activeProc->isJap)
                 if (mode & IME_CMODE_KATAKANA)
-                    modes.push_back(InputMode::Katakana);
+                    conv = ConversionMode::Katakana;
                 else
-                    modes.push_back(InputMode::Hiragana);
+                    conv = ConversionMode::Hiragana;
         }
         else
-            modes.push_back(InputMode::AlphaNumeric);
+            conv = ConversionMode::AlphaNumeric;
 
         if (mode & IME_CMODE_FULLSHAPE)
-            modes.push_back(InputMode::FullShape);
+            pun = PunctuationMode::FullShape;
         else
-            modes.push_back(InputMode::HalfShape);
+            pun = PunctuationMode::HalfShape;
     }
 
     result.proc  = activeProc;
-    result.modes = modes;
+    result.conv  = conv;
+    result.pun   = pun;
 
     return result;
 }

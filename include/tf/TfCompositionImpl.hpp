@@ -9,6 +9,7 @@ namespace IngameIME::tf
 class CompositionImpl : public Composition
 {
   private:
+    InternalRect rect;
     DWORD cookieEditSink{TF_INVALID_COOKIE};
     DWORD cookieEleSink{TF_INVALID_COOKIE};
 
@@ -77,6 +78,16 @@ class CompositionImpl : public Composition
     ~CompositionImpl();
 
   public:
+    /**
+     * @brief Bounding box of the PreEdit text drawn by the Application, the position is in window coordinate
+     *
+     */
+    virtual void        setPreEditRect(const PreEditRect& rect) override;
+    /**
+     * @brief Bounding box of the PreEdit text drawn by the Application, the position is in window coordinate
+     *
+     */
+    virtual PreEditRect getPreEditRect() override;
     /**
      * @brief Terminate active composition
      */

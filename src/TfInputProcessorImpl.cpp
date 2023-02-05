@@ -30,26 +30,26 @@ InputProcessorContext InputProcessorHandler::getCtx()
     mode->GetValue(&var);
 
     if (activeProc->type == InputProcessorType::KeyboardLayout)
-        result.modes.push_back(InputMode::AlphaNumeric);
+        result.conv = ConversionMode::AlphaNumeric;
     else
     {
         if (var.intVal & TF_CONVERSIONMODE_NATIVE)
         {
-            result.modes.push_back(InputMode::Native);
+            result.conv = ConversionMode::Native;
 
             if (activeProc->isJap)
                 if (var.intVal & TF_CONVERSIONMODE_KATAKANA)
-                    result.modes.push_back(InputMode::Katakana);
+                    result.conv = ConversionMode::Katakana;
                 else
-                    result.modes.push_back(InputMode::Hiragana);
+                    result.conv = ConversionMode::Hiragana;
         }
         else
-            result.modes.push_back(InputMode::AlphaNumeric);
+            result.conv = ConversionMode::AlphaNumeric;
 
         if (var.intVal & TF_CONVERSIONMODE_FULLSHAPE)
-            result.modes.push_back(InputMode::FullShape);
+            result.pun = PunctuationMode::FullShape;
         else
-            result.modes.push_back(InputMode::HalfShape);
+            result.pun = PunctuationMode::HalfShape;
     }
 
     return result;
