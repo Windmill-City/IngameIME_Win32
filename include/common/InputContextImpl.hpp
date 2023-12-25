@@ -1,7 +1,7 @@
 #pragma once
 #include <windows.h>
 
-#include "InputContext.hpp"
+#include "IngameIME.hpp"
 
 namespace IngameIME
 {
@@ -17,4 +17,6 @@ struct InternalRect : public PreEditRect
      */
     operator RECT() noexcept;
 };
+
+std::string ToUTF8(std::wstring utf16);
 } // namespace IngameIME

@@ -20,12 +20,7 @@ class ComBSTR
     ~ComBSTR();
 
     /**
-     * @brief Acquire address of bstr
-     *
-     * this usually use for acquiring BSTR string, so the bstr must be null,
-     * if you do want to acquire the address of the bstr, use &bstr instead
-     *
-     * @return address of the bstr
+     * @brief this method only for receiving a new BSTR string, 'bstr' is expected to be null
      */
     [[nodiscard]] BSTR* operator&();
     /**

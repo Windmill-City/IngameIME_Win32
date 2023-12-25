@@ -1,22 +1,18 @@
 #pragma once
-#include <map>
+
+#include <list>
 
 #include <windows.h>
 #pragma comment(lib, "imm32.lib")
 
-#include "IngameIME.hpp"
-
 #include "common/InputContextImpl.hpp"
-#include "common/InputProcessorImpl.hpp"
-#include "Singleton.hpp"
 
 namespace IngameIME::imm
 {
-class InputContextImpl
-    : public InputContext
-    , public Singleton<InputContextImpl, HWND>
+class InputContextImpl : public InputContext
 {
   protected:
+    static std::list<InputContextImpl*> ActiveContexts;
     static LRESULT WndProc(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
   protected:
@@ -27,9 +23,7 @@ class InputContextImpl
 
     bool activated{false};
     bool fullscreen{false};
-
-    friend class CompositionImpl;
-    friend class GlobalImpl;
+    PreEditRect rect;
 
   public:
     InputContextImpl(const HWND hWnd);
@@ -54,34 +48,12 @@ class InputContextImpl
     void procCand();
 
   public:
-    InputProcessorContext getInputProcCtx();
-
-  public:
-    /**
-     * @brief Set InputContext activate state
-     *
-     * @param activated if InputContext activated
-     */
-    virtual void setActivated(const bool activated) noexcept override;
-    /**
-     * @brief Get if InputContext activated
-     *
-     * @return true activated
-     * @return false not activated
-     */
-    virtual bool getActivated() const noexcept override;
-    /**
-     * @brief Set InputContext full screen state
-     *
-     * @param fullscreen if InputContext full screen
-     */
-    virtual void setFullScreen(const bool fullscreen) noexcept override;
-    /**
-     * @brief Get if InputContext in full screen state
-     *
-     * @return true full screen mode
-     * @return false window mode
-     */
-    virtual bool getFullScreen() const noexcept override;
+    virtual InputMode   getInputMode() override;
+    virtual void        setPreEditRect(const PreEditRect& rect) override;
+    virtual PreEditRect getPreEditRect() override;
+    virtual void        setActivated(const bool activated) override;
+    virtual bool        getActivated() const override;
+    virtual void        setFullScreen(const bool fullscreen) override;
+    virtual bool        getFullScreen() const override;
 };
 } // namespace IngameIME::imm

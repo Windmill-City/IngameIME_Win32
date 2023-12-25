@@ -1,7 +1,7 @@
 #pragma once
 #include <stdexcept>
+#include <windows.h>
 
-#include "FormatUtil.hpp"
 
 namespace IngameIME::tf
 {

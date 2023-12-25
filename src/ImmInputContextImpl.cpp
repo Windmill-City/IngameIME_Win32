@@ -1,24 +1,22 @@
 #include "imm\ImmInputContextImpl.hpp"
 
-#include "imm\ImmCompositionImpl.hpp"
-
-IngameIME::imm::InputContextImpl::Singleton::RefHolderType IngameIME::imm::InputContextImpl::WeakRefs = {};
-std::mutex IngameIME::imm::InputContextImpl::RefHolderMutex                                           = std::mutex();
+#include <algorithm>
 
 namespace IngameIME::imm
 {
+std::list<InputContextImpl*> InputContextImpl::ActiveContexts = {};
+
 LRESULT InputContextImpl::WndProc(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
-    auto iter = WeakRefs.find(hWnd);
+    auto iter = std::find_if(ActiveContexts.begin(),
+                             ActiveContexts.end(),
+                             [hWnd](InputContextImpl* it) { return it->hWnd == hWnd; });
 
-    std::shared_ptr<InputContextImpl> inputCtx;
-    if (iter != WeakRefs.end() && (inputCtx = (*iter).second.lock()))
+    InputContextImpl* inputCtx;
+    if (iter != ActiveContexts.end() && (inputCtx = *iter))
     {
         switch (msg)
         {
-        case WM_INPUTLANGCHANGE:
-            Global::getInstance().runCallback(InputProcessorState::FullUpdate, inputCtx->getInputProcCtx());
-            break;
         case WM_IME_SETCONTEXT:
             // We should always hide Composition Window to make the
             // PreEditCallback work
@@ -31,7 +29,7 @@ LRESULT InputContextImpl::WndProc(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lpa
             }
             break;
         case WM_IME_STARTCOMPOSITION:
-            inputCtx->comp->PreEditCallbackHolder::runCallback(CompositionState::Begin, nullptr);
+            inputCtx->PreEditCallbackHolder::runCallback(CompositionState::Begin, nullptr);
             return true;
         case WM_IME_COMPOSITION:
             if (lparam & (GCS_COMPSTR | GCS_CURSORPOS)) inputCtx->procPreEdit();
@@ -41,27 +39,27 @@ LRESULT InputContextImpl::WndProc(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lpa
             // canceled
             if (lparam) return true;
         case WM_IME_ENDCOMPOSITION:
-            inputCtx->comp->PreEditCallbackHolder::runCallback(CompositionState::End, nullptr);
-            inputCtx->comp->CandidateListCallbackHolder::runCallback(CandidateListState::End, nullptr);
+            inputCtx->PreEditCallbackHolder::runCallback(CompositionState::End, nullptr);
+            inputCtx->CandidateListCallbackHolder::runCallback(CandidateListState::End, nullptr);
             return true;
         case WM_IME_NOTIFY:
             if (inputCtx->fullscreen) switch (wparam)
                 {
                 case IMN_OPENCANDIDATE:
-                    inputCtx->comp->CandidateListCallbackHolder::runCallback(CandidateListState::Begin, nullptr);
+                    inputCtx->CandidateListCallbackHolder::runCallback(CandidateListState::Begin, nullptr);
                     return true;
                 case IMN_CHANGECANDIDATE:
                     inputCtx->procCand();
                     return true;
                 case IMN_CLOSECANDIDATE:
-                    inputCtx->comp->CandidateListCallbackHolder::runCallback(CandidateListState::End, nullptr);
+                    inputCtx->CandidateListCallbackHolder::runCallback(CandidateListState::End, nullptr);
                     return true;
                 default:
                     break;
                 }
             if (wparam == IMN_SETCONVERSIONMODE)
             {
-                Global::getInstance().runCallback(InputProcessorState::InputModeUpdate, inputCtx->getInputProcCtx());
+                // todo: inputmode
             }
             break;
         case WM_IME_CHAR:
@@ -75,11 +73,8 @@ LRESULT InputContextImpl::WndProc(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lpa
 }
 
 IngameIME::imm::InputContextImpl::InputContextImpl(const HWND hWnd)
-    : Singleton(hWnd)
-    , hWnd(hWnd)
+    : hWnd(hWnd)
 {
-    comp = std::make_shared<CompositionImpl>(this);
-
     // Reset to default context
     ImmAssociateContextEx(hWnd, NULL, IACE_DEFAULT);
     ctx = ImmAssociateContext(hWnd, NULL);
@@ -89,7 +84,6 @@ IngameIME::imm::InputContextImpl::InputContextImpl(const HWND hWnd)
 
 InputContextImpl::~InputContextImpl()
 {
-    comp->terminate();
     ImmAssociateContextEx(hWnd, NULL, IACE_DEFAULT);
     SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)prevProc);
 }
@@ -108,10 +102,10 @@ void InputContextImpl::procPreEdit()
     int sel = ImmGetCompositionStringW(ctx, GCS_CURSORPOS, NULL, 0);
 
     PreEditContext ctx;
-    ctx.content  = std::wstring(buf.get(), size / sizeof(WCHAR));
+    ctx.content  = ToUTF8(std::wstring(buf.get(), size / sizeof(WCHAR)));
     ctx.selStart = ctx.selEnd = sel;
 
-    comp->PreEditCallbackHolder::runCallback(CompositionState::Update, &ctx);
+    this->PreEditCallbackHolder::runCallback(CompositionState::Update, &ctx);
 }
 
 void InputContextImpl::procCommit()
@@ -122,26 +116,7 @@ void InputContextImpl::procCommit()
 
     auto buf = std::make_unique<WCHAR[]>(size / sizeof(WCHAR));
     ImmGetCompositionStringW(ctx, GCS_RESULTSTR, buf.get(), size);
-
-    comp->CommitCallbackHolder::runCallback(std::wstring(buf.get(), size / sizeof(WCHAR)));
-}
-
-void InputContextImpl::setPreEditRect(InternalRect& rect)
-{
-    CANDIDATEFORM cand;
-    cand.dwIndex        = 0;
-    cand.dwStyle        = CFS_EXCLUDE;
-    cand.ptCurrentPos.x = rect.x;
-    cand.ptCurrentPos.y = rect.y;
-    cand.rcArea         = rect;
-    ImmSetCandidateWindow(ctx, &cand);
-
-    COMPOSITIONFORM comp;
-    comp.dwStyle        = CFS_RECT;
-    comp.ptCurrentPos.x = rect.x;
-    comp.ptCurrentPos.y = rect.y;
-    comp.rcArea         = rect;
-    ImmSetCompositionWindow(ctx, &comp);
+    this->CommitCallbackHolder::runCallback(ToUTF8(std::wstring(buf.get(), size / sizeof(WCHAR))));
 }
 
 void InputContextImpl::procCand()
@@ -172,54 +147,48 @@ void InputContextImpl::procCand()
         auto strEnd   = buf.get() + (((i + pageStart + 1) < candCount) ? cand->dwOffset[i + pageStart + 1] : size);
         auto len      = (strEnd - strStart) / sizeof(WCHAR);
 
-        candCtx.candidates.push_back(std::wstring((wchar_t*)strStart, len));
+        candCtx.candidates.push_back(ToUTF8(std::wstring((wchar_t*)strStart, len)));
     }
-
-    comp->CandidateListCallbackHolder::runCallback(CandidateListState::Update, &candCtx);
+    this->CandidateListCallbackHolder::runCallback(CandidateListState::Update, &candCtx);
 }
 
-InputProcessorContext InputContextImpl::getInputProcCtx()
+InputMode InputContextImpl::getInputMode()
 {
-    InputProcessorContext result;
-
     DWORD mode;
     ImmGetConversionStatus(ctx, &mode, NULL);
 
-    auto activeProc = InputProcessorImpl::getActiveInputProcessor();
-
-    ConversionMode  conv;
-    PunctuationMode pun;
-    if (activeProc->type == InputProcessorType::KeyboardLayout)
-        conv = ConversionMode::AlphaNumeric;
+    if (mode & IME_CMODE_NATIVE)
+        return InputMode::Native;
     else
-    {
-        if (mode & IME_CMODE_NATIVE)
-        {
-            conv = ConversionMode::Native;
-
-            if (activeProc->isJap)
-                if (mode & IME_CMODE_KATAKANA)
-                    conv = ConversionMode::Katakana;
-                else
-                    conv = ConversionMode::Hiragana;
-        }
-        else
-            conv = ConversionMode::AlphaNumeric;
-
-        if (mode & IME_CMODE_FULLSHAPE)
-            pun = PunctuationMode::FullShape;
-        else
-            pun = PunctuationMode::HalfShape;
-    }
-
-    result.proc  = activeProc;
-    result.conv  = conv;
-    result.pun   = pun;
-
-    return result;
+        return InputMode::AlphaNumeric;
 }
 
-void InputContextImpl::setActivated(const bool activated) noexcept
+void InputContextImpl::setPreEditRect(const PreEditRect& _rect)
+{
+    this->rect         = rect;
+    InternalRect  rect = _rect;
+    CANDIDATEFORM cand;
+    cand.dwIndex        = 0;
+    cand.dwStyle        = CFS_EXCLUDE;
+    cand.ptCurrentPos.x = rect.x;
+    cand.ptCurrentPos.y = rect.y;
+    cand.rcArea         = rect;
+    ImmSetCandidateWindow(ctx, &cand);
+
+    COMPOSITIONFORM comp;
+    comp.dwStyle        = CFS_RECT;
+    comp.ptCurrentPos.x = rect.x;
+    comp.ptCurrentPos.y = rect.y;
+    comp.rcArea         = rect;
+    ImmSetCompositionWindow(ctx, &comp);
+}
+
+PreEditRect InputContextImpl::getPreEditRect()
+{
+    return this->rect;
+}
+
+void InputContextImpl::setActivated(const bool activated)
 {
     this->activated = activated;
 
@@ -229,25 +198,24 @@ void InputContextImpl::setActivated(const bool activated) noexcept
         ImmAssociateContext(hWnd, NULL);
 }
 
-bool InputContextImpl::getActivated() const noexcept
+bool InputContextImpl::getActivated() const
 {
     return activated;
 }
 
-void InputContextImpl::setFullScreen(const bool fullscreen) noexcept
+void InputContextImpl::setFullScreen(const bool fullscreen)
 {
     this->fullscreen = fullscreen;
 
     if (activated)
     {
-        comp->terminate();
         // Refresh InputContext
         ImmAssociateContext(hWnd, NULL);
         ImmAssociateContext(hWnd, ctx);
     }
 }
 
-bool InputContextImpl::getFullScreen() const noexcept
+bool InputContextImpl::getFullScreen() const
 {
     return fullscreen;
 }

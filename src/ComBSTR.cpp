@@ -10,7 +10,7 @@ ComBSTR::~ComBSTR()
 
 [[nodiscard]] BSTR* ComBSTR::operator&()
 {
-    if (bstr) throw new std::runtime_error("Acquire address for non-null pointer");
+    if (bstr) throw new std::runtime_error("Pointer non-null, could not receive new string!");
 
     return &bstr;
 }
