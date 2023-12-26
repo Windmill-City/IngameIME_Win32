@@ -12,12 +12,25 @@ InputModeHandler::InputModeHandler(InputContextImpl* inputCtx)
 
     ComPtr<ITfThreadMgr> threadMgr;
     CHECK_HR(getThreadMgr(&threadMgr));
-    compMgr = threadMgr;
 
+    compMgr = threadMgr;
     CHECK_HR(compMgr->GetCompartment(GUID_COMPARTMENT_KEYBOARD_INPUTMODE_CONVERSION, &mode));
+
+    ComQIPtr<ITfSource> source(IID_ITfSource, mode);
+    CHECK_HR(source->AdviseSink(IID_ITfCompartmentEventSink, static_cast<ITfCompartmentEventSink*>(this), &cookieMode));
 
     COM_HR_END();
     COM_HR_THR();
+}
+
+InputModeHandler::~InputModeHandler()
+{
+    if (cookieMode != TF_INVALID_COOKIE)
+    {
+        ComQIPtr<ITfSource> source(IID_ITfSource, mode);
+        source->UnadviseSink(cookieMode);
+        cookieMode = TF_INVALID_COOKIE;
+    }
 }
 
 HRESULT STDMETHODCALLTYPE InputModeHandler::OnChange(REFGUID rguid)

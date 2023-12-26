@@ -1,17 +1,17 @@
-#include "tf/TfInputModeHandler.hpp"
-#include "tf/TfCompositionHandler.hpp"
 #include "tf/TfContextOwner.hpp"
+#include "tf/TfCompositionHandler.hpp"
 #include "tf/TfInputContextImpl.hpp"
+#include "tf/TfInputModeHandler.hpp"
 
 namespace IngameIME::tf
 {
 ContextOwner::ContextOwner(InputContextImpl* inputCtx)
-    : ctx(inputCtx)
+    : inputCtx(inputCtx)
 {
     COM_HR_BEGIN(S_OK);
 
     ComQIPtr<ITfSource> source(IID_ITfSource, inputCtx->ctx);
-    CHECK_HR(source->AdviseSink(IID_ITfContextOwner, this, &cookie));
+    CHECK_HR(source->AdviseSink(IID_ITfContextOwner, this, &cookieOwner));
 
     COM_HR_END();
     COM_HR_THR();
@@ -19,11 +19,11 @@ ContextOwner::ContextOwner(InputContextImpl* inputCtx)
 
 ContextOwner::~ContextOwner()
 {
-    if (cookie != TF_INVALID_COOKIE)
+    if (cookieOwner != TF_INVALID_COOKIE)
     {
-        ComQIPtr<ITfSource> source(IID_ITfSource, ctx->ctx);
-        source->UnadviseSink(cookie);
-        cookie = TF_INVALID_COOKIE;
+        ComQIPtr<ITfSource> source(IID_ITfSource, inputCtx->ctx);
+        source->UnadviseSink(cookieOwner);
+        cookieOwner = TF_INVALID_COOKIE;
     }
 }
 
@@ -34,16 +34,16 @@ HRESULT STDMETHODCALLTYPE ContextOwner::GetACPFromPoint(const POINT* ptScreen, D
 
 HRESULT STDMETHODCALLTYPE ContextOwner::GetTextExt(LONG acpStart, LONG acpEnd, RECT* prc, BOOL* pfClipped)
 {
-    InternalRect rect = this->ctx->getPreEditRect();
+    InternalRect rect = inputCtx->getPreEditRect();
     *prc              = rect;
     // Map window coordinate to screen coordinate
-    MapWindowPoints(ctx->hWnd, NULL, (LPPOINT)prc, 2);
+    MapWindowPoints(inputCtx->hWnd, NULL, (LPPOINT)prc, 2);
     return S_OK;
 }
 
 HRESULT STDMETHODCALLTYPE ContextOwner::GetScreenExt(RECT* prc)
 {
-    GetWindowRect(ctx->hWnd, prc);
+    GetWindowRect(inputCtx->hWnd, prc);
     return S_OK;
 }
 
@@ -58,7 +58,7 @@ HRESULT STDMETHODCALLTYPE ContextOwner::GetStatus(TF_STATUS* pdcs)
 
 HRESULT STDMETHODCALLTYPE ContextOwner::GetWnd(HWND* phwnd)
 {
-    *phwnd = ctx->hWnd;
+    *phwnd = inputCtx->hWnd;
     return S_OK;
 }
 

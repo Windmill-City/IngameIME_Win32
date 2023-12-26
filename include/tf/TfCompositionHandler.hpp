@@ -21,16 +21,17 @@ class CompositionHandler
     , public ITfUIElementSink
 {
   protected:
-    InputContextImpl* inputCtx;
-
-    ComPtr<ITfCompositionView> compView;
-
+    InputContextImpl*                 inputCtx;
+    ComPtr<ITfCompositionView>        compView;
     ComQIPtr<ITfUIElementMgr>         eleMgr{IID_ITfUIElementMgr};
     ComPtr<ITfCandidateListUIElement> ele;
     DWORD                             eleId{TF_INVALID_UIELEMENTID};
+    DWORD                             cookieEleSink{TF_INVALID_COOKIE};
+    DWORD                             cookieEditSink{TF_INVALID_COOKIE};
 
   public:
     CompositionHandler(InputContextImpl* inputCtx);
+    ~CompositionHandler();
 
   public:
     COM_DEF_BEGIN();

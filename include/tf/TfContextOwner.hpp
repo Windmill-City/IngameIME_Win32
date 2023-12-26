@@ -18,11 +18,11 @@ class ContextOwner
     , public ITfContextOwner
 {
   protected:
-    InputContextImpl* ctx;
-    DWORD             cookie{TF_INVALID_COOKIE};
+    InputContextImpl* inputCtx;
+    DWORD             cookieOwner{TF_INVALID_COOKIE};
 
   public:
-    ContextOwner(InputContextImpl* ctx);
+    ContextOwner(InputContextImpl* inputCtx);
     ~ContextOwner();
 
   public:

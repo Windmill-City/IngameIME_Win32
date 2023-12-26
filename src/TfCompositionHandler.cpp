@@ -1,7 +1,7 @@
-#include "tf/TfInputModeHandler.hpp"
 #include "tf/TfCompositionHandler.hpp"
 #include "tf/TfContextOwner.hpp"
 #include "tf/TfInputContextImpl.hpp"
+#include "tf/TfInputModeHandler.hpp"
 
 #include "tf/ComBSTR.hpp"
 
@@ -12,6 +12,43 @@ CompositionHandler::CompositionHandler(InputContextImpl* inputCtx)
     : inputCtx(inputCtx)
 {
     eleMgr = inputCtx->threadMgr;
+
+    COM_HR_BEGIN(S_OK);
+
+    ComQIPtr<ITfUIElementMgr> eleMgr(IID_ITfUIElementMgr, inputCtx->threadMgr);
+    ComQIPtr<ITfSource>       source(IID_ITfSource, eleMgr);
+    CHECK_HR(source->AdviseSink(IID_ITfUIElementSink, static_cast<ITfUIElementSink*>(this), &cookieEleSink));
+
+    // This EditCookie is useless
+    TfEditCookie ec;
+    CHECK_HR(inputCtx->docMgr->CreateContext(inputCtx->clientId,
+                                             0,
+                                             static_cast<ITfContextOwnerCompositionSink*>(this),
+                                             &inputCtx->ctx,
+                                             &ec));
+
+    source = inputCtx->ctx;
+    CHECK_HR(source->AdviseSink(IID_ITfTextEditSink, static_cast<ITfTextEditSink*>(this), &cookieEditSink));
+
+    COM_HR_END();
+    COM_HR_THR();
+}
+
+CompositionHandler::~CompositionHandler()
+{
+    if (cookieEleSink != TF_INVALID_COOKIE)
+    {
+        ComQIPtr<ITfSource> source(IID_ITfSource, eleMgr);
+        source->UnadviseSink(cookieEleSink);
+        cookieEleSink = TF_INVALID_COOKIE;
+    }
+
+    if (cookieEditSink != TF_INVALID_EDIT_COOKIE)
+    {
+        ComQIPtr<ITfSource> source(IID_ITfSource, inputCtx->ctx);
+        source->UnadviseSink(cookieEditSink);
+        cookieEditSink = TF_INVALID_EDIT_COOKIE;
+    }
 }
 
 HRESULT STDMETHODCALLTYPE CompositionHandler::OnStartComposition(ITfCompositionView* pComposition, BOOL* pfOk)

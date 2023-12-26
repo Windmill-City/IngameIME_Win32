@@ -1,7 +1,7 @@
-#include "tf/TfInputModeHandler.hpp"
+#include "tf/TfInputContextImpl.hpp"
 #include "tf/TfCompositionHandler.hpp"
 #include "tf/TfContextOwner.hpp"
-#include "tf/TfInputContextImpl.hpp"
+#include "tf/TfInputModeHandler.hpp"
 
 namespace IngameIME::tf
 {
@@ -20,13 +20,14 @@ InputContextImpl::InputContextImpl(const HWND hWnd)
     CHECK_HR(threadMgr->CreateDocumentMgr(&emptyDocMgr));
     CHECK_HR(threadMgr->CreateDocumentMgr(&docMgr));
 
-    CHECK_HR(docMgr->Push(ctx.get()));
-
     // Deactivate input method at initial
     setActivated(false);
 
-    owner  = new ContextOwner(this);
+    // ITfContext is created by CompositionHandler
     h_comp = new CompositionHandler(this);
+    CHECK_HR(docMgr->Push(ctx.get()));
+
+    owner  = new ContextOwner(this);
     h_mode = new InputModeHandler(this);
 
     COM_HR_END();
@@ -35,16 +36,12 @@ InputContextImpl::InputContextImpl(const HWND hWnd)
 
 InputContextImpl::~InputContextImpl()
 {
-    owner.reset();
-    h_comp.reset();
-    h_mode.reset();
+    if (activated) setActivated(false);
+    if (docMgr) docMgr->Pop(TF_POPF_ALL);
 
-    if (ctx)
-    {
-        setActivated(false);
-        docMgr->Pop(TF_POPF_ALL);
-        ctx.reset();
-    }
+    owner.reset();
+    h_mode.reset();
+    h_comp.reset();
 
     if (clientId != TF_CLIENTID_NULL)
     {
@@ -72,8 +69,6 @@ void InputContextImpl::setActivated(const bool activated)
 {
     COM_HR_BEGIN(S_OK);
 
-    this->activated = activated;
-
     ComPtr<ITfDocumentMgr> prevDocumentMgr;
     if (activated)
     {
@@ -84,6 +79,8 @@ void InputContextImpl::setActivated(const bool activated)
         // Focus on empty context so docMgr can deactivate input method
         CHECK_HR(threadMgr->AssociateFocus(hWnd, emptyDocMgr.get(), &prevDocumentMgr));
     }
+
+    this->activated = activated;
 
     COM_HR_END();
     COM_HR_THR();

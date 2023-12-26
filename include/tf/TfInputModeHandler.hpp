@@ -21,12 +21,14 @@ class InputModeHandler
     InputContextImpl*           inputCtx;
     ComQIPtr<ITfCompartmentMgr> compMgr{IID_ITfCompartmentMgr};
     ComPtr<ITfCompartment>      mode;
+    DWORD                       cookieMode{TF_INVALID_COOKIE};
 
   public:
     InputMode inputMode = InputMode::AlphaNumeric;
 
   public:
     InputModeHandler(InputContextImpl* inputCtx);
+    ~InputModeHandler();
 
   public:
     COM_DEF_BEGIN();
