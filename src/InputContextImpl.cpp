@@ -32,4 +32,5 @@ std::string ToUTF8(std::wstring utf16)
     WideCharToMultiByte(CP_UTF8, 0, &utf16[0], (int)utf16.size(), &strTo[0], size_needed, NULL, NULL);
     return strTo;
 }
+
 } // namespace IngameIME
