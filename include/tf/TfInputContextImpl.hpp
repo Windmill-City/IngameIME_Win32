@@ -10,6 +10,10 @@
 
 namespace IngameIME::tf
 {
+class ContextOwner;
+class CompositionHandler;
+class InputModeHandler;
+
 class InputContextImpl : public InputContext
 {
   private:
@@ -47,8 +51,4 @@ class InputContextImpl : public InputContext
     virtual void        setFullScreen(const bool fullscreen) override;
     virtual bool        getFullScreen() const override;
 };
-
-#include "TfCompositionHandler.hpp"
-#include "TfContextOwner.hpp"
-#include "TfInputModeHandler.hpp"
 } // namespace IngameIME::tf

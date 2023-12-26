@@ -1,3 +1,6 @@
+#include "tf/TfInputModeHandler.hpp"
+#include "tf/TfCompositionHandler.hpp"
+#include "tf/TfContextOwner.hpp"
 #include "tf/TfInputContextImpl.hpp"
 
 namespace IngameIME::tf

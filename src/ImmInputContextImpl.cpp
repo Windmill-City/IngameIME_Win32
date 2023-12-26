@@ -59,7 +59,7 @@ LRESULT InputContextImpl::WndProc(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lpa
                 }
             if (wparam == IMN_SETCONVERSIONMODE)
             {
-                // todo: inputmode
+                inputCtx->InputModeCallbackHolder::runCallback(inputCtx->getInputMode());
             }
             break;
         case WM_IME_CHAR:
@@ -165,7 +165,7 @@ InputMode InputContextImpl::getInputMode()
 
 void InputContextImpl::setPreEditRect(const PreEditRect& _rect)
 {
-    this->rect         = rect;
+    this->rect         = _rect;
     InternalRect  rect = _rect;
     CANDIDATEFORM cand;
     cand.dwIndex        = 0;

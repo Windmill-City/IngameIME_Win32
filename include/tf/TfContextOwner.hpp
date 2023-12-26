@@ -1,3 +1,18 @@
+#pragma once
+
+#include "common/InputContextImpl.hpp"
+
+#include <map>
+#include <msctf.h>
+
+#include "ComObjectBase.hpp"
+#include "ComPtr.hpp"
+#include "TfFunction.hpp"
+
+namespace IngameIME::tf
+{
+class InputContextImpl;
+
 class ContextOwner
     : protected ComObjectBase
     , public ITfContextOwner
@@ -46,3 +61,4 @@ class ContextOwner
      */
     HRESULT STDMETHODCALLTYPE GetAttribute(REFGUID rguidAttribute, VARIANT* pvarValue) override;
 };
+} // namespace IngameIME::tf

@@ -1,3 +1,18 @@
+#pragma once
+
+#include "common/InputContextImpl.hpp"
+
+#include <map>
+#include <msctf.h>
+
+#include "ComObjectBase.hpp"
+#include "ComPtr.hpp"
+#include "TfFunction.hpp"
+
+namespace IngameIME::tf
+{
+class InputContextImpl;
+
 class CompositionHandler
     : protected ComObjectBase
     , public ITfContextOwnerCompositionSink
@@ -48,3 +63,4 @@ class CompositionHandler
     HRESULT STDMETHODCALLTYPE UpdateUIElement(DWORD dwUIElementId) override;
     HRESULT STDMETHODCALLTYPE EndUIElement(DWORD dwUIElementId) override;
 };
+} // namespace IngameIME::tf

@@ -1,3 +1,18 @@
+#pragma once
+
+#include "common/InputContextImpl.hpp"
+
+#include <map>
+#include <msctf.h>
+
+#include "ComObjectBase.hpp"
+#include "ComPtr.hpp"
+#include "TfFunction.hpp"
+
+namespace IngameIME::tf
+{
+class InputContextImpl;
+
 class InputModeHandler
     : public ComObjectBase
     , public ITfCompartmentEventSink
@@ -20,3 +35,4 @@ class InputModeHandler
 
     HRESULT STDMETHODCALLTYPE OnChange(REFGUID rguid) override;
 };
+} // namespace IngameIME::tf
