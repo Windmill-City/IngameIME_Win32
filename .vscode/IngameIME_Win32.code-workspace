@@ -10,6 +10,7 @@
 	],
 	"settings": {
 		"C_Cpp.intelliSenseEngine": "default",
+		"C_Cpp.errorSquiggles": "disabled",
 		"files.associations": {
 			"*.json.liquid": "json",
 			"*.yaml.liquid": "yaml",

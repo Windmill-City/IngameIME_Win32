@@ -36,18 +36,21 @@ InputContextImpl::InputContextImpl(const HWND hWnd)
 
 InputContextImpl::~InputContextImpl()
 {
+    COM_HR_BEGIN(S_OK);
     if (activated) setActivated(false);
-    if (docMgr) docMgr->Pop(TF_POPF_ALL);
 
-    owner.reset();
-    h_mode.reset();
-    h_comp.reset();
+    if (owner) owner->UnadviseSink();
+    if (h_comp) h_comp->UnadviseSink();
+    if (h_mode) h_mode->UnadviseSink();
+
+    if (docMgr) CHECK_HR(docMgr->Pop(TF_POPF_ALL));
 
     if (clientId != TF_CLIENTID_NULL)
     {
-        threadMgr->Deactivate();
+        CHECK_HR(threadMgr->Deactivate());
         clientId = TF_CLIENTID_NULL;
     }
+    COM_HR_END();
 }
 
 InputMode InputContextImpl::getInputMode()
@@ -73,6 +76,8 @@ void InputContextImpl::setActivated(const bool activated)
     if (activated)
     {
         CHECK_HR(threadMgr->AssociateFocus(hWnd, docMgr.get(), &prevDocumentMgr));
+        // Notify on activated
+        this->InputModeCallbackHolder::runCallback(h_mode->inputMode);
     }
     else
     {

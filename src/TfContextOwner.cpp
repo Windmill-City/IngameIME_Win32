@@ -17,14 +17,16 @@ ContextOwner::ContextOwner(InputContextImpl* inputCtx)
     COM_HR_THR();
 }
 
-ContextOwner::~ContextOwner()
+void ContextOwner::UnadviseSink()
 {
+    COM_HR_BEGIN(S_OK);
     if (cookieOwner != TF_INVALID_COOKIE)
     {
         ComQIPtr<ITfSource> source(IID_ITfSource, inputCtx->ctx);
-        source->UnadviseSink(cookieOwner);
+        CHECK_HR(source->UnadviseSink(cookieOwner));
         cookieOwner = TF_INVALID_COOKIE;
     }
+    COM_HR_END();
 }
 
 HRESULT STDMETHODCALLTYPE ContextOwner::GetACPFromPoint(const POINT* ptScreen, DWORD dwFlags, LONG* pacp)

@@ -28,7 +28,7 @@ class InputModeHandler
 
   public:
     InputModeHandler(InputContextImpl* inputCtx);
-    ~InputModeHandler();
+    void UnadviseSink();
 
   public:
     COM_DEF_BEGIN();

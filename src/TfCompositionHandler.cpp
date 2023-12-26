@@ -34,21 +34,23 @@ CompositionHandler::CompositionHandler(InputContextImpl* inputCtx)
     COM_HR_THR();
 }
 
-CompositionHandler::~CompositionHandler()
+void CompositionHandler::UnadviseSink()
 {
+    COM_HR_BEGIN(S_OK);
     if (cookieEleSink != TF_INVALID_COOKIE)
     {
         ComQIPtr<ITfSource> source(IID_ITfSource, eleMgr);
-        source->UnadviseSink(cookieEleSink);
+        CHECK_HR(source->UnadviseSink(cookieEleSink));
         cookieEleSink = TF_INVALID_COOKIE;
     }
 
     if (cookieEditSink != TF_INVALID_EDIT_COOKIE)
     {
         ComQIPtr<ITfSource> source(IID_ITfSource, inputCtx->ctx);
-        source->UnadviseSink(cookieEditSink);
+        CHECK_HR(source->UnadviseSink(cookieEditSink));
         cookieEditSink = TF_INVALID_EDIT_COOKIE;
     }
+    COM_HR_END();
 }
 
 HRESULT STDMETHODCALLTYPE CompositionHandler::OnStartComposition(ITfCompositionView* pComposition, BOOL* pfOk)

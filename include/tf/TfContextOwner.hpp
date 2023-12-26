@@ -23,7 +23,7 @@ class ContextOwner
 
   public:
     ContextOwner(InputContextImpl* inputCtx);
-    ~ContextOwner();
+    void UnadviseSink();
 
   public:
     COM_DEF_BEGIN();

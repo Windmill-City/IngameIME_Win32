@@ -31,7 +31,7 @@ class CompositionHandler
 
   public:
     CompositionHandler(InputContextImpl* inputCtx);
-    ~CompositionHandler();
+    void UnadviseSink();
 
   public:
     COM_DEF_BEGIN();

@@ -19,17 +19,29 @@ InputModeHandler::InputModeHandler(InputContextImpl* inputCtx)
     ComQIPtr<ITfSource> source(IID_ITfSource, mode);
     CHECK_HR(source->AdviseSink(IID_ITfCompartmentEventSink, static_cast<ITfCompartmentEventSink*>(this), &cookieMode));
 
+    VARIANT var;
+    mode->GetValue(&var);
+
+    if (var.intVal & TF_CONVERSIONMODE_NATIVE)
+    {
+        inputMode = InputMode::Native;
+    }
+    else
+        inputMode = InputMode::AlphaNumeric;
+
     COM_HR_END();
     COM_HR_THR();
 }
 
-InputModeHandler::~InputModeHandler()
+void InputModeHandler::UnadviseSink()
 {
     if (cookieMode != TF_INVALID_COOKIE)
     {
+        COM_HR_BEGIN(S_OK);
         ComQIPtr<ITfSource> source(IID_ITfSource, mode);
-        source->UnadviseSink(cookieMode);
+        CHECK_HR(source->UnadviseSink(cookieMode));
         cookieMode = TF_INVALID_COOKIE;
+        COM_HR_END();
     }
 }
 
