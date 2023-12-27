@@ -21,7 +21,8 @@ InputContextImpl::InputContextImpl(const HWND hWnd)
     CHECK_HR(threadMgr->CreateDocumentMgr(&docMgr));
 
     // Deactivate input method at initial
-    setActivated(false);
+    ComPtr<ITfDocumentMgr> prevDocumentMgr;
+    CHECK_HR(threadMgr->AssociateFocus(hWnd, emptyDocMgr.get(), &prevDocumentMgr));
 
     // ITfContext is created by CompositionHandler
     h_comp = new CompositionHandler(this);
