@@ -72,6 +72,15 @@ void InputContextImpl::setActivated(const bool activated)
 {
     COM_HR_BEGIN(S_OK);
 
+    if (activated == this->activated) return;
+
+    if (ctx)
+    {
+        ComQIPtr<ITfContextOwnerCompositionServices> services(IID_ITfContextOwnerCompositionServices, ctx);
+        // Pass Null to terminate all the composition
+        services->TerminateComposition(NULL);
+    }
+
     ComPtr<ITfDocumentMgr> prevDocumentMgr;
     if (activated)
     {

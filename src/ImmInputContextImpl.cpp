@@ -34,29 +34,28 @@ LRESULT InputContextImpl::WndProc(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lpa
         case WM_IME_COMPOSITION:
             if (lparam & (GCS_COMPSTR | GCS_CURSORPOS)) inputCtx->procPreEdit();
             if (lparam & GCS_RESULTSTR) inputCtx->procCommit();
-
-            // when lparam == 0 that means current Composition has been
-            // canceled
-            if (lparam) return true;
+            return true;
         case WM_IME_ENDCOMPOSITION:
             inputCtx->PreEditCallbackHolder::runCallback(CompositionState::End, nullptr);
             inputCtx->CandidateListCallbackHolder::runCallback(CandidateListState::End, nullptr);
             return true;
         case WM_IME_NOTIFY:
-            if (inputCtx->fullscreen) switch (wparam)
-                {
-                case IMN_OPENCANDIDATE:
+            switch (wparam)
+            {
+            case IMN_OPENCANDIDATE:
+                if (inputCtx->fullscreen)
                     inputCtx->CandidateListCallbackHolder::runCallback(CandidateListState::Begin, nullptr);
-                    return true;
-                case IMN_CHANGECANDIDATE:
-                    inputCtx->procCand();
-                    return true;
-                case IMN_CLOSECANDIDATE:
+                return true;
+            case IMN_CHANGECANDIDATE:
+                if (inputCtx->fullscreen) inputCtx->procCand();
+                return true;
+            case IMN_CLOSECANDIDATE:
+                if (inputCtx->fullscreen)
                     inputCtx->CandidateListCallbackHolder::runCallback(CandidateListState::End, nullptr);
-                    return true;
-                default:
-                    break;
-                }
+                return true;
+            default:
+                break;
+            }
             if (wparam == IMN_SETCONVERSIONMODE)
             {
                 inputCtx->InputModeCallbackHolder::runCallback(inputCtx->getInputMode());
@@ -80,12 +79,16 @@ IngameIME::imm::InputContextImpl::InputContextImpl(const HWND hWnd)
     ctx = ImmAssociateContext(hWnd, NULL);
 
     prevProc = (WNDPROC)SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)InputContextImpl::WndProc);
+
+    ActiveContexts.emplace_front(this);
 }
 
 InputContextImpl::~InputContextImpl()
 {
     ImmAssociateContextEx(hWnd, NULL, IACE_DEFAULT);
     SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)prevProc);
+
+    ActiveContexts.remove(this);
 }
 
 void InputContextImpl::procPreEdit()
@@ -190,12 +193,21 @@ PreEditRect InputContextImpl::getPreEditRect()
 
 void InputContextImpl::setActivated(const bool activated)
 {
-    this->activated = activated;
-
+    if (activated == this->activated) return;
     if (activated)
+    {
         ImmAssociateContext(hWnd, ctx);
+        InputModeCallbackHolder::runCallback(getInputMode());
+    }
     else
+    {
+        ImmNotifyIME(ctx, NI_COMPOSITIONSTR, CPS_CANCEL, NULL);
         ImmAssociateContext(hWnd, NULL);
+        // Some input method does not send message correctly, force end on deactivated
+        PreEditCallbackHolder::runCallback(CompositionState::End, nullptr);
+        CandidateListCallbackHolder::runCallback(CandidateListState::End, nullptr);
+    }
+    this->activated = activated;
 }
 
 bool InputContextImpl::getActivated() const
@@ -206,13 +218,6 @@ bool InputContextImpl::getActivated() const
 void InputContextImpl::setFullScreen(const bool fullscreen)
 {
     this->fullscreen = fullscreen;
-
-    if (activated)
-    {
-        // Refresh InputContext
-        ImmAssociateContext(hWnd, NULL);
-        ImmAssociateContext(hWnd, ctx);
-    }
 }
 
 bool InputContextImpl::getFullScreen() const
