@@ -33,8 +33,6 @@ class InputContextImpl : public InputContext
     ComPtr<CompositionHandler> h_comp;
     ComPtr<InputModeHandler>   h_mode;
 
-    PreEditRect rect;
-
     bool activated{false};
 
   public:
@@ -42,10 +40,8 @@ class InputContextImpl : public InputContext
     ~InputContextImpl();
 
   public:
-    virtual InputMode   getInputMode() override;
-    virtual void        setPreEditRect(const PreEditRect& rect) override;
-    virtual PreEditRect getPreEditRect() override;
-    virtual void        setActivated(const bool activated) override;
-    virtual bool        getActivated() const override;
+    virtual InputMode getInputMode() override;
+    virtual void      setActivated(const bool activated) override;
+    virtual bool      getActivated() const override;
 };
 } // namespace IngameIME::tf

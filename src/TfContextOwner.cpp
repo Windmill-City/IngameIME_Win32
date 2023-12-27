@@ -36,11 +36,7 @@ HRESULT STDMETHODCALLTYPE ContextOwner::GetACPFromPoint(const POINT* ptScreen, D
 
 HRESULT STDMETHODCALLTYPE ContextOwner::GetTextExt(LONG acpStart, LONG acpEnd, RECT* prc, BOOL* pfClipped)
 {
-    InternalRect rect = inputCtx->getPreEditRect();
-    *prc              = rect;
-    // Map window coordinate to screen coordinate
-    MapWindowPoints(inputCtx->hWnd, NULL, (LPPOINT)prc, 2);
-    return S_OK;
+    return TS_E_NOLAYOUT;
 }
 
 HRESULT STDMETHODCALLTYPE ContextOwner::GetScreenExt(RECT* prc)

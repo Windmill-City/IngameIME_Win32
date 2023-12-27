@@ -59,16 +59,6 @@ InputMode InputContextImpl::getInputMode()
     return h_mode->inputMode;
 }
 
-void InputContextImpl::setPreEditRect(const PreEditRect& rect)
-{
-    this->rect = rect;
-}
-
-PreEditRect InputContextImpl::getPreEditRect()
-{
-    return rect;
-}
-
 void InputContextImpl::setActivated(const bool activated)
 {
     COM_HR_BEGIN(S_OK);
