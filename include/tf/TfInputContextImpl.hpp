@@ -36,7 +36,6 @@ class InputContextImpl : public InputContext
     PreEditRect rect;
 
     bool activated{false};
-    bool fullscreen{false};
 
   public:
     InputContextImpl(const HWND hWnd);
@@ -48,7 +47,5 @@ class InputContextImpl : public InputContext
     virtual PreEditRect getPreEditRect() override;
     virtual void        setActivated(const bool activated) override;
     virtual bool        getActivated() const override;
-    virtual void        setFullScreen(const bool fullscreen) override;
-    virtual bool        getFullScreen() const override;
 };
 } // namespace IngameIME::tf

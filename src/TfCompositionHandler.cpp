@@ -160,8 +160,8 @@ HRESULT STDMETHODCALLTYPE CompositionHandler::BeginUIElement(DWORD dwUIElementId
     if (dwUIElementId == TF_INVALID_UIELEMENTID) return E_INVALIDARG;
     if (!pbShow) return E_INVALIDARG;
 
-    // Set if CandidateWindow should display
-    *pbShow = !inputCtx->fullscreen;
+    // Hide Candidate Window
+    *pbShow = false;
 
     ComPtr<ITfUIElement> uiEle;
     CHECK_HR(eleMgr->GetUIElement(dwUIElementId, &uiEle));

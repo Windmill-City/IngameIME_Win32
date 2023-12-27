@@ -17,16 +17,15 @@ LRESULT InputContextImpl::WndProc(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lpa
     {
         switch (msg)
         {
+        case WM_INPUTLANGCHANGE:
+            inputCtx->InputModeCallbackHolder::runCallback(inputCtx->getInputMode());
+            return true;
         case WM_IME_SETCONTEXT:
             // We should always hide Composition Window to make the
             // PreEditCallback work
             lparam &= ~ISC_SHOWUICOMPOSITIONWINDOW;
-
-            if (inputCtx->fullscreen)
-            {
-                // Hide Candidate Window
-                lparam &= ~ISC_SHOWUICANDIDATEWINDOW;
-            }
+            // Hide Candidate Window
+            lparam &= ~ISC_SHOWUICANDIDATEWINDOW;
             break;
         case WM_IME_STARTCOMPOSITION:
             inputCtx->PreEditCallbackHolder::runCallback(CompositionState::Begin, nullptr);
@@ -43,15 +42,13 @@ LRESULT InputContextImpl::WndProc(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lpa
             switch (wparam)
             {
             case IMN_OPENCANDIDATE:
-                if (inputCtx->fullscreen)
-                    inputCtx->CandidateListCallbackHolder::runCallback(CandidateListState::Begin, nullptr);
+                inputCtx->CandidateListCallbackHolder::runCallback(CandidateListState::Begin, nullptr);
                 return true;
             case IMN_CHANGECANDIDATE:
-                if (inputCtx->fullscreen) inputCtx->procCand();
+                inputCtx->procCand();
                 return true;
             case IMN_CLOSECANDIDATE:
-                if (inputCtx->fullscreen)
-                    inputCtx->CandidateListCallbackHolder::runCallback(CandidateListState::End, nullptr);
+                inputCtx->CandidateListCallbackHolder::runCallback(CandidateListState::End, nullptr);
                 return true;
             default:
                 break;
@@ -159,11 +156,8 @@ InputMode InputContextImpl::getInputMode()
 {
     DWORD mode;
     ImmGetConversionStatus(ctx, &mode, NULL);
-
-    if (mode & IME_CMODE_NATIVE)
-        return InputMode::Native;
-    else
-        return InputMode::AlphaNumeric;
+    if (mode & IME_CMODE_NATIVE) return InputMode::Native;
+    return InputMode::AlphaNumeric;
 }
 
 void InputContextImpl::setPreEditRect(const PreEditRect& _rect)
@@ -214,15 +208,4 @@ bool InputContextImpl::getActivated() const
 {
     return activated;
 }
-
-void InputContextImpl::setFullScreen(const bool fullscreen)
-{
-    this->fullscreen = fullscreen;
-}
-
-bool InputContextImpl::getFullScreen() const
-{
-    return fullscreen;
-}
-
 } // namespace IngameIME::imm

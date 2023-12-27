@@ -105,14 +105,4 @@ bool InputContextImpl::getActivated() const
 {
     return activated;
 }
-
-void InputContextImpl::setFullScreen(const bool fullscreen)
-{
-    this->fullscreen = fullscreen;
-}
-
-bool InputContextImpl::getFullScreen() const
-{
-    return fullscreen;
-}
 } // namespace IngameIME::tf

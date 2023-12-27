@@ -22,7 +22,6 @@ class InputContextImpl : public InputContext
     HIMC ctx;
 
     bool activated{false};
-    bool fullscreen{false};
     PreEditRect rect;
 
   public:
@@ -53,7 +52,5 @@ class InputContextImpl : public InputContext
     virtual PreEditRect getPreEditRect() override;
     virtual void        setActivated(const bool activated) override;
     virtual bool        getActivated() const override;
-    virtual void        setFullScreen(const bool fullscreen) override;
-    virtual bool        getFullScreen() const override;
 };
 } // namespace IngameIME::imm
