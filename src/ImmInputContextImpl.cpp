@@ -160,6 +160,31 @@ InputMode InputContextImpl::getInputMode()
     return InputMode::AlphaNumeric;
 }
 
+void InputContextImpl::setPreEditRect(const PreEditRect& _rect)
+{
+    this->rect         = _rect;
+    InternalRect  rect = _rect;
+    CANDIDATEFORM cand;
+    cand.dwIndex        = 0;
+    cand.dwStyle        = CFS_EXCLUDE;
+    cand.ptCurrentPos.x = rect.x;
+    cand.ptCurrentPos.y = rect.y;
+    cand.rcArea         = rect;
+    ImmSetCandidateWindow(ctx, &cand);
+
+    COMPOSITIONFORM comp;
+    comp.dwStyle        = CFS_RECT;
+    comp.ptCurrentPos.x = rect.x;
+    comp.ptCurrentPos.y = rect.y;
+    comp.rcArea         = rect;
+    ImmSetCompositionWindow(ctx, &comp);
+}
+
+PreEditRect InputContextImpl::getPreEditRect()
+{
+    return this->rect;
+}
+
 void InputContextImpl::setActivated(const bool activated)
 {
     if (activated == this->activated) return;

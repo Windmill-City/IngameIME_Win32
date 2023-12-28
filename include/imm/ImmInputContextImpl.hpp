@@ -13,13 +13,16 @@ class InputContextImpl : public InputContext
 {
   protected:
     static std::list<InputContextImpl*> ActiveContexts;
-    static LRESULT                      WndProc(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam);
+    static LRESULT WndProc(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
   protected:
     HWND    hWnd;
     WNDPROC prevProc;
+
     HIMC ctx;
+
     bool activated{false};
+    PreEditRect rect;
 
   public:
     InputContextImpl(const HWND hWnd);
@@ -35,13 +38,19 @@ class InputContextImpl : public InputContext
      */
     void procCommit();
     /**
+     * @brief Set CandidateList window's position for current Composition
+     */
+    void setPreEditRect(InternalRect& rect);
+    /**
      * @brief Retrive CandidateList infomation for application to draw
      */
     void procCand();
 
   public:
-    virtual InputMode getInputMode() override;
-    virtual void      setActivated(const bool activated) override;
-    virtual bool      getActivated() const override;
+    virtual InputMode   getInputMode() override;
+    virtual void        setPreEditRect(const PreEditRect& rect) override;
+    virtual PreEditRect getPreEditRect() override;
+    virtual void        setActivated(const bool activated) override;
+    virtual bool        getActivated() const override;
 };
 } // namespace IngameIME::imm
