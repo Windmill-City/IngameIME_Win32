@@ -73,7 +73,31 @@
 			"new": "cpp",
 			"xfacet": "cpp",
 			"xstddef": "cpp",
-			"xtr1common": "cpp"
+			"xtr1common": "cpp",
+			"format": "c",
+			"any": "cpp",
+			"array": "cpp",
+			"charconv": "cpp",
+			"chrono": "cpp",
+			"codecvt": "cpp",
+			"condition_variable": "cpp",
+			"csignal": "cpp",
+			"deque": "cpp",
+			"filesystem": "cpp",
+			"forward_list": "cpp",
+			"fstream": "cpp",
+			"iomanip": "cpp",
+			"locale": "cpp",
+			"ratio": "cpp",
+			"set": "cpp",
+			"span": "cpp",
+			"sstream": "cpp",
+			"unordered_set": "cpp",
+			"variant": "cpp",
+			"xlocbuf": "cpp",
+			"xlocmes": "cpp",
+			"xlocmon": "cpp",
+			"xloctime": "cpp"
 		}
 	}
 }
