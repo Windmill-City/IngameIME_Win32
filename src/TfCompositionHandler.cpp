@@ -11,13 +11,15 @@ namespace IngameIME::tf
 CompositionHandler::CompositionHandler(InputContextImpl* inputCtx)
     : inputCtx(inputCtx)
 {
-    eleMgr = inputCtx->threadMgr;
-
     COM_HR_BEGIN(S_OK);
 
-    ComQIPtr<ITfUIElementMgr> eleMgr(IID_ITfUIElementMgr, inputCtx->threadMgr);
-    ComQIPtr<ITfSource>       source(IID_ITfSource, eleMgr);
-    CHECK_HR(source->AdviseSink(IID_ITfUIElementSink, static_cast<ITfUIElementSink*>(this), &cookieEleSink));
+    if (inputCtx->uiLess)
+    {
+        eleMgr = inputCtx->threadMgr;
+        ComQIPtr<ITfUIElementMgr> eleMgr(IID_ITfUIElementMgr, inputCtx->threadMgr);
+        ComQIPtr<ITfSource>       source(IID_ITfSource, eleMgr);
+        CHECK_HR(source->AdviseSink(IID_ITfUIElementSink, static_cast<ITfUIElementSink*>(this), &cookieEleSink));
+    }
 
     // This EditCookie is useless
     TfEditCookie ec;
@@ -27,7 +29,7 @@ CompositionHandler::CompositionHandler(InputContextImpl* inputCtx)
                                              &inputCtx->ctx,
                                              &ec));
 
-    source = inputCtx->ctx;
+    ComQIPtr<ITfSource> source(IID_ITfSource, inputCtx->ctx);
     CHECK_HR(source->AdviseSink(IID_ITfTextEditSink, static_cast<ITfTextEditSink*>(this), &cookieEditSink));
 
     COM_HR_END();

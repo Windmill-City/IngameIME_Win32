@@ -5,8 +5,9 @@
 
 namespace IngameIME::tf
 {
-InputContextImpl::InputContextImpl(const HWND hWnd)
+InputContextImpl::InputContextImpl(const HWND hWnd, const bool uiLess)
     : hWnd(hWnd)
+    , uiLess(uiLess)
 {
     COM_HR_BEGIN(S_OK);
 
@@ -15,7 +16,14 @@ InputContextImpl::InputContextImpl(const HWND hWnd)
     CHECK_HR(getThreadMgr(&threadMgr));
 
     ComQIPtr<ITfThreadMgrEx> threadMgrEx(IID_ITfThreadMgrEx, threadMgr);
-    CHECK_HR(threadMgrEx->ActivateEx(&clientId, TF_TMAE_UIELEMENTENABLEDONLY));
+    if (uiLess)
+    {
+        CHECK_HR(threadMgrEx->ActivateEx(&clientId, TF_TMAE_UIELEMENTENABLEDONLY));
+    }
+    else
+    {
+        CHECK_HR(threadMgrEx->Activate(&clientId));
+    }
 
     CHECK_HR(threadMgr->CreateDocumentMgr(&emptyDocMgr));
     CHECK_HR(threadMgr->CreateDocumentMgr(&docMgr));

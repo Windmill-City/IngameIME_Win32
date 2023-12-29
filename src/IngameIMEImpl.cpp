@@ -5,11 +5,11 @@
 
 namespace IngameIME
 {
-InputContext* CreateInputContextWin32(HWND hWnd, API api)
+InputContext* CreateInputContextWin32(const HWND hWnd, const API api, const bool uiLess)
 {
     if (api == API::TextServiceFramework)
-        return new tf::InputContextImpl(hWnd);
+        return new tf::InputContextImpl(hWnd, uiLess);
     else
-        return new imm::InputContextImpl(hWnd);
+        return new imm::InputContextImpl(hWnd, uiLess);
 }
 } // namespace IngameIME

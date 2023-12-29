@@ -25,7 +25,7 @@ LRESULT InputContextImpl::WndProc(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lpa
             // PreEditCallback work
             lparam &= ~ISC_SHOWUICOMPOSITIONWINDOW;
             // Hide Candidate Window
-            lparam &= ~ISC_SHOWUICANDIDATEWINDOW;
+            if (inputCtx->uiLess) lparam &= ~ISC_SHOWUICANDIDATEWINDOW;
             break;
         case WM_IME_STARTCOMPOSITION:
             inputCtx->PreEditCallbackHolder::runCallback(CompositionState::Begin, nullptr);
@@ -39,20 +39,20 @@ LRESULT InputContextImpl::WndProc(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lpa
             inputCtx->CandidateListCallbackHolder::runCallback(CandidateListState::End, nullptr);
             return true;
         case WM_IME_NOTIFY:
-            switch (wparam)
-            {
-            case IMN_OPENCANDIDATE:
-                inputCtx->CandidateListCallbackHolder::runCallback(CandidateListState::Begin, nullptr);
-                return true;
-            case IMN_CHANGECANDIDATE:
-                inputCtx->procCand();
-                return true;
-            case IMN_CLOSECANDIDATE:
-                inputCtx->CandidateListCallbackHolder::runCallback(CandidateListState::End, nullptr);
-                return true;
-            default:
-                break;
-            }
+            if (inputCtx->uiLess) switch (wparam)
+                {
+                case IMN_OPENCANDIDATE:
+                    inputCtx->CandidateListCallbackHolder::runCallback(CandidateListState::Begin, nullptr);
+                    return true;
+                case IMN_CHANGECANDIDATE:
+                    inputCtx->procCand();
+                    return true;
+                case IMN_CLOSECANDIDATE:
+                    inputCtx->CandidateListCallbackHolder::runCallback(CandidateListState::End, nullptr);
+                    return true;
+                default:
+                    break;
+                }
             if (wparam == IMN_SETCONVERSIONMODE)
             {
                 inputCtx->InputModeCallbackHolder::runCallback(inputCtx->getInputMode());
@@ -68,8 +68,9 @@ LRESULT InputContextImpl::WndProc(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lpa
     return DefWindowProcW(hWnd, msg, wparam, lparam);
 }
 
-IngameIME::imm::InputContextImpl::InputContextImpl(const HWND hWnd)
+IngameIME::imm::InputContextImpl::InputContextImpl(const HWND hWnd, const bool uiLess)
     : hWnd(hWnd)
+    , uiLess(uiLess)
 {
     // Reset to default context
     ImmAssociateContextEx(hWnd, NULL, IACE_DEFAULT);

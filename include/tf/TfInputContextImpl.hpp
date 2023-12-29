@@ -35,10 +35,11 @@ class InputContextImpl : public InputContext
 
     PreEditRect rect;
 
-    bool activated{false};
+    bool activated = false;
+    bool uiLess    = false;
 
   public:
-    InputContextImpl(const HWND hWnd);
+    InputContextImpl(const HWND hWnd, const bool uiLess);
     ~InputContextImpl();
 
   public:
