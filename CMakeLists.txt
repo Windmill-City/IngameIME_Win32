@@ -73,6 +73,13 @@ if(Binding_Java)
   target_link_libraries(IngameIME_Java PRIVATE IngameIME_Static JNI::JNI)
   set_property(TARGET IngameIME_Java PROPERTY SWIG_COMPILE_DEFINITIONS $<${WIN32}:_WIN32>)
   set_property(TARGET IngameIME_Java PROPERTY SWIG_COMPILE_OPTIONS "-package;ingameime")
+
+  # Pack lib
+  install(TARGETS IngameIME_Java LIBRARY DESTINATION bin)
+
+  # Pack java files
+  file(GLOB_RECURSE JAVA_FILES ${CMAKE_BINARY_DIR}/java/*.java)
+  install(FILES ${JAVA_FILES} DESTINATION java/ingameime)
 endif(Binding_Java)
 
 # ##############################################################################
@@ -85,9 +92,9 @@ install(TARGETS IngameIME_Static IngameIME_Shared)
 # Pack
 set(CPACK_PACKAGE_FILE_NAME
   ${CMAKE_PROJECT_NAME}-${CMAKE_VS_PLATFORM_NAME}-${VERSION})
-set(CPACK_PACKAGE_VENDOR " Windmill_City ")
-set(CPACK_PACKAGE_CHECKSUM " SHA1 ")
-set(CPACK_GENERATOR " ZIP ")
+set(CPACK_PACKAGE_VENDOR "Windmill_City")
+set(CPACK_PACKAGE_CHECKSUM "SHA1")
+set(CPACK_GENERATOR "ZIP")
 
 set(CPACK_PACKAGE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/pack)
 
