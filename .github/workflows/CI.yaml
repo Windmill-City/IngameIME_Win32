@@ -29,7 +29,7 @@ jobs:
         run: cmake -B build -A ${{matrix.target}} -D Binding_Java=ON
 
       - name: Build
-        run: cmake --build build --config Release --target ALL_BUILD && tree
+        run: cmake --build build --config Release --target ALL_BUILD && tree build/java /A /F
 
       - name: Pack
         if: startsWith(github.ref, 'refs/tags/')
