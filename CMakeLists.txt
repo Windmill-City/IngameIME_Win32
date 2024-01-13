@@ -67,8 +67,8 @@ if(Binding_Java)
     IngameIME_Java
     LANGUAGE java
     SOURCES IngameIME-Common/src/IngameIME.i
-    OUTFILE_DIR ${CMAKE_BINARY_DIR}/java_native
-    OUTPUT_DIR ${CMAKE_BINARY_DIR}/java/ingameime
+    OUTFILE_DIR java_native
+    OUTPUT_DIR java/ingameime
   )
   target_link_libraries(IngameIME_Java PRIVATE IngameIME_Static JNI::JNI)
   set_property(TARGET IngameIME_Java PROPERTY SWIG_COMPILE_DEFINITIONS $<${WIN32}:_WIN32>)
@@ -76,10 +76,7 @@ if(Binding_Java)
 
   # Pack lib
   install(TARGETS IngameIME_Java LIBRARY DESTINATION bin)
-
-  # Pack java files
-  file(GLOB_RECURSE JAVA_FILES ${CMAKE_BINARY_DIR}/java/*.java)
-  install(FILES ${JAVA_FILES} DESTINATION java/ingameime)
+  install(DIRECTORY ${CMAKE_BINARY_DIR}/java/ingameime DESTINATION java)
 endif(Binding_Java)
 
 # ##############################################################################
